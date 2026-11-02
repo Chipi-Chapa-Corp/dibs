@@ -4,7 +4,7 @@ import {mkdtempSync,mkdirSync,readFileSync,readdirSync,writeFileSync,rmSync,exis
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {openGameStore} from '../server/storage.ts';
-import {createGame,addPlayer,act} from '../server/engine.ts';
+import {createGame,addPlayer,act,tick,view} from '../server/engine.ts';
 import {demoRounds} from '../shared/model.ts';
 
 function fixture(){
@@ -171,5 +171,20 @@ test('legacy active countdowns are discarded on load and cannot return through u
   act(restored,'undo');assert.equal(restored.players[0].score,0);assert(!JSON.stringify(restored).includes('timer'));
   act(restored,'buzz',{},'player',player.id,86400000);assert.equal(restored.current?.answeringId,player.id);
   store.save(restored);assert(!readFileSync(file,'utf8').includes('timer'));assert(!('timer' in f.load().games.get(game.id)!.current!));
+ }finally{f.remove();}
+});
+
+
+test('a pending selection survives restart and opens once, while older saves default to no selection',()=>{
+ const f=fixture();
+ try{
+  const game=createGame({definition:{rounds:demoRounds()}}),q=game.rounds[0].categories[0].questions[0];
+  act(game,'start');act(game,'selectQuestion',{questionId:q.id},'host',null,1000);
+  const store=f.load();store.save(game);
+  const restored=f.load().games.get(game.id)!;
+  assert.deepEqual(restored.selection,game.selection);assert.equal(restored.current,null);assert(!tick(restored,1799));assert(tick(restored,1800));assert.equal(view(restored,'host').current?.questionId,q.id);assert.equal(restored.questionCount,1);assert.equal(restored.selection,null);assert(!tick(restored,2000));
+  const legacy=JSON.parse(JSON.stringify(restored));delete legacy.selection;for(const snapshot of legacy.undo)delete snapshot.selection;
+  write(join(f.directory,`${game.id}.json`),legacy);const old=f.load().games.get(game.id)!;
+  assert.equal(old.selection,null);act(old,'undo');assert.equal(old.selection,null);
  }finally{f.remove();}
 });

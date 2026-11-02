@@ -27,17 +27,20 @@ test('real clients: discovery, auth, concurrent buzzes, synchronized scores, red
  const host=await connect('host',created.hostToken),a=await connect('player',pa.token),b=await connect('player',pb.token),stage=await connect('stage');assert(host.sub.ok&&a.sub.ok&&b.sub.ok&&stage.sub.ok);const fake=await connect('host','bad-key');assert.equal(fake.sub.ok,false);
  assert.equal((await emit(a.s,'command',{action:'adjust',data:{playerId:pa.playerId,amount:99999}})).ok,false);
  const q=host.state().rounds[0].categories[0].questions[0];assert.equal(stage.state().rounds[0].categories[0].questions[0].answer,'');
- await emit(host.s,'command',{action:'start'});await emit(host.s,'command',{action:'openQuestion',data:{questionId:q.id}});await emit(host.s,'command',{action:'openBuzzers'});const results=await Promise.all([emit(a.s,'command',{action:'buzz'}),emit(b.s,'command',{action:'buzz'})]);assert.equal(results.filter(r=>r.ok).length,1);
+ await emit(host.s,'command',{action:'start'});await emit(host.s,'command',{action:'selectQuestion',data:{questionId:q.id}});
+ await waitState(stage,v=>v.selection?.questionId===q.id);await waitState(a,v=>v.selection?.questionId===q.id);
+ assert.equal(stage.state().currentQuestion,null);assert.equal(a.state().current,null);assert.equal((await emit(a.s,'command',{action:'buzz'})).ok,false);
+ await waitState(host,v=>v.current?.questionId===q.id&&!v.selection);
+ await emit(host.s,'command',{action:'openBuzzers'});const results=await Promise.all([emit(a.s,'command',{action:'buzz'}),emit(b.s,'command',{action:'buzz'})]);assert.equal(results.filter(r=>r.ok).length,1);
  const winner=host.state().current!.answeringId!;await emit(host.s,'command',{action:'judge',data:{correct:true}});assert.equal(host.state().players.find(p=>p.id===winner)?.score,100);assert.equal(stage.state().currentQuestion?.answer,'');assert.equal(a.state().currentQuestion?.answer,'');
  const again=await request(`/api/games/${created.id}/join`,{token:pa.token,name:'Ada'});assert.equal(again.playerId,pa.playerId);assert.equal((await request(`/api/games/${created.id}`)).players.length,2);
  const json=JSON.stringify(stage.state());assert(!json.includes(created.hostToken));assert(!json.includes(pa.token));
- await emit(host.s,'command',{action:'closeQuestion'});await emit(host.s,'command',{action:'save',data:{settings:{selection:'winner'}}});assert(!('selection' in host.state().settings));
+ await emit(host.s,'command',{action:'closeQuestion'});assert.equal((await emit(host.s,'command',{action:'save',data:{settings:{selection:'winner'}}})).ok,false);assert(!('selection' in host.state().settings));
  assert.equal((await emit(a.s,'command',{action:'selectQuestion',data:{questionId:mystery.id}})).ok,false);
  assert.equal((await emit(b.s,'command',{action:'selectQuestion',data:{questionId:mystery.id}})).ok,false);
  assert.equal((await emit(host.s,'command',{action:'openQuestion',data:{questionId:mystery.id}})).ok,true);
  await waitState(stage,v=>v.current?.questionId===mystery.id);await waitState(a,v=>v.current?.questionId===mystery.id);
  assert.equal(stage.state().current?.phase,'modifier');assert(!JSON.stringify(stage.state()).includes(mystery.modifier.instructions));assert(!JSON.stringify(a.state()).includes(mystery.modifier.title));
- await emit(host.s,'command',{action:'save',data:{settings:{revealDelayMs:0}}});
  const claimResults=await Promise.all([emit(a.s,'command',{action:'buzz'}),emit(b.s,'command',{action:'buzz'})]);assert.equal(claimResults.filter(r=>r.ok).length,1);
  await waitState(stage,v=>!!v.current?.revealed);await waitState(host,v=>v.modifierClaims.length===1);
  assert.equal(stage.state().currentQuestion?.modifier?.instructions,mystery.modifier.instructions);assert.equal(host.state().modifierClaims.length,1);
@@ -163,5 +166,35 @@ test('reset returns host and stage to the lobby, revokes players, preserves the 
   assert.equal((await connect('host',created.hostToken)).sub.ok,true);assert.equal((await connect('player',pa.token)).sub.ok,false);
   const fresh=await post(`/api/games/${created.id}/join`,{name:'Ada'});assert(fresh.token);assert.notEqual(fresh.token,pa.token);
   const phone=await connect('player',fresh.token);assert(phone.sub.ok);assert.equal(phone.state().players.find(p=>p.id===fresh.playerId)?.score,0);assert.equal(phone.state().players.find(p=>p.id===fresh.playerId)?.ready,false);
+ }finally{sockets.forEach(s=>s.disconnect());await server.close();rmSync(dir,{recursive:true,force:true});}
+});
+
+test('library preparation saves before hosting; stale editors cannot change a running game and copies start fresh',async()=>{
+ const dir=mkdtempSync(join(tmpdir(),'dibs-prepare-'));const server=await startServer({port:0,dataDir:dir,dev:false,quiet:true});const sockets:Socket[]=[];
+ try{
+  const base=`http://127.0.0.1:${(server.server.address()as{port:number}).port}`;
+  const post=async(path:string,data:unknown)=>(await fetch(base+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})).json();
+  const created=await post('/api/games',{name:'Prepared in advance'});
+  const connect=async(token:string,gameId=created.id)=>{
+   const s=io(base,{autoConnect:false,transports:['websocket']});sockets.push(s);s.connect();await once(s,'connect');
+   assert.equal((await emit(s,'subscribe',{gameId,role:'host',token})).ok,true);return s;
+  };
+  const editor=await connect(created.hostToken),host=await connect(created.hostToken);
+  const rounds=demoRounds();rounds[0].categories[0].questions[0].notes='Keep these notes';rounds[0].categories[0].questions[1].dailyDouble=true;
+  rounds[1].categories[0].questions[0].modifier={title:'Prepared surprise',instructions:'Apply this manually.'};
+  assert.equal((await emit(editor,'command',{action:'save',data:{rounds,settings:{revealDelayMs:0},theme:{title:'Prepared theme'}}})).ok,true);
+  const before=await (await fetch(`${base}/api/games/${created.id}/export`,{headers:{Authorization:`Bearer ${created.hostToken}`}})).json();
+  const list=await (await fetch(base+'/api/games')).json();assert.equal(list.find((g:{id:string})=>g.id===created.id).questionTotal,41);
+  const player=await post(`/api/games/${created.id}/join`,{name:'Ada'});
+  await emit(host,'command',{action:'start'});await emit(host,'command',{action:'adjust',data:{playerId:player.playerId,amount:700}});
+  const rejected=await emit(editor,'command',{action:'save',data:{rounds:[],name:'Must not change',settings:{startingScore:999},theme:{title:'Must not change'}}});
+  assert.equal(rejected.ok,false);assert.match(rejected.error,/Make a copy to edit/);
+  assert.equal((await fetch(`${base}/api/games/${created.id}/media`,{method:'POST',headers:{Authorization:`Bearer ${created.hostToken}`}})).status,400);
+  const exported=await (await fetch(`${base}/api/games/${created.id}/export`,{headers:{Authorization:`Bearer ${created.hostToken}`}})).json();assert.deepEqual(exported,before);
+  const copied=await post('/api/games',{name:before.name+' (copy)',definition:{...before,name:before.name+' (copy)'}});
+  assert.notEqual(copied.id,created.id);assert.notEqual(copied.hostToken,created.hostToken);
+  const copy=server.games.get(copied.id)!;assert.equal(copy.status,'lobby');assert.deepEqual(copy.players,[]);assert.deepEqual(copy.played,[]);assert.equal(copy.current,null);assert.deepEqual(copy.undo,[]);assert.deepEqual(copy.rounds,before.rounds);assert.deepEqual(copy.settings,before.settings);assert.deepEqual(copy.theme,before.theme);
+  const copyEditor=await connect(copied.hostToken,copied.id);assert.equal((await emit(copyEditor,'command',{action:'save',data:{name:'Next event'}})).ok,true);
+  assert.equal(server.games.get(created.id)!.players[0].score,700);assert.equal(server.games.get(created.id)!.name,before.name);assert.equal(copy.name,'Next event');
  }finally{sockets.forEach(s=>s.disconnect());await server.close();rmSync(dir,{recursive:true,force:true});}
 });

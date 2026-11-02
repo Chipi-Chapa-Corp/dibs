@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {createGame,normalizeStoredGameplay,updateDefinition} from './engine.ts';
 import type {Game} from '../shared/model.ts';
+import {isQuestionFilled} from '../shared/model.ts';
 
 type RecordValue=Record<string,any>;
 const validId=(value:unknown):value is string=>typeof value==='string'&&/^[A-Z0-9_-]{1,60}$/.test(value);
@@ -16,6 +17,7 @@ function restore(value:unknown):Game{
   if(!Array.isArray(value.played)||!Array.isArray(value.history)||!Array.isArray(value.undo))throw new Error('Invalid game history');
   for(const p of value.players)if(!object(p)||typeof p.id!=='string'||typeof p.token!=='string'||!Number.isFinite(p.score))throw new Error('Invalid saved player');
   if(value.current!==null&&(!object(value.current)||!object(value.current.wagers)||!Array.isArray(value.current.buzzes)||!Array.isArray(value.current.attempted)||!['question','wager','final','modifier'].includes(value.current.phase)))throw new Error('Invalid active question');
+  if(value.selection!=null&&(!object(value.selection)||typeof value.selection.questionId!=='string'||!Number.isFinite(value.selection.opensAt)||value.current!==null))throw new Error('Invalid question selection');
   if(value.modifierClaims!==undefined&&!Array.isArray(value.modifierClaims))throw new Error('Invalid modifier reminders');
   const {format:_format,modifiers:_legacyModifiers,uses:_legacyUses,chooserId:_legacyChooserId,...stored}=value;
   const game=stored as Game;
@@ -25,6 +27,7 @@ function restore(value:unknown):Game{
   normalizeStoredGameplay(game);
   for(const snapshot of game.undo)if(object(snapshot)&&object(snapshot.settings)&&Array.isArray(snapshot.rounds))normalizeStoredGameplay(snapshot as Game);
   updateDefinition(game,{rounds:game.rounds});
+  if(game.selection){const question=game.rounds[game.roundIndex].categories.flatMap(c=>c.questions).find(q=>q.id===game.selection!.questionId);if(!question||!isQuestionFilled(question)||game.played.includes(question.id)||game.status!=='playing')throw new Error('Invalid selected question');}
   game.players.forEach(p=>p.connected=false);
   return game;
 }

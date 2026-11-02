@@ -10,6 +10,7 @@ import {fileURLToPath} from 'node:url';
 import {act,addPlayer,createGame,view,tick,token} from './engine.ts';
 import {openGameStore} from './storage.ts';
 import type {Game,GameSummary} from '../shared/model.ts';
+import {isQuestionFilled} from '../shared/model.ts';
 
 export async function startServer(options:{port?:number;dataDir?:string;dev?:boolean;quiet?:boolean}={}){
   const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
@@ -22,7 +23,7 @@ export async function startServer(options:{port?:number;dataDir?:string;dev?:boo
   server.on('connection',socket=>{connections.add(socket);socket.once('close',()=>connections.delete(socket));});
   const saveNow=()=>{for(const id of dirty){const game=games.get(id);if(game)storage.save(game);dirty.delete(id);}};
   const save=(game:Game)=>{dirty.add(game.id);if(stopping)return;if(saveHandle)clearTimeout(saveHandle);saveHandle=setTimeout(saveNow,150);};
-  const summaries=():GameSummary[]=>[...games.values()].map(g=>({id:g.id,name:g.name,subtitle:g.subtitle,status:g.status,playerCount:g.players.length,rounds:g.rounds.length,accent:g.theme.accent,createdAt:g.createdAt,locked:!!g.settings.joinPin,hostClaimable:!!g.hostClaimable})).sort((a,b)=>b.createdAt-a.createdAt);
+  const summaries=():GameSummary[]=>[...games.values()].map(g=>({id:g.id,name:g.name,subtitle:g.subtitle,status:g.status,playerCount:g.players.length,questionTotal:g.rounds.reduce((total,r)=>total+r.categories.reduce((total,c)=>total+c.questions.filter(isQuestionFilled).length,0),0),rounds:g.rounds.length,accent:g.theme.accent,createdAt:g.createdAt,locked:!!g.settings.joinPin,hostClaimable:!!g.hostClaimable})).sort((a,b)=>b.createdAt-a.createdAt);
   const publish=(g:Game,removedMessage='You were removed from this game')=>{for(const s of io.sockets.sockets.values())if(s.data.gameId===g.id){if(s.data.role==='player'&&!g.players.some(p=>p.id===s.data.playerId)){s.emit('revoked',removedMessage);s.data={};continue;}s.emit('state',view(g,s.data.role,s.data.playerId));}io.emit('games',summaries());save(g);};
   const game=(id:string)=>{const g=games.get(id.toUpperCase());if(!g)throw new Error('Game not found');return g;};
   app.use(express.json({limit:'2mb'}));app.use((_req,res,next)=>{res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','same-origin');next();});
@@ -58,7 +59,7 @@ export async function startServer(options:{port?:number;dataDir?:string;dev?:boo
   app.get('/api/games/:id/export',(req,res,next)=>{try{const g=host(req);res.json({format:'jeopardy/1',name:g.name,subtitle:g.subtitle,rounds:g.rounds,settings:g.settings,theme:g.theme});}catch(e){next(e);}});
   const extensions:Record<string,string>={'image/png':'.png','image/jpeg':'.jpg','image/webp':'.webp','image/gif':'.gif','video/mp4':'.mp4','video/webm':'.webm','audio/mpeg':'.mp3','audio/wav':'.wav','audio/x-wav':'.wav','audio/ogg':'.ogg','video/ogg':'.ogv'};
   const upload=multer({storage:multer.diskStorage({destination:mediaDir,filename:(_req,file,cb)=>cb(null,token()+extensions[file.mimetype])}),limits:{fileSize:100*1024*1024},fileFilter:(_req,file,cb)=>{if(!extensions[file.mimetype])cb(new Error('Use PNG, JPEG, WebP, GIF, MP4, WebM, MP3, WAV or OGG'));else cb(null,true);}});
-  app.post('/api/games/:id/media',(req,res,next)=>{try{host(req);next();}catch(e){next(e);}},upload.single('file'),(req,res)=>{if(!req.file){res.status(400).json({error:'Select a file'});return;}res.json({url:`/media/${req.file.filename}`,type:req.file.mimetype});});
+  app.post('/api/games/:id/media',(req,res,next)=>{try{const g=host(req);if(g.status!=='lobby')throw new Error('This game has started. Make a copy to edit it.');next();}catch(e){next(e);}},upload.single('file'),(req,res)=>{if(!req.file){res.status(400).json({error:'Select a file'});return;}res.json({url:`/media/${req.file.filename}`,type:req.file.mimetype});});
   app.use('/media',express.static(mediaDir,{setHeaders:res=>res.setHeader('Cache-Control','public, max-age=31536000, immutable')}));
   app.use('/api',(_req,res)=>res.status(404).json({error:'Not found'}));
   app.use((error:Error,_req:express.Request,res:express.Response,_next:express.NextFunction)=>res.status(error.message==='Game not found'?404:error.message.includes('access')?403:400).json({error:error.message}));

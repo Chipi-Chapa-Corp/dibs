@@ -42,7 +42,6 @@ export function QuestionsEditor({g,save}:EditorProps){
 }
 
 function QuestionEditor({g,question,allowModifier,onChange,onDelete,onClose}:{g:GameView;question:Question;allowModifier:boolean;onChange:(q:Question,delay?:number)=>void;onDelete:(q:Question)=>void;onClose:()=>void}){
-  const active=g.current?.questionId===question.id;
   const[q,set]=useState(question),[preview,setPreview]=useState(false),[field,setField]=useState<'prompt'|'answer'>('prompt');
   const patch=(data:Partial<Question>,delay=450)=>{const next={...q,...data};set(next);onChange(next,delay);};
   return <Modal title="Edit question" onClose={onClose} wide>
@@ -50,8 +49,7 @@ function QuestionEditor({g,question,allowModifier,onChange,onDelete,onClose}:{g:
       <Field label="Board value"><input type="number" min={0} step={100} value={q.value} onChange={e=>patch({value:Number(e.target.value)})}/></Field>
       {!q.modifier&&<Switch label="Daily double" checked={q.dailyDouble} onChange={dailyDouble=>patch({dailyDouble},0)}/>}
     </div>
-    {allowModifier&&<Switch label="Hidden modifier" disabled={active} description="Replaces this question. First to buzz claims it, then the instructions are revealed." checked={!!q.modifier} onChange={enabled=>patch({modifier:enabled?{title:'',instructions:''}:null,dailyDouble:false},0)}/>}
-    {active&&<p className="field-hint">Return to the board before changing this cell between a question and a modifier.</p>}
+    {allowModifier&&<Switch label="Hidden modifier" description="Replaces this question. First to buzz claims it, then the instructions are revealed." checked={!!q.modifier} onChange={enabled=>patch({modifier:enabled?{title:'',instructions:''}:null,dailyDouble:false},0)}/>}
     {q.modifier?<div className="modifier-fields">
       <Field label="Modifier title" hint="Hidden from players until someone claims it."><input value={q.modifier.title} maxLength={80} placeholder="Trading places" onChange={e=>patch({modifier:{...q.modifier!,title:e.target.value}})}/></Field>
       <Field label="What it does" hint="The presenter applies this manually. Include any duration here."><textarea rows={5} value={q.modifier.instructions} maxLength={20000} placeholder="Swap your points with another team. Or: approximate answers are allowed for the next 3 rounds." onChange={e=>patch({modifier:{...q.modifier!,instructions:e.target.value}})}/></Field>
@@ -61,7 +59,7 @@ function QuestionEditor({g,question,allowModifier,onChange,onDelete,onClose}:{g:
       {preview?<div className="markdown-preview"><RichText text={q[field]||'*Nothing here yet.*'}/></div>:<textarea className="markdown-editor" aria-label={field==='prompt'?'Question Markdown':'Answer Markdown'} value={q[field]} onChange={e=>patch({[field]:e.target.value})} placeholder={field==='prompt'?'Write your question. Markdown, images and media links work here.':'The answer, just for the host.'} rows={9}/>}
     </>}
     <details className="editor-details"><summary>Host notes<ChevronDown size={20}/></summary><Field label="Host notes"><textarea rows={3} value={q.notes} onChange={e=>patch({notes:e.target.value})}/></Field></details>
-    <div className="modal-actions"><Button variant="danger" disabled={active&&!!q.modifier} onClick={()=>onDelete(q)}><Trash2 size={20}/>Clear question</Button><Button variant="primary" onClick={onClose}><Check size={20}/>Done</Button></div>
+    <div className="modal-actions"><Button variant="danger" onClick={()=>onDelete(q)}><Trash2 size={20}/>Clear question</Button><Button variant="primary" onClick={onClose}><Check size={20}/>Done</Button></div>
   </Modal>;
 }
 

@@ -93,9 +93,9 @@ test('empty modifier instructions are unplayable even when the old question stil
 });
 test('only the presenter selects questions, including after correct answers and modifier claims',()=>{
  const g=createGame({definition:{rounds:demoRounds(),settings:{selection:'winner'}}});
- const a=addPlayer(g,'Ada'),b=addPlayer(g,'Bea');act(g,'start');
+ const a=addPlayer(g,'Ada'),b=addPlayer(g,'Bea');
  const q=g.rounds[0].categories[0].questions[0];
- act(g,'save',{settings:{selection:'winner'}});assert(!('selection' in g.settings));
+ act(g,'save',{settings:{selection:'winner'}});assert(!('selection' in g.settings));act(g,'start');
  for(const p of [a,b])for(const action of ['selectQuestion','openQuestion','chooser'])assert.throws(()=>act(g,action,{questionId:q.id,playerId:p.id},'player',p.id),/Host access/);
  assert.throws(()=>act(g,'chooser',{playerId:a.id}),/Unknown action/);
  act(g,'openQuestion',{questionId:q.id});act(g,'openBuzzers');act(g,'buzz',{},'player',a.id);act(g,'judge',{correct:true});act(g,'closeQuestion');
@@ -137,7 +137,7 @@ test('Daily Double answerers have no deadline',()=>{
 test('an active cell cannot switch between a question and a hidden modifier',()=>{
  const {g,q}=fixture();act(g,'openQuestion',{questionId:q.id});
  const rounds=structuredClone(g.rounds);rounds[0].categories[0].questions[0].modifier={title:'Secret',instructions:'Hidden effect'};
- assert.throws(()=>act(g,'save',{rounds}),/question type/);assert.equal(g.current?.phase,'question');assert.equal(g.rounds[0].categories[0].questions[0].modifier,null);
+ assert.throws(()=>updateDefinition(g,{rounds}),/question type/);assert.equal(g.current?.phase,'question');assert.equal(g.rounds[0].categories[0].questions[0].modifier,null);
 });
 
 test('host reset clears the session in every game state and preserves the complete board and room',()=>{
@@ -169,4 +169,52 @@ test('players cannot reset the game or clear another player’s progress',()=>{
  const {g,a,b,q}=fixture();act(g,'openQuestion',{questionId:q.id});act(g,'adjust',{playerId:b.id,amount:500});
  const before=structuredClone(g);
  assert.throws(()=>act(g,'reset',{},'player',a.id),/Host access required/);assert.deepEqual(g,before);
+});
+
+test('prepare before play: game definitions lock on start, stay locked when paused or finished, and unlock after reset',()=>{
+ const g=createGame({name:'Prepared game',definition:{rounds:demoRounds()}});
+ const rounds=structuredClone(g.rounds);rounds[0].categories[0].questions[0].prompt='Prepared clue';
+ act(g,'save',{rounds,name:'Ready to host',settings:{startingScore:0},theme:{title:'Prepared appearance'}});
+ assert.equal(g.name,'Ready to host');assert.equal(g.rounds[0].categories[0].questions[0].prompt,'Prepared clue');assert.equal(g.theme.title,'Prepared appearance');
+ act(g,'start');
+ for(const state of ['playing','paused','finished']){
+  if(state==='paused')act(g,'pause');
+  if(state==='finished')act(g,'finish');
+  const before=structuredClone(g);
+  for(const data of [{rounds:demoRounds()},{name:'Late rename'},{settings:{startingScore:999}},{theme:{title:'Late appearance'}}]){
+   assert.throws(()=>act(g,'save',data),/Make a copy to edit/);assert.deepEqual(g,before);
+  }
+ }
+ act(g,'reset');act(g,'save',{name:'Prepared for next time'});assert.equal(g.name,'Prepared for next time');
+});
+
+test('selection cue exposes only the chosen cell before normal questions, Daily Doubles and modifiers open',()=>{
+ for(const kind of ['question','dailyDouble','modifier']){
+  const {g,a,q}=fixture();g.settings.autoOpenBuzzers=true;
+  if(kind==='dailyDouble')q.dailyDouble=true;
+  if(kind==='modifier'){q.prompt='';q.modifier={title:'Secret modifier',instructions:'Secret instructions'};}
+  act(g,'selectQuestion',{questionId:q.id},'host',null,1000);
+  assert.equal(g.current,null);assert.equal(g.selection?.questionId,q.id);assert.equal(g.questionCount,0);
+  for(const role of ['stage','player']as const){const snapshot=view(g,role,a.id);assert.equal(snapshot.selection?.questionId,q.id);assert.equal(snapshot.currentQuestion,null);assert(!JSON.stringify(snapshot).includes(q.answer));if(q.modifier)assert(!JSON.stringify(snapshot).includes(q.modifier.instructions));}
+  assert.throws(()=>act(g,'buzz',{},'player',a.id,1100));assert.equal(a.blockedUntil,0);
+  assert.throws(()=>act(g,'selectQuestion',{questionId:g.rounds[0].categories[0].questions[1].id},'host',null,1100),/already selected/);
+  assert.throws(()=>act(g,'openQuestion',{questionId:q.id},'host',null,1100));
+  assert(!tick(g,1799));assert.equal(g.current,null);assert(tick(g,1800));
+  const active=view(g,'host').current;assert.equal(g.selection,null);assert.equal(active?.questionId,q.id);assert.equal(g.questionCount,1);
+  assert.equal(active?.phase,kind==='modifier'?'modifier':kind==='dailyDouble'?'wager':'question');assert.equal(active?.buzzOpen,kind!=='dailyDouble');
+ }
+});
+test('undo, reset, finish and round changes cancel pending question selections',()=>{
+ for(const action of ['undo','reset','finish','round']){
+  const {g,q}=fixture();act(g,'selectQuestion',{questionId:q.id},'host',null,1000);
+  act(g,action,action==='round'?{index:1}:{},'host',null,1200);
+  assert.equal(g.selection,null);assert.equal(g.current,null);assert(!tick(g,5000));assert.equal(g.current,null);assert.equal(g.questionCount,0);
+ }
+});
+test('paused selections wait for resume and invalid or played questions cannot be selected',()=>{
+ const {g,q}=fixture();act(g,'selectQuestion',{questionId:q.id},'host',null,1000);act(g,'pause');
+ assert(!tick(g,5000));assert.equal(g.current,null);act(g,'pause');assert(tick(g,5001));assert.equal(view(g,'host').current?.questionId,q.id);
+ act(g,'closeQuestion');assert.throws(()=>act(g,'selectQuestion',{questionId:q.id}),/already been played/);
+ const blank=g.rounds[0].categories[0].questions[1];blank.prompt=' ';
+ assert.throws(()=>act(g,'selectQuestion',{questionId:blank.id}),/empty/);assert.throws(()=>act(g,'selectQuestion',{questionId:'missing'}),/not found/);assert.equal(g.selection,null);
 });

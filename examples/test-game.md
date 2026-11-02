@@ -1,8 +1,8 @@
 # Quick playtest
 
-The installed copy loads automatically from `data/games/test-game.json`. Open the games list on `http://localhost:43187` and click **Host** to start using it.
+The installed copy loads automatically from `data/games/test-game.json`. Open the game library on `http://localhost:43187` and click **Host** to start using it.
 
-To create another copy, import [test-game.json](test-game.json) from **All games → Create game → Import JSON**, then click **Create game**. The import creates a new game. Your existing game is not replaced. Join with 2–3 phones, one per team, and open the Presenter screen.
+To create another copy, import [test-game.json](test-game.json) from **Game library → Create game → Import JSON**, then click **Create game**. Review it on the preparation page, click **Done**, then choose **Host** from the library. The import creates a new game. Your existing game is not replaced. Join with 2–3 phones, one per team, and open the Presenter screen.
 
 The sample has two boards of three categories × two cells, plus one final question: **13 cells total**, including **three picture questions, two Daily Doubles and four hidden modifiers**. Teams start with **0 points**. Automatic buzzers are on. Questions, answers and the final have no time limits; the presenter controls the pace. Expect roughly 15–20 minutes including setup.
 

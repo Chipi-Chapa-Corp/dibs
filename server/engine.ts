@@ -1,5 +1,5 @@
 import {randomBytes} from 'node:crypto';
-import {defaultSettings,defaultTheme,emptyRound,uid,themes,isQuestionFilled} from '../shared/model.ts';
+import {defaultSettings,defaultTheme,emptyRound,uid,themes,isQuestionFilled,QUESTION_SELECTION_MS} from '../shared/model.ts';
 import type {Game,GameView,Player,Settings,Theme,Round} from '../shared/model.ts';
 
 type Input=Record<string,any>;
@@ -12,7 +12,7 @@ export const currentQuestion=(g:Game)=>g.rounds.flatMap(r=>r.categories.flatMap(
 const scores=(g:Game)=>Object.fromEntries(g.players.map(p=>[p.id,p.score]));
 const colors=['#bd4b31','#587058','#636f9a','#9e7639','#8a6080','#427e85','#8b6653','#4d5865'];
 export function createGame(input:Input={}):Game {
-  const g:Game={id:randomBytes(3).toString('hex').toUpperCase(),name:text(input.name)||'Untitled game',subtitle:'',hostToken:token(),createdAt:Date.now(),status:'lobby',paused:false,roundIndex:0,rounds:[emptyRound()],modifierClaims:[],settings:clone(defaultSettings),theme:clone(defaultTheme),players:[],played:[],current:null,history:[],undo:[],questionCount:0,announcement:null,revision:0};
+  const g:Game={id:randomBytes(3).toString('hex').toUpperCase(),name:text(input.name)||'Untitled game',subtitle:'',hostToken:token(),createdAt:Date.now(),status:'lobby',paused:false,roundIndex:0,rounds:[emptyRound()],modifierClaims:[],settings:clone(defaultSettings),theme:clone(defaultTheme),players:[],played:[],current:null,history:[],undo:[],questionCount:0,selection:null,announcement:null,revision:0};
   if(input.definition)updateDefinition(g,input.definition);
   return g;
 }
@@ -29,8 +29,8 @@ export function normalizeSettings(data:Input,old=defaultSettings):Settings {
   if(!['first','queue'].includes(s.buzzMode))s.buzzMode='first';if(!['score','unlimited'].includes(s.finalMaxWager))s.finalMaxWager='score';return s;
 }
 /** Discard retired countdown fields in saved games and undo snapshots. */
-export function normalizeStoredGameplay(state:Pick<Game,'settings'|'rounds'|'current'>){
-  state.settings=normalizeSettings(state.settings);
+export function normalizeStoredGameplay(state:Pick<Game,'settings'|'rounds'|'current'>&Partial<Pick<Game,'selection'>>){
+  state.settings=normalizeSettings(state.settings);state.selection??=null;
   for(const round of state.rounds)for(const category of round.categories)for(const question of category.questions)delete(question as unknown as Input).timer;
   if(state.current)delete(state.current as unknown as Input).timer;
 }
@@ -59,21 +59,25 @@ export function updateDefinition(g:Game,data:Input){
 function snapshot(g:Game){const{undo,...rest}=g;g.undo.push(clone(rest));if(g.undo.length>35)g.undo.shift();}
 function log(g:Game,label:string,before:Record<string,number>){g.history.unshift({id:uid(),at:Date.now(),label,deltas:Object.fromEntries(g.players.filter(p=>p.score!==(before[p.id]??p.score)).map(p=>[p.id,p.score-(before[p.id]??p.score)]))});g.history=g.history.slice(0,100);g.revision++;}
 function setScore(g:Game,p:Player,value:number){value=Math.round(finite(value,p.score));if(!g.settings.allowNegative)value=Math.max(0,value);p.score=value;}
-function open(g:Game,qid:string,now:number,dailyDoublePlayerId:string|null=null){
+function selectableQuestion(g:Game,qid:string){
   const r=g.rounds[g.roundIndex];const c=r.categories.find(c=>c.questions.some(q=>q.id===qid));const q=c?.questions.find(q=>q.id===qid);assert(q&&c,'Question not found');assert(!g.played.includes(qid),'This question has already been played');assert(isQuestionFilled(q!),'This question is empty');
+  return {r,c:c!,q:q!};
+}
+function open(g:Game,qid:string,now:number,dailyDoublePlayerId:string|null=null){
+  const {r,c,q}=selectableQuestion(g,qid);
   g.questionCount++;g.current={questionId:qid,category:c!.name,buzzOpen:!!q!.modifier||g.settings.autoOpenBuzzers&&!q!.dailyDouble,buzzes:[],answeringId:null,attempted:[],revealAt:null,revealed:false,phase:q!.modifier?'modifier':r.type==='final'||q!.dailyDouble?'wager':'question',wagers:{},closed:false};
   if(q!.dailyDouble&&dailyDoublePlayerId)g.current.answeringId=dailyDoublePlayerId;
 
 }
 function reveal(g:Game,now:number){assert(g.current,'Open a question first');g.current!.buzzOpen=false;g.current!.revealAt=now+g.settings.revealDelayMs;g.current!.revealed=g.settings.revealDelayMs===0;}
-function nextRound(g:Game,index:number,now:number){assert(index>=0&&index<g.rounds.length,'No such round');g.roundIndex=index;g.current=null;g.paused=false;g.status='playing';if(g.rounds[index].type==='final'){const q=g.rounds[index].categories.flatMap(c=>c.questions).find(q=>q.prompt.trim());if(q)open(g,q.id,now);}}
+function nextRound(g:Game,index:number,now:number){assert(index>=0&&index<g.rounds.length,'No such round');g.roundIndex=index;g.current=null;g.selection=null;g.paused=false;g.status='playing';if(g.rounds[index].type==='final'){const q=g.rounds[index].categories.flatMap(c=>c.questions).find(q=>q.prompt.trim());if(q)open(g,q.id,now);}}
 
 /** All gameplay mutations run synchronously on the server. No client supplies a score or a buzz timestamp. */
 export function act(g:Game,action:string,data:Input={},role:'host'|'player'='host',playerId:string|null=null,now=Date.now()){
   assert(role==='host'||['buzz','ready','wager','finalAnswer'].includes(action),'Host access required');
   const self=g.players.find(p=>p.id===playerId);if(role==='player')assert(self,'Join the game first');
   if(action==='reset'){
-    Object.assign(g,{status:'lobby',paused:false,roundIndex:0,players:[],played:[],current:null,modifierClaims:[],history:[],undo:[],questionCount:0,announcement:null,revision:g.revision+1});
+    Object.assign(g,{status:'lobby',paused:false,roundIndex:0,players:[],played:[],current:null,modifierClaims:[],history:[],undo:[],questionCount:0,selection:null,announcement:null,revision:g.revision+1});
     return;
   }
   if(action==='ready'){assert(self,'Player not found');self!.ready=!!data.ready;g.revision++;return;}
@@ -108,9 +112,14 @@ export function act(g:Game,action:string,data:Input={},role:'host'|'player'='hos
   try{
     let label='';const c=g.current,q=currentQuestion(g);
     switch(action){
-      case'save':updateDefinition(g,data);label='Game settings updated';break;
+      case'save':assert(g.status==='lobby','This game has started. Make a copy to edit it.');updateDefinition(g,data);label='Game settings updated';break;
       case'start':assert(g.status==='lobby','Game has already started');assert(!g.settings.requireReady||g.players.every(p=>p.ready),'Wait until everyone is ready');nextRound(g,0,now);label='Game started';break;
-      case'openQuestion':assert(g.status==='playing'&&!g.paused,'Start or resume the game first');assert(!c,'Close the current question first');open(g,text(data.questionId),now,text(data.playerId)||null);label=`Question opened · ${currentQuestion(g)?.value}`;break;
+      case'selectQuestion':{
+        assert(g.status==='playing'&&!g.paused,'Start or resume the game first');assert(!c&&!g.selection,'A question is already selected');
+        const {q}=selectableQuestion(g,text(data.questionId));
+        g.selection={questionId:q.id,opensAt:now+QUESTION_SELECTION_MS};label=`Question selected · ${q.value}`;break;
+      }
+      case'openQuestion':assert(g.status==='playing'&&!g.paused,'Start or resume the game first');assert(!c&&!g.selection,'Close the current question first');open(g,text(data.questionId),now,text(data.playerId)||null);label=`Question opened · ${currentQuestion(g)?.value}`;break;
       case'closeQuestion':assert(c,'No active question');if(!g.played.includes(c!.questionId))g.played.push(c!.questionId);g.current=null;label='Question closed';break;
       case'openBuzzers':assert(c&&!c.revealed&&!c.revealAt&&c.phase==='question'&&!c.closed&&!g.paused,'No active question');c!.buzzOpen=true;c!.answeringId=null;c!.buzzes=[];label='Buzzers opened';break;
       case'closeBuzzers':assert(c,'No question');c!.buzzOpen=false;label='Buzzers closed';break;
@@ -132,7 +141,7 @@ export function act(g:Game,action:string,data:Input={},role:'host'|'player'='hos
         assert(g.modifierClaims?.some(m=>m.id===data.id),'Modifier not found');
         g.modifierClaims=g.modifierClaims.filter(m=>m.id!==data.id);label='Modifier reminder dismissed';break;
       }
-      case'finish':g.status='finished';g.paused=false;if(c)c.buzzOpen=false;label='Game finished';break;
+      case'finish':g.status='finished';g.paused=false;g.selection=null;if(c)c.buzzOpen=false;label='Game finished';break;
       case'resume':g.status='playing';g.paused=false;label='Game resumed';break;
       case'adjust':{const p=g.players.find(p=>p.id===data.playerId);assert(p,'Player not found');setScore(g,p!,data.mode==='set'?finite(data.amount):p!.score+finite(data.amount));label=`${p!.name} · score adjusted`;break;}
       case'addPlayer':{const p=addPlayer(g,text(data.name));label=`${p.name} added`;break;}
@@ -144,8 +153,10 @@ export function act(g:Game,action:string,data:Input={},role:'host'|'player'='hos
   }catch(error){Object.assign(g,backup);throw error;}
 }
 export function tick(g:Game,now=Date.now()):boolean{
-  if(!g.current||g.paused||g.status!=='playing')return false;let changed=false;const c=g.current;
-  if(c.revealAt&&!c.revealed&&now>=c.revealAt){c.revealed=true;changed=true;}
+  if(g.paused||g.status!=='playing')return false;let changed=false;
+  if(g.selection&&now>=g.selection.opensAt){const {questionId}=g.selection;g.selection=null;open(g,questionId,now);changed=true;}
+  const c=g.current;
+  if(c?.revealAt&&!c.revealed&&now>=c.revealAt){c.revealed=true;changed=true;}
   if(changed)g.revision++;return changed;
 }
 export function view(g:Game,role:GameView['role'],playerId?:string,now=Date.now()):GameView{

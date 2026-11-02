@@ -5,7 +5,7 @@ A local quiz game with phone buzzers, custom rules, and a separate presenter scr
 - Build question boards with Markdown, images, video, and audio.
 - Hide a mystery modifier in a board cell. First to buzz claims it; the presenter applies the revealed instructions manually.
 - Customize themes, rounds, and scoring.
-- Edit as you go. Changes save automatically.
+- Prepare games in the library, then host from a focused gameplay screen.
 
 ## Run
 
@@ -26,13 +26,21 @@ React and CSS edits in `src/` update through Vite without restarting the game se
 
 After updating the dev command itself, stop and start `npm run dev` once to activate it.
 
+## Prepare, then host
+
+Open the **Game library** and choose **Create game** or **Edit**. Questions, hidden modifiers, appearance and settings are edited on a separate preparation page. Changes save automatically; **Done** waits for pending saves before returning to the library.
+
+When your board is ready, choose **Host**, invite players and start. The host screen contains the board, buzzers, judging, scores and player status. It has no question, appearance or settings editor. **More** contains pause/resume, finish, reset and keyboard shortcuts.
+
+After a game starts, its definition is locked, including in editor tabs left open elsewhere. Choose **Copy & edit** in the library to prepare a fresh version while keeping the current game's players, scores and results. A reset returns the original to the lobby and allows preparation again.
+
 ## Hidden modifiers
 
-In **Questions**, open a cell and enable **Hidden modifier**. Enter its title and what it does, including any duration (for example, “Approximate answers allowed for the next 3 rounds”). The cell keeps its normal board value.
+In **Game library → Edit → Questions**, open a cell and enable **Hidden modifier**. Enter its title and what it does, including any duration (for example, “Approximate answers allowed for the next 3 rounds”). The cell keeps its normal board value.
 
 When selected, the presenter and phones show a mystery modifier with buzzers open. The first player or team to buzz claims it, then its instructions are revealed. No points change automatically: edit scores from the host screen as needed. Claimed modifiers stay in the host’s reminders and on the winner’s phone until the host dismisses them.
 
-The presenter selects every question from the host board. Questions, answers and the final have no countdowns or time limits; the presenter opens/closes buzzers and reveals answers when ready. Older timer settings are ignored. A team can join with one phone under its team name.
+The presenter selects every question from the host board. The chosen tile briefly highlights on both boards before opening, and phones show the selected category and value. Buzzers stay closed during this cue, including for hidden modifiers. Motion preferences use a static highlight instead of a pulse. Questions, answers and the final have no countdowns or time limits; the presenter opens/closes buzzers and reveals answers when ready. Older timer settings are ignored. A team can join with one phone under its team name.
 
 Older game files still import their questions, settings and appearance; the former automated modifier rules are no longer used.
 
@@ -42,9 +50,9 @@ Each game lives in its own JSON file under **`data/games/`**. The server reads e
 
 You can put an exported game JSON directly into this directory and restart the server. It becomes a saved game in that same file. Open `http://localhost:43187` on the server computer and click **Host** to claim a game added this way. Host access remains saved in that browser. Phones join using the LAN address as usual.
 
-To replay a board, open **Lobby / Live → Reset game** on the host page and confirm. It clears all players, scores, played questions, wagers, claimed modifiers and activity, then returns to the lobby. Questions, settings, appearance, room code and host access stay the same. Players join again using the same link. Reset cannot be undone.
+To replay a board, open **More → Reset game** on the host page and confirm. It clears all players, scores, played questions, wagers, claimed modifiers and activity, then returns to the lobby. Questions, settings, appearance, room code and host access stay the same. Players join again using the same link. Reset cannot be undone.
 
-To delete a game, open **All games** and click **Delete** beside its **Host** button, then confirm the game name. This removes its JSON file and ends access for connected players and presenter screens. Only the host can delete a game.
+To delete a game, open **Game library** and click the trash button beside **Host**, then confirm the game name. This removes its JSON file and ends access for connected players and presenter screens. Only the host can delete a game.
 
 Saved game files contain host/player keys, scores and current progress. Keep them private. To edit or remove a file manually, stop the server first; it loads the updated directory on the next start.
 
