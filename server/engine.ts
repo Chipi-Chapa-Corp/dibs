@@ -1,6 +1,6 @@
 import {randomBytes} from 'node:crypto';
 import {defaultSettings,defaultTheme,emptyRound,uid,themes,isQuestionFilled,QUESTION_SELECTION_MS} from '../shared/model.ts';
-import type {Game,GameView,Player,Settings,Theme,Round} from '../shared/model.ts';
+import type {Game,GameView,Player,Question,Settings,Theme,Round} from '../shared/model.ts';
 
 type Input=Record<string,any>;
 export const token=()=>randomBytes(24).toString('hex');
@@ -42,7 +42,18 @@ function normalizeTheme(data:Input,old=defaultTheme):Theme {
 function normalizeRounds(data:unknown):Round[]{
   assert(Array.isArray(data)&&data.length>0&&data.length<=20,'Use 1–20 rounds');const ids=new Set<string>();
   const id=(s:unknown)=>{let n=text(s,60)||uid();if(ids.has(n))n=uid();ids.add(n);return n;};
-  return (data as Input[]).map((r,i)=>{assert(Array.isArray(r.categories)&&r.categories.length<=10,'Use up to 10 categories');return{id:id(r.id),name:text(r.name,60)||`Round ${i+1}`,type:r.type==='final'?'final':'board',categories:r.categories.map((c:Input)=>{assert(Array.isArray(c.questions)&&c.questions.length<=12,'Use up to 12 questions per category');return{id:id(c.id),name:text(c.name,60)||'Category',questions:c.questions.map((q:Input)=>({id:id(q.id),value:Math.round(finite(q.value,100,0,1e7)),prompt:text(q.prompt,100000),answer:text(q.answer,100000),notes:text(q.notes,20000),dailyDouble:!!q.dailyDouble&&!q.modifier,modifier:r.type==='final'||!q.modifier?null:{title:text(q.modifier.title,80)||'Mystery modifier',instructions:text(q.modifier.instructions,20000)}}))};})};});
+  return (data as Input[]).map((r,i)=>{assert(Array.isArray(r.categories)&&r.categories.length<=10,'Use up to 10 categories');return{id:id(r.id),name:text(r.name,60)||`Round ${i+1}`,type:r.type==='final'?'final':'board',categories:r.categories.map((c:Input)=>{assert(Array.isArray(c.questions)&&c.questions.length<=12,'Use up to 12 questions per category');return{id:id(c.id),name:text(c.name,60)||'Category',questions:c.questions.map((q:Input)=>{
+    const question:Question={id:id(q.id),value:Math.round(finite(q.value,100,0,1e7)),prompt:text(q.prompt,100000),answer:text(q.answer,100000),notes:text(q.notes,20000),dailyDouble:!!q.dailyDouble&&!q.modifier,modifier:r.type==='final'||!q.modifier?null:{title:text(q.modifier.title,80)||'Mystery modifier',instructions:text(q.modifier.instructions,20000)}};
+    if(q.answerOptions!==undefined){
+      assert(Array.isArray(q.answerOptions),'Answer options must be a list');
+      const answerOptions:string[]=q.answerOptions.length?q.answerOptions.map((option:unknown)=>text(option,100000)):[question.answer];
+      while(answerOptions.length<2)answerOptions.push('');
+      question.correctAnswerIndex=Math.round(finite(q.correctAnswerIndex,Math.max(0,answerOptions.indexOf(question.answer)),0,answerOptions.length-1));
+      question.answerOptions=answerOptions;question.answer=answerOptions[question.correctAnswerIndex];
+    }
+    if(q.answerOptions!==undefined||q.shuffleAnswers!==undefined)question.shuffleAnswers=q.shuffleAnswers!==false;
+    return question;
+  })};})};});
 }
 export function updateDefinition(g:Game,data:Input){
   // Normalize everything first: malformed imports must not partially mutate a game.
@@ -67,7 +78,11 @@ function open(g:Game,qid:string,now:number,dailyDoublePlayerId:string|null=null)
   const {r,c,q}=selectableQuestion(g,qid);
   g.questionCount++;g.current={questionId:qid,category:c!.name,buzzOpen:!!q!.modifier||g.settings.autoOpenBuzzers&&!q!.dailyDouble,buzzes:[],answeringId:null,attempted:[],revealAt:null,revealed:false,phase:q!.modifier?'modifier':r.type==='final'||q!.dailyDouble?'wager':'question',wagers:{},closed:false};
   if(q!.dailyDouble&&dailyDoublePlayerId)g.current.answeringId=dailyDoublePlayerId;
-
+  if(!q.modifier&&q.shuffleAnswers!==false&&q.answerOptions&&q.answerOptions.length>1){
+    const order=q.answerOptions.map((_,i)=>i);
+    for(let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[order[i],order[j]]=[order[j],order[i]];}
+    g.current.answerOrder=order;
+  }
 }
 function reveal(g:Game,now:number){assert(g.current,'Open a question first');g.current!.buzzOpen=false;g.current!.revealAt=now+g.settings.revealDelayMs;g.current!.revealed=g.settings.revealDelayMs===0;}
 function nextRound(g:Game,index:number,now:number){assert(index>=0&&index<g.rounds.length,'No such round');g.roundIndex=index;g.current=null;g.selection=null;g.paused=false;g.status='playing';if(g.rounds[index].type==='final'){const q=g.rounds[index].categories.flatMap(c=>c.questions).find(q=>q.prompt.trim());if(q)open(g,q.id,now);}}
@@ -161,8 +176,15 @@ export function tick(g:Game,now=Date.now()):boolean{
 }
 export function view(g:Game,role:GameView['role'],playerId?:string,now=Date.now()):GameView{
   const{hostToken:_legacyHostToken,hostClaimable:_legacyHostClaimable,undo,players,modifiers:_legacyModifiers,uses:_legacyUses,...base}=g as Game&{hostToken?:unknown;hostClaimable?:unknown;modifiers?:unknown;uses?:unknown};const q=currentQuestion(g);const reveal=role==='host'||!!g.current?.revealed;
-  const rounds=g.rounds.map(r=>({...r,categories:r.categories.map(c=>({...c,questions:c.questions.map(q=>role==='host'?clone(q):{...q,prompt:'',answer:'',notes:'',modifier:null})}))}));
-  const cur=g.current?clone(g.current):null;if(cur&&role!=='host')cur.wagers=Object.fromEntries(Object.entries(cur.wagers).map(([id,e])=>[id,{wager:reveal?e.wager:0,answer:reveal?e.answer:'',submitted:e.submitted,judged:e.judged,correct:reveal?e.correct:undefined}]));
-  let cq=q?clone(q):null;if(cq&&role!=='host'){if(!reveal){cq.answer='';cq.modifier=null;}cq.notes='';if(cur?.phase==='wager')cq.prompt='';if(cur?.phase==='modifier'){cq.prompt='';cq.answer='';if(!reveal)cq.modifier=null;}}
+  const rounds=g.rounds.map(r=>({...r,categories:r.categories.map(c=>({...c,questions:c.questions.map(q=>{
+    if(role==='host')return clone(q);
+    const{answerOptions:_options,correctAnswerIndex:_correct,...question}=q;
+    return{...question,prompt:'',answer:'',notes:'',modifier:null};
+  })}))}));
+  const cur=g.current?clone(g.current):null;if(cur&&role!=='host'){delete cur.answerOrder;cur.wagers=Object.fromEntries(Object.entries(cur.wagers).map(([id,e])=>[id,{wager:reveal?e.wager:0,answer:reveal?e.answer:'',submitted:e.submitted,judged:e.judged,correct:reveal?e.correct:undefined}]));}
+  let cq=q?clone(q):null;
+  const order=g.current?.answerOrder;
+  if(cq?.answerOptions&&order){const options=cq.answerOptions;cq.answerOptions=order.map(i=>options[i]);cq.correctAnswerIndex=order.indexOf(cq.correctAnswerIndex??0);}
+  if(cq&&role!=='host'){delete cq.correctAnswerIndex;if(!reveal){cq.answer='';cq.modifier=null;}cq.notes='';if(cur?.phase==='wager'){cq.prompt='';delete cq.answerOptions;}if(cur?.phase==='modifier'){cq.prompt='';cq.answer='';delete cq.answerOptions;if(!reveal)cq.modifier=null;}}
   return{...clone(base),modifierClaims:clone(g.modifierClaims||[]).filter(m=>role==='host'||m.questionId!==cur?.questionId||cur.revealed),filledQuestionIds:g.rounds.flatMap(r=>r.categories.flatMap(c=>c.questions.filter(isQuestionFilled).map(q=>q.id))),settings:normalizeSettings(g.settings),rounds,players:(players as (Player&{shield?:number})[]).map(({token,shield:_legacyShield,...p})=>clone(p)),current:cur,role,serverTime:now,selfId:playerId,currentQuestion:cq,yourFinal:playerId&&g.current?.wagers[playerId]?clone(g.current.wagers[playerId]):null};
 }

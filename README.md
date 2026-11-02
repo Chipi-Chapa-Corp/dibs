@@ -34,9 +34,11 @@ When your board is ready, choose **Host**, invite players and start. The host sc
 
 After a game starts, its definition is locked, including in editor tabs left open elsewhere. Choose **Copy & edit** in the library to prepare a fresh version while keeping the current game's players, scores and results. A reset returns the original to the lobby and allows preparation again.
 
+In the question popup, **Daily double** uses the same checkbox control as **Show ended**. Enter the question, then choose **Answer** or **Modifier**. Answers start with two rows; **Add answer** adds more choices, with a radio button marking the correct one. Deleting the correct answer selects the next remaining choice. **Shuffle answers** is on by default and randomizes the shared order when a question opens; turn it off to keep the written order. The Answer / Modifier toolbar also offers media insertion and preview. Choices appear with the question during play, and the correct answer is revealed by the host. Host notes are always visible in the popup.
+
 ## Hidden modifiers
 
-In **Edit → Questions**, open a cell and enable **Hidden modifier**. Enter its title and what it does, including any duration (for example, “Approximate answers allowed for the next 3 rounds”). The cell keeps its normal board value.
+In **Edit → Questions**, open a cell and choose **Modifier** below the question. Enter its title and what it does, including any duration (for example, “Approximate answers allowed for the next 3 rounds”). The cell keeps its normal board value.
 
 When selected, the presenter and phones show a mystery modifier with buzzers open. The first player or team to buzz claims it, then its instructions are revealed. No points change automatically: edit scores from the host screen as needed. Claimed modifiers stay in the host’s reminders and on the winner’s phone until the host dismisses them.
 

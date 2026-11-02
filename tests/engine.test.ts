@@ -12,6 +12,53 @@ test('players can always join running and paused games, including old definition
  act(g,'finish');assert.throws(()=>addPlayer(g,'After the end'),/ended/);
 });
 test('answer reveal is withheld until the configured server-side deadline',()=>{const{g,q}=fixture();act(g,'openQuestion',{questionId:q.id},'host',null,1000);act(g,'reveal',{},'host',null,1100);assert.equal(view(g,'stage',undefined,1500).currentQuestion?.answer,'');tick(g,2001);assert.equal(view(g,'stage').currentQuestion?.answer,q.answer);});
+test('answer choices preserve the selected answer while public views hide correctness and future options',()=>{
+ const rounds=demoRounds();Object.assign(rounds[0].categories[0].questions[0],{answer:'Old answer',answerOptions:['Mercury','Venus','Mars'],correctAnswerIndex:1,shuffleAnswers:false});
+ const g=createGame({definition:{rounds,settings:{revealDelayMs:0}}}),player=addPlayer(g,'Ada'),q=g.rounds[0].categories[0].questions[0];
+ assert.equal(q.answer,'Venus');assert.equal(q.correctAnswerIndex,1);
+ for(const role of ['stage','player']as const){const future=view(g,role).rounds[0].categories[0].questions[0];assert(!('answerOptions' in future));assert(!('correctAnswerIndex' in future));}
+ act(g,'start');act(g,'openQuestion',{questionId:q.id});
+ for(const role of ['stage','player']as const){const current=view(g,role,player.id).currentQuestion!;assert.deepEqual(current.answerOptions,['Mercury','Venus','Mars']);assert.equal(current.answer,'');assert(!('correctAnswerIndex' in current));}
+ assert.equal(view(g,'host').currentQuestion?.answer,'Venus');assert.equal(view(g,'host').currentQuestion?.correctAnswerIndex,1);
+ act(g,'reveal');assert.equal(view(g,'stage').currentQuestion?.answer,'Venus');assert(!('correctAnswerIndex' in view(g,'stage').currentQuestion!));
+});
+test('Daily Double choices stay hidden until wagering ends',()=>{
+ const {g,a,q}=fixture();Object.assign(q,{dailyDouble:true,answerOptions:['First','Second'],correctAnswerIndex:1,answer:'Second',shuffleAnswers:false});
+ act(g,'openQuestion',{questionId:q.id,playerId:a.id});
+ for(const role of ['stage','player']as const)assert(!('answerOptions' in view(g,role,a.id).currentQuestion!));
+ act(g,'wager',{wager:50},'player',a.id);act(g,'finalBegin');
+ assert.deepEqual(view(g,'player',a.id).currentQuestion?.answerOptions,['First','Second']);assert(!('correctAnswerIndex' in view(g,'player',a.id).currentQuestion!));
+});
+test('answer shuffling defaults on, stays synchronized, preserves correctness, and can be disabled',t=>{
+ const {g,a,q}=fixture();Object.assign(q,{answerOptions:['A','B','C','D'],correctAnswerIndex:2,answer:'C'});
+ t.mock.method(Math,'random',()=>0);
+ act(g,'openQuestion',{questionId:q.id});
+ assert.deepEqual(g.current?.answerOrder,[1,2,3,0]);assert.deepEqual(q.answerOptions,['A','B','C','D']);
+ for(const role of ['stage','player']as const){
+  const state=view(g,role,a.id);assert.deepEqual(state.currentQuestion?.answerOptions,['B','C','D','A']);assert(!('answerOrder' in state.current!));assert(!('correctAnswerIndex' in state.currentQuestion!));
+ }
+ const host=view(g,'host');assert.equal(host.currentQuestion?.correctAnswerIndex,1);assert.equal(host.currentQuestion?.answer,'C');
+ act(g,'pause');assert.deepEqual(view(g,'stage').currentQuestion?.answerOptions,['B','C','D','A']);act(g,'pause');
+ act(g,'closeQuestion');const next=g.rounds[0].categories[0].questions[1];Object.assign(next,{answerOptions:['First','Second'],correctAnswerIndex:0,answer:'First',shuffleAnswers:false});
+ act(g,'openQuestion',{questionId:next.id});assert.equal(g.current?.answerOrder,undefined);assert.deepEqual(view(g,'stage').currentQuestion?.answerOptions,['First','Second']);
+});
+test('answer option normalization keeps at least two rows and defaults shuffling on',()=>{
+ for(const input of [[],['Only answer']]){
+  const rounds=demoRounds();Object.assign(rounds[0].categories[0].questions[0],{answer:'Legacy answer',answerOptions:input});
+  const g=createGame({definition:{rounds}}),q=g.rounds[0].categories[0].questions[0];
+  assert.equal(q.answerOptions?.length,2);assert.equal(q.answerOptions?.[1],'');assert.equal(q.shuffleAnswers,true);
+ }
+});
+test('answer option imports retain single answers, infer and clamp selection, and reject malformed lists atomically',()=>{
+ const rounds=demoRounds(),q=rounds[0].categories[0].questions[0];
+ const original=q.answer;const legacy=createGame({definition:{rounds}});assert.equal(legacy.rounds[0].categories[0].questions[0].answer,original);
+ Object.assign(q,{answer:'Second',answerOptions:['First','Second']});
+ const g=createGame({definition:{rounds}});assert.equal(g.rounds[0].categories[0].questions[0].correctAnswerIndex,1);
+ Object.assign(q,{correctAnswerIndex:999});updateDefinition(g,{rounds});assert.equal(g.rounds[0].categories[0].questions[0].answer,'Second');
+ Object.assign(q,{correctAnswerIndex:-1});updateDefinition(g,{rounds});assert.equal(g.rounds[0].categories[0].questions[0].answer,'First');
+ const before=structuredClone(g);Object.assign(q,{answerOptions:'not a list'});
+ assert.throws(()=>updateDefinition(g,{rounds,name:'Must not replace'}),/Answer options/);assert.deepEqual(g,before);
+});
 test('first buzz wins; a second player cannot steal the floor',()=>{const{g,a,b,q}=fixture();act(g,'openQuestion',{questionId:q.id});act(g,'openBuzzers');act(g,'buzz',{},'player',a.id,1000);assert.throws(()=>act(g,'buzz',{},'player',b.id,1001));assert.equal(g.current?.answeringId,a.id);assert.equal(g.current?.buzzes.length,1);});
 test('a wrong answer reopens the floor but locks out the player who missed',()=>{const{g,a,b,q}=fixture();act(g,'openQuestion',{questionId:q.id});act(g,'openBuzzers');act(g,'buzz',{},'player',a.id);act(g,'judge',{correct:false});assert.equal(a.score,-100);assert(g.current?.buzzOpen);assert.throws(()=>act(g,'buzz',{},'player',a.id));act(g,'buzz',{},'player',b.id);act(g,'judge',{correct:true});assert.equal(g.players.find(p=>p.id===b.id)?.score,100);assert(g.current?.closed);assert.throws(()=>act(g,'judge',{correct:true,playerId:b.id}));});
 test('queue mode advances to the next buzz after a wrong answer',()=>{const{g,a,b,q}=fixture();g.settings.buzzMode='queue';act(g,'openQuestion',{questionId:q.id});act(g,'openBuzzers');act(g,'buzz',{},'player',a.id);act(g,'buzz',{},'player',b.id);act(g,'judge',{correct:false});assert.equal(g.current?.answeringId,b.id);});

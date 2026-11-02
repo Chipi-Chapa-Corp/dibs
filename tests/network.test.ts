@@ -253,10 +253,11 @@ test('library preparation saves before hosting; stale editors cannot change a ru
    assert.equal((await emit(s,'subscribe',{gameId,role:'host',editing})).ok,true);return s;
   };
   const editor=await connect(true),host=await connect();
-  const rounds=demoRounds();rounds[0].categories[0].questions[0].notes='Keep these notes';rounds[0].categories[0].questions[1].dailyDouble=true;
+  const rounds=demoRounds();Object.assign(rounds[0].categories[0].questions[0],{answerOptions:['First choice','Correct choice','Third choice'],correctAnswerIndex:1});rounds[0].categories[0].questions[0].notes='Keep these notes';rounds[0].categories[0].questions[1].dailyDouble=true;
   rounds[1].categories[0].questions[0].modifier={title:'Prepared surprise',instructions:'Apply this manually.'};
   assert.equal((await emit(editor,'command',{action:'save',data:{rounds,settings:{revealDelayMs:0},theme:{title:'Prepared theme'}}})).ok,true);
   const before=await (await fetch(`${base}/api/games/${created.id}/export`)).json();
+  assert.deepEqual(before.rounds[0].categories[0].questions[0].answerOptions,['First choice','Correct choice','Third choice']);assert.equal(before.rounds[0].categories[0].questions[0].answer,'Correct choice');assert.equal(before.rounds[0].categories[0].questions[0].correctAnswerIndex,1);
   const list=await (await fetch(base+'/api/games')).json();assert.equal(list.find((g:{id:string})=>g.id===created.id).questionTotal,41);
   const player=await post(`/api/games/${created.id}/join`,{name:'Ada'});
   assert.equal((await emit(editor,'subscribe',{gameId:created.id,role:'host',editing:false})).ok,true);

@@ -1,9 +1,9 @@
-import {useState} from 'react';
-import {Plus,Trash2,Check,ArrowRight,ArrowLeft,Copy,Eye,Code2,ChevronDown} from 'lucide-react';
+import {useRef,useState} from 'react';
+import {Plus,Trash2,Check,ArrowRight,ArrowLeft,Copy,Eye,Code2,Shuffle} from 'lucide-react';
 import type {GameView,Question,Round,Settings,Theme} from '../shared/model';
 import {emptyQuestion,emptyRound,isQuestionFilled,themes,uid} from '../shared/model';
 import {number} from './lib';
-import {Button,Field,IconButton,Modal,RichText,StageContent,Switch,UploadMedia} from './components';
+import {Button,Checkbox,Field,IconButton,Modal,Radio,RichText,StageContent,Switch,UploadMedia} from './components';
 import {useAutosave} from './autosave';
 type EditorProps={g:GameView;editorId:string;save:(data:Record<string,unknown>)=>Promise<boolean>};
 function AutosaveStatus({autosave}:{autosave:ReturnType<typeof useAutosave>}){return <span className="autosave-status" role="status">{autosave.status==='saving'?'Saving…':autosave.status==='error'?<button onClick={()=>void autosave.retry()}>Couldn’t save · retry</button>:null}</span>}
@@ -28,7 +28,7 @@ export function QuestionsEditor({g,save,editorId}:EditorProps){
   const requestRemoveRow=(row:number)=>{
     const hasContent=r.categories.some(c=>{
       const q=c.questions[row];
-      return q&&(q.prompt.trim()||q.answer.trim()||q.notes.trim()||q.modifier?.title.trim()||q.modifier?.instructions.trim());
+      return q&&(q.prompt.trim()||q.answer.trim()||q.answerOptions?.some(option=>option.trim())||q.notes.trim()||q.modifier?.title.trim()||q.modifier?.instructions.trim());
     });
     if(hasContent)setPendingRemove(row);else removeRow(row);
   };
@@ -58,23 +58,63 @@ export function QuestionsEditor({g,save,editorId}:EditorProps){
 }
 
 function QuestionEditor({g,editorId,question,allowModifier,onChange,onDelete,onClose}:{g:GameView;editorId:string;question:Question;allowModifier:boolean;onChange:(q:Question,delay?:number)=>void;onDelete:(q:Question)=>void;onClose:()=>void}){
-  const[q,set]=useState(question),[preview,setPreview]=useState(false),[field,setField]=useState<'prompt'|'answer'>('prompt');
+  const[q,set]=useState<Question>(()=>{
+    const answerOptions=question.answerOptions?.length?[...question.answerOptions]:[question.answer];
+    while(answerOptions.length<2)answerOptions.push('');
+    return{...question,answerOptions,correctAnswerIndex:question.correctAnswerIndex??0,shuffleAnswers:question.shuffleAnswers!==false};
+  }),[preview,setPreview]=useState(false),[responsePreview,setResponsePreview]=useState(false);
+  const[activeAnswer,setActiveAnswer]=useState(question.correctAnswerIndex??0);
+  const[modifierDraft,setModifierDraft]=useState(question.modifier||{title:'',instructions:''});
+  const answerInputs=useRef<(HTMLInputElement|null)[]>([]);
+  const answers=q.answerOptions?.length?q.answerOptions:[q.answer];
+  const correct=Math.min(q.correctAnswerIndex??0,answers.length-1);
   const patch=(data:Partial<Question>,delay=450)=>{const next={...q,...data};set(next);onChange(next,delay);};
+  const updateAnswers=(answerOptions:string[],correctAnswerIndex=correct,delay=450)=>patch({answerOptions,correctAnswerIndex,answer:answerOptions[correctAnswerIndex]},delay);
+  const addAnswer=()=>{
+    setResponsePreview(false);setActiveAnswer(answers.length);
+    updateAnswers([...answers,''],correct,0);
+    requestAnimationFrame(()=>answerInputs.current[answers.length]?.focus());
+  };
+  const removeAnswer=(index:number)=>{
+    if(answers.length<=2)return;
+    const next=answers.filter((_,i)=>i!==index);
+    setActiveAnswer(index===activeAnswer?index%next.length:index<activeAnswer?activeAnswer-1:activeAnswer);
+    updateAnswers(next,index===correct?index%next.length:index<correct?correct-1:correct,0);
+  };
   return <Modal title="Edit question" onClose={onClose} wide>
     <div className="question-settings">
       <Field label="Board value"><input type="number" min={0} step={100} value={q.value} onChange={e=>patch({value:Number(e.target.value)})}/></Field>
-      {!q.modifier&&<Switch label="Daily double" checked={q.dailyDouble} onChange={dailyDouble=>patch({dailyDouble},0)}/>}
+      <Checkbox label="Daily double" checked={q.dailyDouble} disabled={!!q.modifier||!allowModifier} onChange={dailyDouble=>patch({dailyDouble},0)}/>
     </div>
-    {allowModifier&&<Switch label="Hidden modifier" description="Replaces this question. First to buzz claims it, then the instructions are revealed." checked={!!q.modifier} onChange={enabled=>patch({modifier:enabled?{title:'',instructions:''}:null,dailyDouble:false},0)}/>}
-    {q.modifier?<div className="modifier-fields">
-      <Field label="Modifier title" hint="Hidden from players until someone claims it."><input value={q.modifier.title} maxLength={80} placeholder="Trading places" onChange={e=>patch({modifier:{...q.modifier!,title:e.target.value}})}/></Field>
-      <Field label="What it does" hint="The presenter applies this manually. Include any duration here."><textarea rows={5} value={q.modifier.instructions} maxLength={20000} placeholder="Swap your points with another team. Or: approximate answers are allowed for the next 3 rounds." onChange={e=>patch({modifier:{...q.modifier!,instructions:e.target.value}})}/></Field>
-      <p className="modifier-help">The board shows only the value. Opening this cell starts a race to claim the mystery modifier. No points change automatically.</p>
-    </div>:<>
-      <div className="markdown-tools"><div className="segmented"><button className={field==='prompt'?'selected':''} onClick={()=>setField('prompt')}>Question</button><button className={field==='answer'?'selected':''} onClick={()=>setField('answer')}>Answer</button></div><div className="toolbar-actions"><UploadMedia id={g.id} editorId={editorId} onInsert={s=>patch({[field]:q[field]+s})}/><IconButton title={preview?'Edit Markdown':'Preview Markdown'} onClick={()=>setPreview(!preview)}>{preview?<Code2/>:<Eye/>}</IconButton></div></div>
-      {preview?<div className="markdown-preview"><RichText text={q[field]||'*Nothing here yet.*'}/></div>:<textarea className="markdown-editor" aria-label={field==='prompt'?'Question Markdown':'Answer Markdown'} value={q[field]} onChange={e=>patch({[field]:e.target.value})} placeholder={field==='prompt'?'Write your question. Markdown, images and media links work here.':'The answer, just for the host.'} rows={9}/>}
-    </>}
-    <details className="editor-details"><summary>Host notes<ChevronDown size={20}/></summary><Field label="Host notes"><textarea rows={3} value={q.notes} onChange={e=>patch({notes:e.target.value})}/></Field></details>
+    <div className="question-prompt-editor">
+      <div className="markdown-tools"><label htmlFor={`question-prompt-${q.id}`}>Question</label><div className="toolbar-actions"><UploadMedia id={g.id} editorId={editorId} onInsert={s=>patch({prompt:q.prompt+s})}/><IconButton title={preview?'Edit Markdown':'Preview Markdown'} onClick={()=>setPreview(!preview)}>{preview?<Code2/>:<Eye/>}</IconButton></div></div>
+      {preview?<div className="markdown-preview"><RichText text={q.prompt||'*Nothing here yet.*'}/></div>:<textarea id={`question-prompt-${q.id}`} className="markdown-editor" value={q.prompt} onChange={e=>patch({prompt:e.target.value})} placeholder="Write your question. Markdown, images and media links work here." rows={5}/>}
+    </div>
+    <section className="question-answer-editor" aria-label="Answer or modifier">
+      <div className="question-answer-toolbar">
+        {allowModifier?<div className="segmented" role="group" aria-label="Question type"><button type="button" aria-pressed={!q.modifier} className={!q.modifier?'selected':''} onClick={()=>{setResponsePreview(false);patch({modifier:null},0);}}>Answer</button><button type="button" aria-pressed={!!q.modifier} className={q.modifier?'selected':''} onClick={()=>{setResponsePreview(false);patch({modifier:modifierDraft,dailyDouble:false},0);}}>Modifier</button></div>:<h3>Answer</h3>}
+        <div className="toolbar-actions">
+          {!q.modifier&&<IconButton title="Shuffle answers" aria-pressed={q.shuffleAnswers!==false} onClick={()=>patch({shuffleAnswers:q.shuffleAnswers===false},0)}><Shuffle size={20}/></IconButton>}
+          <UploadMedia id={g.id} editorId={editorId} onInsert={s=>{
+            if(q.modifier){const modifier={...q.modifier,instructions:q.modifier.instructions+s};setModifierDraft(modifier);patch({modifier});}
+            else updateAnswers(answers.map((answer,i)=>i===activeAnswer?`${answer}${answer?' ':''}${s.trim()}`:answer));
+          }}/>
+          <IconButton title={`${responsePreview?'Edit':'Preview'} ${q.modifier?'modifier':'answers'}`} aria-pressed={responsePreview} onClick={()=>setResponsePreview(!responsePreview)}>{responsePreview?<Code2 size={20}/>:<Eye size={20}/>}</IconButton>
+        </div>
+      </div>
+      {q.modifier?responsePreview?<div className="modifier-preview markdown-preview"><h3>{q.modifier.title}</h3><RichText text={q.modifier.instructions||'*Nothing here yet.*'}/></div>:<div className="modifier-fields">
+        <Field label="Modifier title"><input value={q.modifier.title} maxLength={80} placeholder="Trading places" onChange={e=>{const modifier={...q.modifier!,title:e.target.value};setModifierDraft(modifier);patch({modifier});}}/></Field>
+        <Field label="What it does" hint="The presenter applies this manually. Include any duration here."><textarea rows={3} value={q.modifier.instructions} maxLength={20000} placeholder="Swap your points with another team. Include any duration here." onChange={e=>{const modifier={...q.modifier!,instructions:e.target.value};setModifierDraft(modifier);patch({modifier});}}/></Field>
+      </div>:<fieldset className="answer-options-editor"><legend className="visually-hidden">Answers</legend>
+        {answers.map((answer,i)=><div className={`answer-option-row has-choices ${activeAnswer===i?'is-active':''}`} key={i}>
+          <Radio name={`correct-answer-${q.id}`} label={`Answer ${i+1} is correct`} checked={correct===i} onChange={()=>{setActiveAnswer(i);updateAnswers(answers,i,0);}}/>
+          {responsePreview?<div className="answer-option-preview" tabIndex={0} aria-label={`Answer ${i+1} preview`} onFocus={()=>setActiveAnswer(i)} onClick={()=>setActiveAnswer(i)}><RichText text={answer||'*No answer yet.*'}/></div>:<input ref={node=>{answerInputs.current[i]=node;}} aria-label={`Answer ${i+1}`} value={answer} onFocus={()=>setActiveAnswer(i)} onChange={e=>updateAnswers(answers.map((value,index)=>index===i?e.target.value:value))} placeholder={`Answer ${i+1}`} maxLength={100000}/>}
+          <IconButton title={`Remove answer ${i+1}`} disabled={answers.length<=2} onClick={()=>removeAnswer(i)}><Trash2 size={20}/></IconButton>
+        </div>)}
+        <Button className="add-answer" onClick={addAnswer}><Plus size={20}/>Add answer</Button>
+      </fieldset>}
+    </section>
+    <div className="question-host-notes"><Field label="Host notes"><textarea rows={3} value={q.notes} onChange={e=>patch({notes:e.target.value})}/></Field></div>
     <div className="modal-actions"><Button variant="danger" onClick={()=>onDelete(q)}><Trash2 size={20}/>Clear question</Button><Button variant="primary" onClick={onClose}><Check size={20}/>Done</Button></div>
   </Modal>;
 }

@@ -1,6 +1,6 @@
 export interface HiddenModifier { title: string; instructions: string }
 export interface ModifierClaim extends HiddenModifier { id: string; questionId: string; playerId: string; roundIndex: number }
-export interface Question { modifier?: HiddenModifier|null; id: string; value: number; prompt: string; answer: string; notes: string; dailyDouble: boolean }
+export interface Question { modifier?: HiddenModifier|null; id: string; value: number; prompt: string; answer: string; answerOptions?: string[]; correctAnswerIndex?: number; shuffleAnswers?: boolean; notes: string; dailyDouble: boolean }
 export interface Category { id: string; name: string; questions: Question[] }
 export interface Round { id: string; name: string; type: 'board'|'final'; categories: Category[] }
 export interface Theme { preset: 'paper'|'ink'|'clay'|'forest'; accent: string; paper: string; ink: string; surface: string; muted: string; line: string; displayFont: 'serif'|'sans'; background: string; motion: boolean; sound: boolean; title: string }
@@ -8,7 +8,7 @@ export interface Settings { buzzMode: 'first'|'queue'; autoOpenBuzzers: boolean;
 export interface Player { id: string; name: string; color: string; token: string; score: number; connected: boolean; ready: boolean; blockedUntil: number; stats: {correct: number; incorrect: number; buzzes: number}; joinedAt: number }
 export interface Buzz { playerId: string; at: number; order: number }
 export interface FinalEntry { wager: number; answer: string; submitted: boolean; judged: boolean; correct?: boolean }
-export interface Current { questionId: string; category: string; buzzOpen: boolean; buzzes: Buzz[]; answeringId: string|null; attempted: string[]; revealAt: number|null; revealed: boolean; phase: 'question'|'wager'|'final'|'modifier'; wagers: Record<string, FinalEntry>; closed: boolean }
+export interface Current { questionId: string; category: string; answerOrder?: number[]; buzzOpen: boolean; buzzes: Buzz[]; answeringId: string|null; attempted: string[]; revealAt: number|null; revealed: boolean; phase: 'question'|'wager'|'final'|'modifier'; wagers: Record<string, FinalEntry>; closed: boolean }
 export interface QuestionSelection { questionId:string; opensAt:number }
 export const QUESTION_SELECTION_MS=800;
 export interface HistoryEntry { id:string; at:number; label:string; deltas:Record<string,number> }

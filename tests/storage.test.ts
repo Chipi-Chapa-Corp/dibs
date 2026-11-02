@@ -14,6 +14,18 @@ function fixture(){
 }
 const write=(file:string,data:unknown)=>writeFileSync(file,JSON.stringify(data));
 const read=(file:string)=>JSON.parse(readFileSync(file,'utf8'));
+test('answer choices, selection, shuffle preference and the live shuffled order survive restart',()=>{
+ const f=fixture();
+ try{
+  const rounds=demoRounds();Object.assign(rounds[0].categories[0].questions[0],{answerOptions:['Mercury','Venus','Mars'],correctAnswerIndex:1,shuffleAnswers:true});
+  const g=createGame({definition:{rounds}}),q=g.rounds[0].categories[0].questions[0];
+  act(g,'start');act(g,'openQuestion',{questionId:q.id});
+  const order=structuredClone(g.current?.answerOrder),visible=view(g,'stage').currentQuestion?.answerOptions;
+  f.load().save(g);const restored=f.load().games.get(g.id)!,saved=restored.rounds[0].categories[0].questions[0];
+  assert.deepEqual(saved.answerOptions,['Mercury','Venus','Mars']);assert.equal(saved.correctAnswerIndex,1);assert.equal(saved.answer,'Venus');assert.equal(saved.shuffleAnswers,true);
+  assert.deepEqual(restored.current?.answerOrder,order);assert.deepEqual(view(restored,'stage').currentQuestion?.answerOptions,visible);
+ }finally{f.remove();}
+});
 
 test('each new game gets its own JSON file and saving one leaves the others untouched',()=>{
  const f=fixture();
