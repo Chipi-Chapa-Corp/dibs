@@ -8,14 +8,15 @@ export interface Settings { buzzMode: 'first'|'queue'; autoOpenBuzzers: boolean;
 export interface Player { id: string; name: string; color: string; token: string; score: number; connected: boolean; ready: boolean; blockedUntil: number; stats: {correct: number; incorrect: number; buzzes: number}; joinedAt: number }
 export interface Buzz { playerId: string; at: number; order: number }
 export interface FinalEntry { wager: number; answer: string; submitted: boolean; judged: boolean; correct?: boolean }
-export interface Current { questionId: string; category: string; buzzOpen: boolean; buzzes: Buzz[]; answeringId: string|null; attempted: string[]; revealAt: number|null; revealed: boolean; phase: 'question'|'wager'|'final'|'modifier'; wagers: Record<string, FinalEntry>; closed: boolean }
+export interface Current { dailyDoubleFromId?:string|null; questionId: string; category: string; buzzOpen: boolean; buzzes: Buzz[]; answeringId: string|null; attempted: string[]; revealAt: number|null; revealed: boolean; phase: 'question'|'wager'|'final'|'modifier'; wagers: Record<string, FinalEntry>; closed: boolean }
 export interface QuestionSelection { questionId:string; opensAt:number }
 export const QUESTION_SELECTION_MS=800;
 export interface HistoryEntry { id:string; at:number; label:string; deltas:Record<string,number> }
 export interface Announcement { id:string; title:string; detail:string; at:number }
-export interface Game { hostClaimable?: boolean; modifierClaims: ModifierClaim[]; id:string; name:string; subtitle:string; hostToken:string; createdAt:number; status:'lobby'|'playing'|'finished'; paused:boolean; roundIndex:number; rounds:Round[]; settings:Settings; theme:Theme; players:Player[]; played:string[]; current:Current|null; history:HistoryEntry[]; undo:unknown[]; questionCount:number; selection:QuestionSelection|null; announcement:Announcement|null; revision:number }
+export interface HostTransfer { tokenHash:string; expiresAt:number }
+export interface Game { hostTransfer?:HostTransfer|null; hostClaimable?: boolean; modifierClaims: ModifierClaim[]; id:string; name:string; subtitle:string; hostToken:string; createdAt:number; status:'lobby'|'playing'|'finished'; paused:boolean; roundIndex:number; rounds:Round[]; settings:Settings; theme:Theme; players:Player[]; played:string[]; current:Current|null; history:HistoryEntry[]; undo:unknown[]; questionCount:number; selection:QuestionSelection|null; announcement:Announcement|null; revision:number }
 export type PublicPlayer = Omit<Player,'token'>;
-export interface GameView extends Omit<Game,'hostToken'|'players'|'undo'|'rounds'> { players:PublicPlayer[]; rounds:Round[]; selfId?:string; filledQuestionIds:string[]; role:'host'|'player'|'stage'; serverTime:number; currentQuestion:Question|null; yourFinal:FinalEntry|null }
+export interface GameView extends Omit<Game,'hostToken'|'hostTransfer'|'players'|'undo'|'rounds'> { players:PublicPlayer[]; rounds:Round[]; selfId?:string; filledQuestionIds:string[]; role:'host'|'player'|'stage'; serverTime:number; currentQuestion:Question|null; yourFinal:FinalEntry|null }
 export interface GameSummary {hostClaimable?:boolean;id:string;name:string;subtitle:string;status:Game['status'];playerCount:number;questionTotal:number;rounds:number;accent:string;createdAt:number;locked:boolean}
 export const uid = () => Math.random().toString(36).slice(2,10);
 export const themes: Record<Theme['preset'], Omit<Theme,'preset'|'displayFont'|'background'|'motion'|'sound'|'title'>> = {

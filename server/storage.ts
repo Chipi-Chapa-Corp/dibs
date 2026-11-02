@@ -24,6 +24,7 @@ function restore(value:unknown):Game{
   if(game.current){const {selectionPlayerId:_legacySelectionPlayer,...current}=game.current as Game['current']&RecordValue;game.current=current;}
   game.modifierClaims??=[];
   game.hostClaimable=game.hostClaimable===true;
+  if(game.hostTransfer&&(!object(game.hostTransfer)||!/^[a-f0-9]{64}$/.test(game.hostTransfer.tokenHash)||!Number.isFinite(game.hostTransfer.expiresAt)))game.hostTransfer=null;
   normalizeStoredGameplay(game);
   for(const snapshot of game.undo)if(object(snapshot)&&object(snapshot.settings)&&Array.isArray(snapshot.rounds))normalizeStoredGameplay(snapshot as Game);
   updateDefinition(game,{rounds:game.rounds});

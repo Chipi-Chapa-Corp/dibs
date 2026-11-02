@@ -10,6 +10,31 @@ import {demoRounds} from '../shared/model.ts';
 import type {GameView} from '../shared/model.ts';
 const once=(s:Socket,event:string)=>new Promise<any>(resolve=>s.once(event,resolve));
 const emit=(s:Socket,event:string,data:unknown)=>new Promise<any>((resolve,reject)=>s.timeout(3000).emit(event,data,(err:Error,result:unknown)=>err?reject(err):resolve(result)));
+test('Daily Double host assignment, phone wager and mandatory answer synchronize across real clients',async()=>{
+ const dir=mkdtempSync(join(tmpdir(),'dibs-daily-network-')),server=await startServer({port:0,dataDir:dir,dev:false,quiet:true}),sockets:Socket[]=[];
+ try{
+  const base=`http://127.0.0.1:${(server.server.address()as{port:number}).port}`;
+  const post=async(path:string,data:unknown)=>(await fetch(base+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})).json();
+  const rounds=demoRounds();rounds[0].categories[0].questions[0].dailyDouble=true;
+  const created=await post('/api/games',{name:'Daily Double network',definition:{rounds}}),a=await post(`/api/games/${created.id}/join`,{name:'Choosing team'}),b=await post(`/api/games/${created.id}/join`,{name:'Required team'});
+  const connect=async(role:string,token?:string)=>{const s=io(base,{autoConnect:false,transports:['websocket']});sockets.push(s);let latest:GameView;s.on('state',v=>latest=v);s.connect();await once(s,'connect');assert((await emit(s,'subscribe',{gameId:created.id,role,token})).ok);return{s,state:()=>latest!};};
+  const host=await connect('host',created.hostToken),selecting=await connect('player',a.token),answering=await connect('player',b.token),stage=await connect('stage');
+  const command=(s:Socket,action:string,data?:unknown)=>emit(s,'command',{action,data});
+  await command(host.s,'start');await command(host.s,'openQuestion',{questionId:rounds[0].categories[0].questions[0].id});
+  await command(host.s,'assignDailyDouble',{fromId:a.playerId,playerId:b.playerId});
+  await waitState(answering,v=>v.current?.answeringId===b.playerId);assert.equal(answering.state().current?.dailyDoubleFromId,a.playerId);
+  assert.equal((await command(selecting.s,'wager',{wager:750})).ok,false);
+  assert.equal((await command(answering.s,'wager',{wager:750})).ok,true);
+  await waitState(host,v=>v.current?.wagers[b.playerId]?.wager===750);await waitState(stage,v=>v.current?.wagers[b.playerId]?.wager===750);
+  assert.equal(stage.state().currentQuestion?.prompt,'');assert.equal(answering.state().yourFinal?.wager,750);
+  await command(host.s,'finalBegin');await waitState(stage,v=>v.current?.phase==='question');
+  assert.equal(stage.state().currentQuestion?.prompt,rounds[0].categories[0].questions[0].prompt);assert.equal(stage.state().current?.buzzOpen,false);
+  assert.equal((await command(selecting.s,'buzz')).ok,false);assert.equal((await command(host.s,'answerer',{playerId:a.playerId})).ok,false);
+  assert.equal((await command(host.s,'judge',{correct:false})).ok,true);
+  await waitState(stage,v=>v.players.find(p=>p.id===b.playerId)?.score===-750);
+  assert.equal(stage.state().players.find(p=>p.id===a.playerId)?.score,0);assert(stage.state().current?.closed);
+ }finally{sockets.forEach(s=>s.disconnect());await server.close();rmSync(dir,{recursive:true,force:true});}
+});
 async function waitState(client:{s:Socket;state:()=>GameView},predicate:(v:GameView)=>boolean){
  if(predicate(client.state()))return;
  await new Promise<void>((resolve,reject)=>{
@@ -189,7 +214,7 @@ test('library preparation saves before hosting; stale editors cannot change a ru
   await emit(host,'command',{action:'start'});await emit(host,'command',{action:'adjust',data:{playerId:player.playerId,amount:700}});
   const rejected=await emit(editor,'command',{action:'save',data:{rounds:[],name:'Must not change',settings:{startingScore:999},theme:{title:'Must not change'}}});
   assert.equal(rejected.ok,false);assert.match(rejected.error,/Make a copy to edit/);
-  assert.equal((await fetch(`${base}/api/games/${created.id}/media`,{method:'POST',headers:{Authorization:`Bearer ${created.hostToken}`}})).status,400);
+  assert.equal((await fetch(`${base}/api/games/${created.id}/media`,{method:'POST',headers:{Authorization:`Bearer ${created.hostToken}`,'Content-Type':'application/json'},body:'{}'})).status,400);
   const exported=await (await fetch(`${base}/api/games/${created.id}/export`,{headers:{Authorization:`Bearer ${created.hostToken}`}})).json();assert.deepEqual(exported,before);
   const copied=await post('/api/games',{name:before.name+' (copy)',definition:{...before,name:before.name+' (copy)'}});
   assert.notEqual(copied.id,created.id);assert.notEqual(copied.hostToken,created.hostToken);

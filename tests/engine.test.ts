@@ -17,7 +17,7 @@ test('questions remain open without time limits and game pause still blocks play
  act(g,'pause');act(g,'buzz',{},'player',a.id,86400002);assert.equal(g.current?.answeringId,a.id);
 });
 test('private final wagers, private submissions, scoring exactly once and final results',()=>{const{g,a,b}=fixture();a.score=500;b.score=-100;act(g,'round',{index:2});act(g,'wager',{wager:800},'player',a.id);act(g,'wager',{wager:200},'player',b.id);assert.equal(g.current?.wagers[a.id].wager,500);assert.equal(g.current?.wagers[b.id].wager,0);assert.equal(view(g,'stage').current?.wagers[a.id].wager,0);act(g,'finalBegin');act(g,'finalAnswer',{answer:'A light-year'},'player',a.id);assert.equal(view(g,'stage').current?.wagers[a.id].answer,'');assert.equal(view(g,'host').current?.wagers[a.id].answer,'A light-year');act(g,'judge',{playerId:a.id,correct:true});assert.equal(a.score,1000);assert.throws(()=>act(g,'judge',{playerId:a.id,correct:true}));act(g,'finish');assert.equal(g.status,'finished');});
-test('daily double prompts only its selected player, then uses the wager for scoring',()=>{const{g,a,b,q}=fixture();q.dailyDouble=true;a.score=500;act(g,'openQuestion',{questionId:q.id,playerId:a.id});assert.equal(g.current?.phase,'wager');assert.throws(()=>act(g,'wager',{wager:100},'player',b.id));act(g,'wager',{wager:400},'player',a.id);act(g,'finalBegin');act(g,'judge',{correct:true});assert.equal(a.score,900);});
+test('daily double prompts only its selected player, then uses the wager for scoring',()=>{const{g,a,b,q}=fixture();q.dailyDouble=true;a.score=500;act(g,'openQuestion',{questionId:q.id});act(g,'assignDailyDouble',{fromId:b.id,playerId:a.id});assert.equal(g.current?.phase,'wager');assert.throws(()=>act(g,'wager',{wager:100},'player',b.id));act(g,'wager',{wager:400},'player',a.id);act(g,'finalBegin');act(g,'judge',{correct:true});assert.equal(a.score,900);});
 test('malformed definitions cannot partially overwrite valid data',()=>{const{g}=fixture();const original=structuredClone(g.rounds);assert.throws(()=>updateDefinition(g,{rounds:[{name:'broken',categories:null}],name:'oops'}));assert.deepEqual(g.rounds,original);assert.equal(g.name,'Test');});
 test('player permissions reject score changes, judging, settings and arbitrary actor impersonation',()=>{const{g,a,b}=fixture();for(const action of ['adjust','judge','save','round','finish','undo'])assert.throws(()=>act(g,action,{playerId:b.id,amount:9999},'player',a.id));assert.equal(b.score,0);});
 test('old timer settings, question overrides and timer commands cannot enable countdowns',()=>{
@@ -127,8 +127,8 @@ test('final answers remain editable until the presenter reveals the answer',()=>
  assert.throws(()=>act(g,'finalAnswer',{answer:'After reveal'},'player',a.id,172801001),/Answers are closed/);
 });
 test('Daily Double answerers have no deadline',()=>{
- const {g,a,q}=fixture();q.dailyDouble=true;
- act(g,'openQuestion',{questionId:q.id,playerId:a.id},'host',null,1000);
+ const {g,a,b,q}=fixture();q.dailyDouble=true;
+ act(g,'openQuestion',{questionId:q.id},'host',null,1000);act(g,'assignDailyDouble',{fromId:b.id,playerId:a.id},'host',null,1100);
  act(g,'wager',{wager:100},'player',a.id,2000);act(g,'finalBegin',{},'host',null,3000);
  assert(!tick(g,86400000));assert(!g.current?.revealed);assert(!('timer' in g.current!));
  act(g,'judge',{correct:true},'host',null,86400001);assert.equal(a.score,100);

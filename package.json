@@ -7,7 +7,9 @@
     "dev": "node scripts/dev.mjs",
     "build": "tsc --noEmit && vite build",
     "start": "NODE_ENV=production tsx server/index.ts",
-    "test": "tsx --test tests/*.test.ts"
+    "test": "tsx --test tests/*.test.ts",
+    "play": "npm run build && npm start",
+    "firewall:enable": "node scripts/enable-firewall.mjs"
   },
   "dependencies": {
     "react": "^19.3.1",

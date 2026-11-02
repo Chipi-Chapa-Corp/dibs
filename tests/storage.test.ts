@@ -106,19 +106,19 @@ test('the bundled sample is seeded only when the game directory is first created
  }finally{f.remove();}
 });
 
-test('loading and undoing older saves discards player-selection settings while preserving Daily Double answerers',()=>{
+test('loading and undoing older saves removes chooser settings and returns legacy Daily Doubles to team assignment',()=>{
  const f=fixture();
  try{
   const game=createGame({definition:{rounds:demoRounds()}}),player=addPlayer(game,'Ada');player.score=500;
   const question=game.rounds[0].categories[0].questions[0];question.dailyDouble=true;
   act(game,'start');act(game,'openQuestion',{questionId:question.id,playerId:player.id});act(game,'adjust',{playerId:player.id,amount:1});
   const stored=JSON.parse(JSON.stringify(game));
-  for(const snapshot of [stored,...stored.undo]){snapshot.settings.selection='winner';snapshot.chooserId=player.id;if(snapshot.current)snapshot.current.selectionPlayerId=player.id;}
+  for(const snapshot of [stored,...stored.undo]){snapshot.settings.selection='winner';snapshot.chooserId=player.id;if(snapshot.current){snapshot.current.selectionPlayerId=player.id;snapshot.current.answeringId=player.id;snapshot.current.phase='question';snapshot.current.wagers={[player.id]:{wager:200,answer:'',submitted:true,judged:false}};}}
   write(join(f.directory,'old-selection.json'),stored);
   const restored=f.load().games.get(game.id)!;
-  assert(!('selection' in restored.settings));assert(!('chooserId' in restored));assert(!('selectionPlayerId' in restored.current!));assert.equal(restored.current?.answeringId,player.id);
+  assert(!('selection' in restored.settings));assert(!('chooserId' in restored));assert(!('selectionPlayerId' in restored.current!));assert.equal(restored.current?.answeringId,null);assert.equal(restored.current?.phase,'wager');assert.deepEqual(restored.current?.wagers,{});
   act(restored,'undo');
-  assert(!('selection' in restored.settings));assert(!('chooserId' in restored));assert(!('selectionPlayerId' in restored.current!));assert.equal(restored.current?.answeringId,player.id);assert.equal(restored.players[0].score,500);
+  assert(!('selection' in restored.settings));assert(!('chooserId' in restored));assert(!('selectionPlayerId' in restored.current!));assert.equal(restored.current?.answeringId,null);assert.equal(restored.current?.phase,'wager');assert.deepEqual(restored.current?.wagers,{});assert.equal(restored.players[0].score,500);
   assert.throws(()=>act(restored,'selectQuestion',{questionId:question.id},'player',player.id),/Host access/);
  }finally{f.remove();}
 });

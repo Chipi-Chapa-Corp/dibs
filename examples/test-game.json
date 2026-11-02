@@ -61,7 +61,7 @@
               "value": 200,
               "prompt": "What is **12 × 12**?",
               "answer": "144.",
-              "notes": "Daily Double: select the wagering team, collect its wager (or set it in the host console), then lock wagers and open the question. Only that team answers; judge directly without opening buzzers.",
+              "notes": "Daily Double: record the selecting team and a different team they give it to. Offer wager choices verbally; the assigned team chooses one on its phone, or the presenter records it. Confirm the chosen wager, then lock it and open the question. The assigned team must answer; judge directly without buzzers.",
               "dailyDouble": true,
               "modifier": null
             }

@@ -34,7 +34,7 @@ The presenter can open cells in any order; this table is for the host only.
 2. On a normal question, judge one team incorrect and let another team buzz. Check the first team stays locked out.
 3. Leave the hexagon question open, then try pausing/resuming the game and closing, reopening or resetting buzzers.
 4. Open a hidden modifier: neither its name nor effect should be visible to players before the first claim. Buzz at the same time; only one team should win. Apply its instructions manually using the score controls. Undo a score edit if needed.
-5. For a Daily Double, choose the wagering team, collect or set its wager, and select **Lock wagers & open question**. Judge that team directly; there is no buzzer race.
+5. For a Daily Double, record the selecting team and a different team they give it to, then click **Confirm teams**. Offer wager amounts verbally; the assigned team chooses one on its phone, or the presenter records it. Confirm the choice, then click **Lock wager & open question**. That team must answer. Judge **Correct** or **Incorrect / no answer**; there is no buzzer race.
 6. Keep **Close enough** as a reminder through the next board and final. Its numeric tolerance is explained in each relevant question’s host notes. Dismiss one-time modifiers after applying them.
 7. Close and reopen one phone’s tab in the same browser. Its identity, score and modifier reminders should return.
 8. Move to the final, collect private wagers and answers, and reveal the answer and check that further answer edits are rejected. Judge each team once and finish to show standings.
