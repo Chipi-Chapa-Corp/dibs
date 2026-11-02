@@ -105,16 +105,6 @@ function Host({id}:{id:string}){
   const{g,connected,error,command}=useGame(id,'host');
   const[invite,setInvite]=useState(false),[adjust,setAdjust]=useState<string|null>(null),[confirm,setConfirm]=useState<'finish'|'round'|null>(null),[reset,setReset]=useState(false),[more,setMore]=useState(false);
   const toast=useToast();
-  useEffect(()=>{
-    const key=(e:KeyboardEvent)=>{
-      if((e.target as HTMLElement).closest('input,textarea,select,[contenteditable=true]')||document.querySelector('[role=dialog]'))return;
-      if(e.code==='Space'){e.preventDefault();if(g?.current?.phase==='question')void command(g.current.buzzOpen?'closeBuzzers':'openBuzzers');}
-      if(e.key.toLowerCase()==='r'&&g?.current)void command('reveal');
-      if(e.key.toLowerCase()==='n'&&g?.current)void command('closeQuestion');
-      if((e.ctrlKey||e.metaKey)&&e.key==='z'){e.preventDefault();void command('undo');}
-    };
-    document.addEventListener('keydown',key);return()=>document.removeEventListener('keydown',key);
-  },[g]);
   if(!g)return <LoadError error={error} connected={connected}/>;
   const questionTotal=g.filledQuestionIds.length;
   const waitingForReady=g.settings.requireReady&&g.players.some(p=>!p.ready);
@@ -136,7 +126,7 @@ function Host({id}:{id:string}){
       {g.status==='finished'&&<Button disabled={!connected} onClick={async()=>{if(await command('resume'))setMore(false);}}><Play size={20}/>Resume game</Button>}
       {g.status==='playing'&&<Button onClick={()=>{setMore(false);setConfirm('finish');}}><Flag size={20}/>Finish game</Button>}
       <Button onClick={()=>{setMore(false);setReset(true);}}><RotateCcw size={20}/>Reset game</Button>
-    </div><details className="host-shortcuts"><summary>Keyboard shortcuts<ChevronDown size={20}/></summary><div className="shortcut-strip"><span><kbd>Space</kbd> Buzzers</span><span><kbd>R</kbd> Reveal</span><span><kbd>N</kbd> Board</span><span><kbd>⌘/Ctrl Z</kbd> Undo</span></div></details></Modal>}
+    </div></Modal>}
     {reset&&<ResetGameDialog name={g.name} command={command} onClose={()=>setReset(false)} onReset={()=>{setReset(false);setAdjust(null);setConfirm(null);toast('Game reset · players can join again');}}/>}
     {confirm&&<Modal title={confirm==='finish'?'Finish this game?':'Move to the next round?'} onClose={()=>setConfirm(null)}><div className="modal-actions"><Button onClick={()=>setConfirm(null)}>Cancel</Button><Button variant="primary" disabled={!connected} onClick={async()=>{if(await command(confirm==='finish'?'finish':'round',{index:g.roundIndex+1}))setConfirm(null);}}>{confirm==='finish'?'Show results':'Next round'}<ArrowRight size={20}/></Button></div></Modal>}
   </div>;
