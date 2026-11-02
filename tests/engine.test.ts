@@ -49,6 +49,27 @@ test('answer option normalization keeps at least two rows and defaults shuffling
   assert.equal(q.answerOptions?.length,2);assert.equal(q.answerOptions?.[1],'');assert.equal(q.shuffleAnswers,true);
  }
 });
+test('Free Response discards proposed choices and keeps the expected answer private until reveal',()=>{
+ const rounds=demoRounds();Object.assign(rounds[0].categories[0].questions[0],{responseType:'free',answer:'Expected response',answerOptions:['Old choice','Other choice'],correctAnswerIndex:1,shuffleAnswers:true});
+ const g=createGame({definition:{rounds,settings:{revealDelayMs:0}}}),q=g.rounds[0].categories[0].questions[0],a=addPlayer(g,'Ada');
+ assert.equal(q.responseType,'free');assert.equal(q.answer,'Expected response');assert(!('answerOptions' in q));assert(!('correctAnswerIndex' in q));assert(!('shuffleAnswers' in q));
+ act(g,'start');act(g,'openQuestion',{questionId:q.id});assert(!g.current?.answerOrder);
+ for(const role of ['stage','player']as const){const visible=view(g,role,a.id).currentQuestion!;assert.equal(visible.responseType,'free');assert.equal(visible.answer,'');assert(!visible.answerOptions);}
+ assert.equal(view(g,'host').currentQuestion?.answer,'Expected response');act(g,'reveal');assert.equal(view(g,'stage').currentQuestion?.answer,'Expected response');
+});
+test('Final stays after boards and reordering preserves the selected round',()=>{
+ const [first,second,final]=demoRounds();
+ const g=createGame({definition:{rounds:[final,first,second]}});assert.deepEqual(g.rounds.map(r=>r.id),[first.id,second.id,final.id]);
+ g.roundIndex=1;act(g,'save',{rounds:[final,second,first]});assert.deepEqual(g.rounds.map(r=>r.id),[second.id,first.id,final.id]);assert.equal(g.rounds[g.roundIndex].id,second.id);
+});
+test('Final Free Response accepts private submissions and never offers a modifier or choices',()=>{
+ const rounds=demoRounds();Object.assign(rounds[2].categories[0].questions[0],{responseType:'free',answer:'The final answer',answerOptions:['Old','Choices'],modifier:{title:'Invalid',instructions:'Not allowed'},dailyDouble:true});
+ const g=createGame({definition:{rounds}}),a=addPlayer(g,'Ada');a.score=500;
+ const q=g.rounds[2].categories[0].questions[0];assert.equal(q.modifier,null);assert.equal(q.dailyDouble,false);assert.equal(q.answer,'The final answer');assert(!q.answerOptions);
+ act(g,'start');act(g,'round',{index:2});act(g,'wager',{wager:200},'player',a.id);act(g,'finalBegin');
+ assert.equal(g.current?.phase,'final');assert.equal(view(g,'player',a.id).currentQuestion?.responseType,'free');assert(!view(g,'player',a.id).currentQuestion?.answerOptions);
+ act(g,'finalAnswer',{answer:'My final response'},'player',a.id);assert.equal(view(g,'host').current?.wagers[a.id].answer,'My final response');assert.equal(view(g,'stage').current?.wagers[a.id].answer,'');
+});
 test('answer option imports retain single answers, infer and clamp selection, and reject malformed lists atomically',()=>{
  const rounds=demoRounds(),q=rounds[0].categories[0].questions[0];
  const original=q.answer;const legacy=createGame({definition:{rounds}});assert.equal(legacy.rounds[0].categories[0].questions[0].answer,original);

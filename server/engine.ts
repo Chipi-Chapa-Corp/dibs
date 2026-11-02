@@ -1,5 +1,5 @@
 import {randomBytes} from 'node:crypto';
-import {defaultSettings,defaultTheme,emptyRound,uid,themes,isQuestionFilled,QUESTION_SELECTION_MS} from '../shared/model.ts';
+import {defaultSettings,defaultTheme,emptyRound,uid,themes,isQuestionFilled,QUESTION_SELECTION_MS,orderRounds} from '../shared/model.ts';
 import type {Game,GameView,Player,Question,Settings,Theme,Round} from '../shared/model.ts';
 
 type Input=Record<string,any>;
@@ -28,9 +28,12 @@ export function normalizeSettings(data:Input,old=defaultSettings):Settings {
   if(!['first','queue'].includes(s.buzzMode))s.buzzMode='first';if(!['score','unlimited'].includes(s.finalMaxWager))s.finalMaxWager='score';return s;
 }
 /** Discard retired settings and countdown fields in saved games and undo snapshots. */
-export function normalizeStoredGameplay(state:Pick<Game,'settings'|'rounds'|'current'>&Partial<Pick<Game,'selection'>>){
+export function normalizeStoredGameplay(state:Pick<Game,'settings'|'rounds'|'current'>&Partial<Pick<Game,'selection'|'roundIndex'>>){
   for(const field of ['hostToken','hostClaimable','hostTransfer'])delete(state as unknown as Input)[field];
   state.settings=normalizeSettings(state.settings);state.selection??=null;
+  const activeRoundId=state.roundIndex===undefined?undefined:state.rounds[state.roundIndex]?.id;
+  state.rounds=orderRounds(state.rounds);
+  if(activeRoundId)state.roundIndex=state.rounds.findIndex(r=>r.id===activeRoundId);
   for(const round of state.rounds)for(const category of round.categories)for(const question of category.questions)delete(question as unknown as Input).timer;
   if(state.current){
     delete(state.current as unknown as Input).timer;
@@ -49,18 +52,20 @@ function normalizeTheme(data:Input,old=defaultTheme):Theme {
 function normalizeRounds(data:unknown):Round[]{
   assert(Array.isArray(data)&&data.length>0&&data.length<=20,'Use 1–20 rounds');const ids=new Set<string>();
   const id=(s:unknown)=>{let n=text(s,60)||uid();if(ids.has(n))n=uid();ids.add(n);return n;};
-  return (data as Input[]).map((r,i)=>{assert(Array.isArray(r.categories)&&r.categories.length<=10,'Use up to 10 categories');return{id:id(r.id),name:text(r.name,60)||`Round ${i+1}`,type:r.type==='final'?'final':'board',categories:r.categories.map((c:Input)=>{assert(Array.isArray(c.questions)&&c.questions.length<=12,'Use up to 12 questions per category');return{id:id(c.id),name:text(c.name,60)||'Category',questions:c.questions.map((q:Input)=>{
+  const rounds:Round[]=(data as Input[]).map((r,i)=>{assert(Array.isArray(r.categories)&&r.categories.length<=10,'Use up to 10 categories');return{id:id(r.id),name:text(r.name,60)||`Round ${i+1}`,type:r.type==='final'?'final':'board',categories:r.categories.map((c:Input)=>{assert(Array.isArray(c.questions)&&c.questions.length<=12,'Use up to 12 questions per category');return{id:id(c.id),name:text(c.name,60)||'Category',questions:c.questions.map((q:Input)=>{
     const question:Question={id:id(q.id),value:Math.round(finite(q.value,100,0,1e7)),prompt:text(q.prompt,100000),answer:text(q.answer,100000),notes:text(q.notes,20000),dailyDouble:!!q.dailyDouble&&!q.modifier&&r.type!=='final',modifier:r.type==='final'||!q.modifier?null:{title:text(q.modifier.title,80)||'Mystery modifier',instructions:text(q.modifier.instructions,20000)}};
-    if(q.answerOptions!==undefined){
+    if(q.responseType!==undefined)question.responseType=q.responseType==='free'?'free':'answer';
+    if(q.responseType!=='free'&&q.answerOptions!==undefined){
       assert(Array.isArray(q.answerOptions),'Answer options must be a list');
       const answerOptions:string[]=q.answerOptions.length?q.answerOptions.map((option:unknown)=>text(option,100000)):[question.answer];
       while(answerOptions.length<2)answerOptions.push('');
       question.correctAnswerIndex=Math.round(finite(q.correctAnswerIndex,Math.max(0,answerOptions.indexOf(question.answer)),0,answerOptions.length-1));
       question.answerOptions=answerOptions;question.answer=answerOptions[question.correctAnswerIndex];
     }
-    if(q.answerOptions!==undefined||q.shuffleAnswers!==undefined)question.shuffleAnswers=q.shuffleAnswers!==false;
+    if(q.responseType!=='free'&&(q.answerOptions!==undefined||q.shuffleAnswers!==undefined))question.shuffleAnswers=q.shuffleAnswers!==false;
     return question;
   })};})};});
+  return orderRounds(rounds);
 }
 export function updateDefinition(g:Game,data:Input){
   // Normalize everything first: malformed imports must not partially mutate a game.
@@ -84,7 +89,7 @@ function selectableQuestion(g:Game,qid:string){
 function open(g:Game,qid:string,now:number){
   const {r,c,q}=selectableQuestion(g,qid);
   g.questionCount++;g.current={dailyDoubleFromId:null,questionId:qid,category:c!.name,buzzOpen:!!q!.modifier||g.settings.autoOpenBuzzers&&!q!.dailyDouble,buzzes:[],answeringId:null,attempted:[],revealAt:null,revealed:false,phase:q!.modifier?'modifier':r.type==='final'||q!.dailyDouble?'wager':'question',wagers:{},closed:false};
-  if(!q.modifier&&q.shuffleAnswers!==false&&q.answerOptions&&q.answerOptions.length>1){
+  if(!q.modifier&&q.responseType!=='free'&&q.shuffleAnswers!==false&&q.answerOptions&&q.answerOptions.length>1){
     const order=q.answerOptions.map((_,i)=>i);
     for(let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[order[i],order[j]]=[order[j],order[i]];}
     g.current.answerOrder=order;

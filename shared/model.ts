@@ -1,8 +1,9 @@
 export interface HiddenModifier { title: string; instructions: string }
 export interface ModifierClaim extends HiddenModifier { id: string; questionId: string; playerId: string; roundIndex: number }
-export interface Question { modifier?: HiddenModifier|null; id: string; value: number; prompt: string; answer: string; answerOptions?: string[]; correctAnswerIndex?: number; shuffleAnswers?: boolean; notes: string; dailyDouble: boolean }
+export interface Question { modifier?: HiddenModifier|null; id: string; value: number; prompt: string; answer: string; responseType?: 'answer'|'free'; answerOptions?: string[]; correctAnswerIndex?: number; shuffleAnswers?: boolean; notes: string; dailyDouble: boolean }
 export interface Category { id: string; name: string; questions: Question[] }
 export interface Round { id: string; name: string; type: 'board'|'final'; categories: Category[] }
+export const orderRounds=(rounds:Round[]):Round[]=>[...rounds.filter(r=>r.type!=='final'),...rounds.filter(r=>r.type==='final')];
 export interface Theme { preset: 'paper'|'ink'|'clay'|'forest'; accent: string; paper: string; ink: string; surface: string; muted: string; line: string; displayFont: 'serif'|'sans'; background: string; motion: boolean; sound: boolean; title: string }
 export interface Settings { buzzMode: 'first'|'queue'; autoOpenBuzzers: boolean; earlyPenaltyMs: number; deductWrong: boolean; wrongMultiplier: number; correctMultiplier: number; allowNegative: boolean; reopenWrong: boolean; lockWrong: boolean; revealDelayMs: number; showQuestionOnPhone: boolean; showScoresOnPhone: boolean; showLeaderboardOnStage: boolean; startingScore: number; requireReady: boolean; finalMaxWager: 'score'|'unlimited'; }
 export interface Player { id: string; name: string; color: string; token: string; score: number; connected: boolean; ready: boolean; blockedUntil: number; stats: {correct: number; incorrect: number; buzzes: number}; joinedAt: number }

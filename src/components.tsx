@@ -17,7 +17,7 @@ export function Logo(){return <a href="/" className="wordmark">dibs<span>↗</sp
 export function Connection({connected}:{connected:boolean}){return <span className={`connection ${connected?'':'offline'}`}><i/>{connected?'Live':'Reconnecting'}</span>}
 const MarkdownView=lazy(()=>import('./Markdown'));
 export function RichText({text,className=''}:{text:string;className?:string}){return <Suspense fallback={<div className={className}>{text}</div>}><MarkdownView text={text} className={className}/></Suspense>}
-export function AnswerChoices({question}:{question:Question}){const options=question.answerOptions?.filter(option=>option.trim());if(question.modifier||!options||options.length<2)return null;return <ol className="answer-choices" aria-label="Answer choices">{options.map((option,i)=><li key={i}><span>{String.fromCharCode(65+i)}</span><RichText text={option}/></li>)}</ol>}
+export function AnswerChoices({question}:{question:Question}){const options=question.answerOptions?.filter(option=>option.trim());if(question.modifier||question.responseType==='free'||!options||options.length<2)return null;return <ol className="answer-choices" aria-label="Answer choices">{options.map((option,i)=><li key={i}><span>{String.fromCharCode(65+i)}</span><RichText text={option}/></li>)}</ol>}
 export function Board({g,onSelect,editable=false,onEdit}:{g:GameView;onSelect?:(q:Question)=>void;editable?:boolean;onEdit?:(q:Question,categoryId:string)=>void}){
   const r=g.rounds[g.roundIndex];if(!r)return null;
   const questionColumns=Math.max(1,...r.categories.map(c=>c.questions.length));
