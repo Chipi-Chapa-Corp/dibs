@@ -1,26 +1,35 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {act,addPlayer,applyModifier,createGame,currentQuestion,tick,updateDefinition,view} from '../server/engine.ts';
-import {demoRounds,newModifier,newEffect} from '../shared/model.ts';
-function fixture(){const g=createGame({name:'Test',definition:{rounds:demoRounds()}});g.modifiers=[];const a=addPlayer(g,'Ada'),b=addPlayer(g,'Bea'),c=addPlayer(g,'Cam');act(g,'start');return{g,a,b,c,q:g.rounds[0].categories[0].questions[0]};}
+import {act,addPlayer,createGame,tick,updateDefinition,view} from '../server/engine.ts';
+import {demoRounds} from '../shared/model.ts';
+function fixture(){const g=createGame({name:'Test',definition:{rounds:demoRounds()}});const a=addPlayer(g,'Ada'),b=addPlayer(g,'Bea'),c=addPlayer(g,'Cam');act(g,'start');return{g,a,b,c,q:g.rounds[0].categories[0].questions[0]};}
 test('public snapshots never contain future answers, private notes, host keys, player tokens or PINs',()=>{const{g,a,q}=fixture();g.settings.joinPin='secret-pin';q.notes='secret-host-notes';act(g,'openQuestion',{questionId:q.id});for(const role of ['stage','player']as const){const v=view(g,role,a.id);const json=JSON.stringify(v);assert(!json.includes(q.answer));assert(!json.includes('secret-host-notes'));assert(!json.includes(g.hostToken));assert(!json.includes(a.token));assert(!json.includes('secret-pin'));assert.equal(v.rounds[0].categories[1].questions[0].prompt,'');assert.equal(v.currentQuestion?.prompt,q.prompt);}assert.equal(view(g,'host').currentQuestion?.answer,q.answer);});
 test('answer reveal is withheld until the configured server-side deadline',()=>{const{g,q}=fixture();act(g,'openQuestion',{questionId:q.id},'host',null,1000);act(g,'reveal',{},'host',null,1100);assert.equal(view(g,'stage',undefined,1500).currentQuestion?.answer,'');tick(g,2001);assert.equal(view(g,'stage').currentQuestion?.answer,q.answer);});
 test('first buzz wins; a second player cannot steal the floor',()=>{const{g,a,b,q}=fixture();act(g,'openQuestion',{questionId:q.id});act(g,'openBuzzers');act(g,'buzz',{},'player',a.id,1000);assert.throws(()=>act(g,'buzz',{},'player',b.id,1001));assert.equal(g.current?.answeringId,a.id);assert.equal(g.current?.buzzes.length,1);});
 test('a wrong answer reopens the floor but locks out the player who missed',()=>{const{g,a,b,q}=fixture();act(g,'openQuestion',{questionId:q.id});act(g,'openBuzzers');act(g,'buzz',{},'player',a.id);act(g,'judge',{correct:false});assert.equal(a.score,-100);assert(g.current?.buzzOpen);assert.throws(()=>act(g,'buzz',{},'player',a.id));act(g,'buzz',{},'player',b.id);act(g,'judge',{correct:true});assert.equal(g.players.find(p=>p.id===b.id)?.score,100);assert(g.current?.closed);assert.throws(()=>act(g,'judge',{correct:true,playerId:b.id}));});
 test('queue mode advances to the next buzz after a wrong answer',()=>{const{g,a,b,q}=fixture();g.settings.buzzMode='queue';act(g,'openQuestion',{questionId:q.id});act(g,'openBuzzers');act(g,'buzz',{},'player',a.id);act(g,'buzz',{},'player',b.id);act(g,'judge',{correct:false});assert.equal(g.current?.answeringId,b.id);});
 test('early buzzing applies a temporary penalty without adding a buzz',()=>{const{g,a,q}=fixture();act(g,'openQuestion',{questionId:q.id});assert.throws(()=>act(g,'buzz',{},'player',a.id,1000));assert.equal(a.blockedUntil,1750);act(g,'openBuzzers');assert.throws(()=>act(g,'buzz',{},'player',a.id,1500));act(g,'buzz',{},'player',a.id,1800);assert.equal(g.current?.answeringId,a.id);});
-test('composed modifiers execute in order and undo restores scores and charges atomically',()=>{const{g,a,b}=fixture();a.score=500;b.score=1000;const m=newModifier({playerUsable:true,usesPerPlayer:1,effects:[newEffect({type:'transfer',target:'selected',source:'targetScore',amount:.3}),newEffect({type:'multiply',target:'actor',amount:-1})]});g.modifiers=[m];act(g,'modifier',{modifierId:m.id,targetId:b.id},'player',a.id);assert.equal(a.score,-800);assert.equal(b.score,700);assert.throws(()=>act(g,'modifier',{modifierId:m.id,targetId:b.id},'player',a.id));act(g,'undo');assert.equal(g.players.find(p=>p.id===a.id)?.score,500);assert.equal(g.players.find(p=>p.id===b.id)?.score,1000);assert.equal(Object.keys(g.uses).length,0);});
-test('a shield prevents score theft without minting points for the thief',()=>{const{g,a,b}=fixture();a.score=500;b.score=1000;b.shield=1;applyModifier(g,newModifier({effects:[newEffect({type:'transfer',target:'selected',source:'targetScore',amount:.3})]}),a.id,b.id);assert.equal(a.score,500);assert.equal(b.score,1000);assert.equal(b.shield,0);});
-test('free modifiers remain usable with negative scores, with optional floors respected',()=>{const{g,a}=fixture();a.score=-200;const m=newModifier({effects:[newEffect({type:'multiply',amount:-1})]});applyModifier(g,m,a.id,null);assert.equal(a.score,200);g.settings.allowNegative=false;applyModifier(g,m,a.id,null);assert.equal(a.score,0);});
-test('rules apply conditions, per-round charges and cooldowns',()=>{const{g,a,b}=fixture();a.score=100;b.score=500;const m=newModifier({usesPerPlayer:1,resetEachRound:true,conditions:[{id:'condition',subject:'actor',field:'rank',op:'eq',value:-1}],effects:[newEffect({amount:50})]});g.players=g.players.filter(p=>p.id!==g.players[2].id);applyModifier(g,m,a.id,b.id);assert.equal(a.score,150);assert.throws(()=>applyModifier(g,m,a.id,b.id));act(g,'round',{index:1});applyModifier(g,m,a.id,b.id);assert.equal(a.score,200);});
-test('timer pause preserves remaining time and expiry closes buzzers',()=>{const{g,q}=fixture();g.settings.timerEnabled=true;g.settings.questionSeconds=10;g.settings.autoOpenBuzzers=true;act(g,'openQuestion',{questionId:q.id},'host',null,1000);act(g,'pause',{},'host',null,4000);assert.equal(g.current?.timer.remainingMs,7000);assert(!tick(g,50000));act(g,'pause',{},'host',null,60000);assert.equal(g.current?.timer.endsAt,67000);assert(tick(g,67001));assert.equal(g.current?.buzzOpen,false);assert.equal(g.current?.timer.remainingMs,0);});
+test('questions remain open without time limits and game pause still blocks play',()=>{
+ const {g,a,q}=fixture();g.settings.autoOpenBuzzers=true;
+ act(g,'openQuestion',{questionId:q.id},'host',null,1000);
+ assert(!('timer' in g.current!));assert(!tick(g,86400000));assert(g.current?.buzzOpen);assert(!g.current?.revealed);
+ act(g,'pause');assert.throws(()=>act(g,'buzz',{},'player',a.id,86400001),/not running/);
+ act(g,'pause');act(g,'buzz',{},'player',a.id,86400002);assert.equal(g.current?.answeringId,a.id);
+});
 test('private final wagers, private submissions, scoring exactly once and final results',()=>{const{g,a,b}=fixture();a.score=500;b.score=-100;act(g,'round',{index:2});act(g,'wager',{wager:800},'player',a.id);act(g,'wager',{wager:200},'player',b.id);assert.equal(g.current?.wagers[a.id].wager,500);assert.equal(g.current?.wagers[b.id].wager,0);assert.equal(view(g,'stage').current?.wagers[a.id].wager,0);act(g,'finalBegin');act(g,'finalAnswer',{answer:'A light-year'},'player',a.id);assert.equal(view(g,'stage').current?.wagers[a.id].answer,'');assert.equal(view(g,'host').current?.wagers[a.id].answer,'A light-year');act(g,'judge',{playerId:a.id,correct:true});assert.equal(a.score,1000);assert.throws(()=>act(g,'judge',{playerId:a.id,correct:true}));act(g,'finish');assert.equal(g.status,'finished');});
 test('daily double prompts only its selected player, then uses the wager for scoring',()=>{const{g,a,b,q}=fixture();q.dailyDouble=true;a.score=500;act(g,'openQuestion',{questionId:q.id,playerId:a.id});assert.equal(g.current?.phase,'wager');assert.throws(()=>act(g,'wager',{wager:100},'player',b.id));act(g,'wager',{wager:400},'player',a.id);act(g,'finalBegin');act(g,'judge',{correct:true});assert.equal(a.score,900);});
 test('malformed definitions cannot partially overwrite valid data',()=>{const{g}=fixture();const original=structuredClone(g.rounds);assert.throws(()=>updateDefinition(g,{rounds:[{name:'broken',categories:null}],name:'oops'}));assert.deepEqual(g.rounds,original);assert.equal(g.name,'Test');});
 test('player permissions reject score changes, judging, settings and arbitrary actor impersonation',()=>{const{g,a,b}=fixture();for(const action of ['adjust','judge','save','round','finish','undo'])assert.throws(()=>act(g,action,{playerId:b.id,amount:9999},'player',a.id));assert.equal(b.score,0);});
-test('optional timers stay absent until explicitly enabled',()=>{const{g,q}=fixture();act(g,'openQuestion',{questionId:q.id});assert.equal(g.current?.timer.durationMs,0);act(g,'timerStart',{seconds:12},'host',null,1000);assert.equal(g.current?.timer.endsAt,13000);});
-test('a modifier cost is charged to its actor after a score swap',()=>{const{g,a,b}=fixture();a.score=500;b.score=1000;applyModifier(g,newModifier({cost:100,effects:[newEffect({type:'swap',target:'selected'})]}),a.id,b.id);assert.equal(a.score,900);assert.equal(b.score,500);});
-test('players tied for last place both satisfy the last-place condition',()=>{const{g,a,b,c}=fixture();a.score=500;b.score=0;c.score=0;const m=newModifier({conditions:[{id:'last',subject:'actor',field:'rank',op:'eq',value:-1}],effects:[newEffect({amount:100})]});applyModifier(g,m,b.id,a.id);assert.equal(b.score,100);b.score=0;applyModifier(g,m,c.id,a.id);assert.equal(c.score,100);});
+test('old timer settings, question overrides and timer commands cannot enable countdowns',()=>{
+ const rounds=demoRounds();Object.assign(rounds[0].categories[0].questions[0],{timer:1});
+ const settings={timerEnabled:true,questionSeconds:1,answerSeconds:1,finalSeconds:1,autoStartTimer:true,expiryAction:'reveal'};
+ const g=createGame({definition:{rounds,settings}});
+ act(g,'save',{settings});for(const key of Object.keys(settings))assert(!(key in g.settings));
+ const q=g.rounds[0].categories[0].questions[0];assert(!('timer' in q));
+ act(g,'start');act(g,'openQuestion',{questionId:q.id});
+ for(const action of ['timerStart','timerPause'])assert.throws(()=>act(g,action,{seconds:1}),/Unknown action/);
+ assert(!('timer' in g.current!));assert(!tick(g,Date.now()+86400000));assert(!g.current?.revealed);
+});
 
 test('new games have no precreated categories or questions; empty drafts can be saved',()=>{
  const g=createGame({name:'Empty'});assert.equal(g.rounds.length,1);assert.equal(g.rounds[0].categories.length,0);
@@ -37,4 +46,127 @@ test('an empty final round can be edited and started without attempting to open 
 test('public boards distinguish playable questions from blanks without disclosing question text',()=>{
  const {g,q}=fixture();q.prompt='   ';const filled=g.rounds[0].categories[0].questions[1];
  for(const role of ['stage','player']as const){const publicView=view(g,role);assert(!publicView.filledQuestionIds.includes(q.id));assert(publicView.filledQuestionIds.includes(filled.id));assert.equal(publicView.rounds[0].categories[0].questions[1].prompt,'');}
+});
+
+test('hidden modifiers look like normal cells and reveal their instructions only after being claimed',()=>{
+ const {g,a,b,q}=fixture();q.prompt='';q.answer='';q.modifier={title:'Trading places',instructions:'Swap all points with another team.'};
+ g.settings.buzzMode='queue';a.score=300;b.score=700;
+ for(const role of ['stage','player']as const){const v=view(g,role,a.id);assert(v.filledQuestionIds.includes(q.id));assert.equal(v.rounds[0].categories[0].questions[0].modifier,null);assert(!JSON.stringify(v).includes('Trading places'));}
+ act(g,'openQuestion',{questionId:q.id},'host',null,1000);
+ assert.equal(g.current?.phase,'modifier');assert.equal(g.current?.buzzOpen,true);assert(!('timer' in g.current!));
+ assert.throws(()=>act(g,'reveal',{},'host',null,1001),/claim/);
+ for(const role of ['stage','player']as const)assert(!JSON.stringify(view(g,role,a.id)).includes(q.modifier.instructions));
+ act(g,'buzz',{},'player',b.id,1100);
+ assert.throws(()=>act(g,'buzz',{},'player',a.id,1101),/claimed/);
+ assert.equal(g.current?.answeringId,b.id);assert.equal(g.modifierClaims.length,1);
+ assert.equal(a.score,300);assert.equal(b.score,700);assert.equal(b.stats.correct,0);
+ for(const role of ['stage','player']as const){const v=view(g,role,b.id,1500);assert.equal(v.modifierClaims.length,0);assert.equal(v.currentQuestion?.modifier,null);assert(!JSON.stringify(v).includes(q.modifier.instructions));}
+ tick(g,2001);
+ for(const role of ['stage','player']as const){const v=view(g,role,b.id,2001);assert.equal(v.currentQuestion?.modifier?.instructions,q.modifier.instructions);assert.equal(v.modifierClaims[0].playerId,b.id);assert.equal(v.rounds[0].categories[0].questions[0].modifier,null);}
+ assert.throws(()=>act(g,'judge',{correct:true}),/manually/);
+});
+test('claiming a modifier can be undone and never consumes answer or score rules',()=>{
+ const {g,a,b,q}=fixture();q.modifier={title:'Sign flip',instructions:'Multiply your points by -1.'};
+ act(g,'openQuestion',{questionId:q.id});act(g,'buzz',{},'player',a.id);
+ act(g,'undo');assert.equal(g.modifierClaims.length,0);assert.equal(g.current?.answeringId,null);assert.equal(g.current?.buzzOpen,true);
+ act(g,'buzz',{},'player',b.id);assert.equal(g.modifierClaims[0].playerId,b.id);
+});
+test('modifier reminders survive the board and round changes until manually dismissed',()=>{
+ const {g,a,q}=fixture();q.modifier={title:'Close enough',instructions:'Approximate answers allowed for 3 rounds.'};g.settings.revealDelayMs=0;
+ act(g,'openQuestion',{questionId:q.id});act(g,'buzz',{},'player',a.id);act(g,'closeQuestion');act(g,'round',{index:1});
+ assert.equal(view(g,'player',a.id).modifierClaims[0].instructions,q.modifier.instructions);
+ assert.throws(()=>act(g,'dismissModifier',{id:g.modifierClaims[0].id},'player',a.id),/Host/);
+ act(g,'dismissModifier',{id:g.modifierClaims[0].id});assert.equal(g.modifierClaims.length,0);
+ act(g,'undo');assert.equal(g.modifierClaims.length,1);
+});
+test('hidden modifier definitions validate, export cleanly, and exclude daily doubles and finals',()=>{
+ const rounds=demoRounds(),q=rounds[0].categories[0].questions[0];q.prompt='';q.dailyDouble=true;q.modifier={title:'Hidden',instructions:'Steal 100 points.'};
+ rounds[2].categories[0].questions[0].modifier={title:'Invalid final',instructions:'Not supported.'};
+ const g=createGame({definition:{rounds,modifiers:[{trigger:'roundStart',effects:[{type:'set',amount:999999}]}]}});
+ assert.equal(g.rounds[0].categories[0].questions[0].dailyDouble,false);assert.equal(g.rounds[2].categories[0].questions[0].modifier,null);
+ const p=addPlayer(g,'Ada');act(g,'start');assert.equal(p.score,0);assert.throws(()=>act(g,'modifier',{modifierId:'legacy'}),/Unknown action/);
+ const imported=createGame({definition:JSON.parse(JSON.stringify({rounds:g.rounds}))});assert.deepEqual(imported.rounds,g.rounds);
+});
+test('empty modifier instructions are unplayable even when the old question still has text',()=>{
+ const {g,q}=fixture();q.modifier={title:'Draft',instructions:'   '};
+ assert.throws(()=>act(g,'openQuestion',{questionId:q.id}),/empty/);assert(!view(g,'stage').filledQuestionIds.includes(q.id));
+});
+test('only the presenter selects questions, including after correct answers and modifier claims',()=>{
+ const g=createGame({definition:{rounds:demoRounds(),settings:{selection:'winner'}}});
+ const a=addPlayer(g,'Ada'),b=addPlayer(g,'Bea');act(g,'start');
+ const q=g.rounds[0].categories[0].questions[0];
+ act(g,'save',{settings:{selection:'winner'}});assert(!('selection' in g.settings));
+ for(const p of [a,b])for(const action of ['selectQuestion','openQuestion','chooser'])assert.throws(()=>act(g,action,{questionId:q.id,playerId:p.id},'player',p.id),/Host access/);
+ assert.throws(()=>act(g,'chooser',{playerId:a.id}),/Unknown action/);
+ act(g,'openQuestion',{questionId:q.id});act(g,'openBuzzers');act(g,'buzz',{},'player',a.id);act(g,'judge',{correct:true});act(g,'closeQuestion');
+ const mystery=g.rounds[0].categories[0].questions[1];mystery.modifier={title:'Surprise',instructions:'Apply manually.'};
+ assert.throws(()=>act(g,'selectQuestion',{questionId:mystery.id},'player',a.id),/Host access/);
+ act(g,'openQuestion',{questionId:mystery.id});act(g,'buzz',{},'player',b.id);act(g,'closeQuestion');
+ assert.throws(()=>act(g,'selectQuestion',{questionId:q.id},'player',b.id),/Host access/);
+ assert(!('chooserId' in g));
+});
+test('queued answerers retain the floor until the presenter judges them',()=>{
+ const {g,a,b,q}=fixture();g.settings.buzzMode='queue';
+ act(g,'openQuestion',{questionId:q.id},'host',null,1000);act(g,'openBuzzers');
+ act(g,'buzz',{},'player',a.id,2000);act(g,'buzz',{},'player',b.id,3000);
+ assert(!tick(g,86400000));assert.equal(g.current?.answeringId,a.id);
+ act(g,'judge',{correct:false},'host',null,86400001);
+ assert.equal(g.current?.answeringId,b.id);assert(!('timer' in g.current!));
+ assert(!tick(g,172800000));assert.equal(g.current?.answeringId,b.id);
+ act(g,'judge',{correct:true},'host',null,172800001);assert.equal(b.score,100);
+});
+test('final answers remain editable until the presenter reveals the answer',()=>{
+ const {g,a}=fixture();act(g,'round',{index:2},'host',null,1000);act(g,'finalBegin',{},'host',null,2000);
+ assert(!('timer' in g.current!));assert(!tick(g,86400000));
+ act(g,'finalAnswer',{answer:'First answer'},'player',a.id,86400001);
+ act(g,'finalAnswer',{answer:'Edited answer'},'player',a.id,172800000);
+ assert.equal(g.current?.wagers[a.id].answer,'Edited answer');
+ act(g,'reveal',{},'host',null,172800001);
+ assert.throws(()=>act(g,'finalAnswer',{answer:'After reveal'},'player',a.id,172800002),/Answers are closed/);
+ tick(g,172801000);assert(g.current?.revealed);
+ assert.throws(()=>act(g,'finalAnswer',{answer:'After reveal'},'player',a.id,172801001),/Answers are closed/);
+});
+test('Daily Double answerers have no deadline',()=>{
+ const {g,a,q}=fixture();q.dailyDouble=true;
+ act(g,'openQuestion',{questionId:q.id,playerId:a.id},'host',null,1000);
+ act(g,'wager',{wager:100},'player',a.id,2000);act(g,'finalBegin',{},'host',null,3000);
+ assert(!tick(g,86400000));assert(!g.current?.revealed);assert(!('timer' in g.current!));
+ act(g,'judge',{correct:true},'host',null,86400001);assert.equal(a.score,100);
+});
+
+test('an active cell cannot switch between a question and a hidden modifier',()=>{
+ const {g,q}=fixture();act(g,'openQuestion',{questionId:q.id});
+ const rounds=structuredClone(g.rounds);rounds[0].categories[0].questions[0].modifier={title:'Secret',instructions:'Hidden effect'};
+ assert.throws(()=>act(g,'save',{rounds}),/question type/);assert.equal(g.current?.phase,'question');assert.equal(g.rounds[0].categories[0].questions[0].modifier,null);
+});
+
+test('host reset clears the session in every game state and preserves the complete board and room',()=>{
+ for(const status of ['lobby','playing','paused','finished']){
+  const {g,a,q}=fixture();
+  q.notes='Keep host notes';q.dailyDouble=true;
+  const modifier=g.rounds[1].categories[0].questions[0];modifier.modifier={title:'Keep this modifier',instructions:'Swap scores manually.'};
+  g.subtitle='Keep subtitle';g.theme.title='Keep this screen';g.settings.joinPin='2468';g.settings.allowLateJoin=false;
+  a.score=900;a.ready=true;a.connected=true;a.stats.correct=3;
+  g.played=[q.id];g.questionCount=7;g.modifierClaims=[{id:'claim',questionId:modifier.id,playerId:a.id,roundIndex:1,...modifier.modifier}];
+  act(g,'round',{index:2});act(g,'finalBegin');act(g,'finalAnswer',{answer:'Old answer'},'player',a.id);
+  g.announcement={id:'old',title:'Old announcement',detail:'Old progress',at:1};
+  if(status==='lobby')g.status='lobby';
+  if(status==='paused')act(g,'pause');
+  if(status==='finished')act(g,'finish');
+  const definition=structuredClone({id:g.id,hostToken:g.hostToken,createdAt:g.createdAt,name:g.name,subtitle:g.subtitle,rounds:g.rounds,settings:g.settings,theme:g.theme});
+  const revision=g.revision;
+  act(g,'reset');
+  assert.deepEqual({id:g.id,hostToken:g.hostToken,createdAt:g.createdAt,name:g.name,subtitle:g.subtitle,rounds:g.rounds,settings:g.settings,theme:g.theme},definition);
+  assert.equal(g.status,'lobby');assert.equal(g.roundIndex,0);assert.equal(g.paused,false);assert.equal(g.current,null);assert.equal(g.questionCount,0);assert.equal(g.announcement,null);assert.equal(g.revision,revision+1);
+  for(const key of ['players','played','modifierClaims','history','undo']as const)assert.deepEqual(g[key],[]);
+  assert(!JSON.stringify(g).includes(a.token));assert(!JSON.stringify(g).includes('Old answer'));
+  assert.throws(()=>act(g,'undo'),/Nothing to undo/);
+  const fresh=addPlayer(g,a.name);assert.notEqual(fresh.id,a.id);assert.notEqual(fresh.token,a.token);assert.equal(fresh.score,0);assert.equal(fresh.ready,false);assert.deepEqual(fresh.stats,{correct:0,incorrect:0,buzzes:0});
+  act(g,'start');act(g,'openQuestion',{questionId:q.id,playerId:fresh.id});const reopened=view(g,'host').current;assert.equal(reopened?.questionId,q.id);assert.equal(reopened?.phase,'wager');
+ }
+});
+test('players cannot reset the game or clear another player’s progress',()=>{
+ const {g,a,b,q}=fixture();act(g,'openQuestion',{questionId:q.id});act(g,'adjust',{playerId:b.id,amount:500});
+ const before=structuredClone(g);
+ assert.throws(()=>act(g,'reset',{},'player',a.id),/Host access required/);assert.deepEqual(g,before);
 });

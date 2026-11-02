@@ -3,8 +3,8 @@
 A local quiz game with phone buzzers, custom rules, and a separate presenter screen.
 
 - Build question boards with Markdown, images, video, and audio.
-- Create modifiers: flip scores, steal points, swap places.
-- Customize themes, timers, rounds, and scoring.
+- Hide a mystery modifier in a board cell. First to buzz claims it; the presenter applies the revealed instructions manually.
+- Customize themes, rounds, and scoring.
 - Edit as you go. Changes save automatically.
 
 ## Run
@@ -18,6 +18,42 @@ npm run dev
 
 Open [localhost:43187](http://localhost:43187). Players join using the LAN address printed in the terminal, on the same Wi-Fi. Open **Presenter** on your second screen.
 
+## Development reloads
+
+Keep `npm run dev` running while editing. Changes in `server/`, `shared/`, `vite.config.ts`, `tsconfig.json`, or `package.json` restart the server automatically. A restart saves the current game first; host, presenter, and player screens reconnect using their existing keys. Vite refreshes the page after a server restart, so allow pending edits to finish saving.
+
+React and CSS edits in `src/` update through Vite without restarting the game server. Both watchers poll every 200 ms, including when filesystem change notifications are unavailable. Saved games and uploaded media do not trigger restarts.
+
+After updating the dev command itself, stop and start `npm run dev` once to activate it.
+
+## Hidden modifiers
+
+In **Questions**, open a cell and enable **Hidden modifier**. Enter its title and what it does, including any duration (for example, “Approximate answers allowed for the next 3 rounds”). The cell keeps its normal board value.
+
+When selected, the presenter and phones show a mystery modifier with buzzers open. The first player or team to buzz claims it, then its instructions are revealed. No points change automatically: edit scores from the host screen as needed. Claimed modifiers stay in the host’s reminders and on the winner’s phone until the host dismisses them.
+
+The presenter selects every question from the host board. Questions, answers and the final have no countdowns or time limits; the presenter opens/closes buzzers and reveals answers when ready. Older timer settings are ignored. A team can join with one phone under its team name.
+
+Older game files still import their questions, settings and appearance; the former automated modifier rules are no longer used.
+
+## Game files
+
+Each game lives in its own JSON file under **`data/games/`**. The server reads every `.json` file in that directory at startup and saves changes back to the same file. New browser-created games use their room ID as the filename, for example `data/games/90D59B.json`. Set `DATA_DIR` to use a different data root; its game files live in `<DATA_DIR>/games/`.
+
+You can put an exported game JSON directly into this directory and restart the server. It becomes a saved game in that same file. Open `http://localhost:43187` on the server computer and click **Host** to claim a game added this way. Host access remains saved in that browser. Phones join using the LAN address as usual.
+
+To replay a board, open **Lobby / Live → Reset game** on the host page and confirm. It clears all players, scores, played questions, wagers, claimed modifiers and activity, then returns to the lobby. Questions, settings, appearance, room code and host access stay the same. Players join again using the same link. Reset cannot be undone.
+
+To delete a game, open **All games** and click **Delete** beside its **Host** button, then confirm the game name. This removes its JSON file and ends access for connected players and presenter screens. Only the host can delete a game.
+
+Saved game files contain host/player keys, scores and current progress. Keep them private. To edit or remove a file manually, stop the server first; it loads the updated directory on the next start.
+
+The old combined `data/games.json` is migrated automatically. Existing per-game files take precedence, and the original combined file is kept as `data/games.json.migrated` after a successful migration. Invalid game files are reported and skipped so other games can still load.
+
+## Sample test game
+
+On the first startup with the default data directory, the bundled sample is copied to `data/games/test-game.json` and loads with the other games. Removing that file later does not recreate it. It has two small boards and a final, with pictures, hidden modifiers and Daily Doubles. A portable definition remains in [examples/test-game.json](examples/test-game.json) for creating another copy through **Create game → Import JSON**. The photos are bundled in `public/test-board/`, so the sample works offline. See the [host guide](examples/test-game.md) for the answer map and a suggested playthrough.
+
 ## Commands
 
 ```sh
@@ -27,4 +63,4 @@ npm start                             # Run the build
 PORT=43189 npm run dev                # Use another port
 ```
 
-Games live in `data/`, uploads in `public/media/`. Back up both. JSON imports and exports game definitions; uploaded media stays separate.
+Games live in `data/games/`, uploads in `public/media/`. Back up both. JSON imports and exports game definitions; uploaded media stays separate.

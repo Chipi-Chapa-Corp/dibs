@@ -1,0 +1,27 @@
+{
+  "provider": "Lorem Picsum (Unsplash photos)",
+  "providerUrl": "https://picsum.photos/",
+  "photos": [
+    {
+      "file": "/test-board/picture-1.jpg",
+      "id": "521",
+      "author": "Christian Holzinger",
+      "source": "https://unsplash.com/photos/lqQlmcPt9Qg",
+      "download": "https://picsum.photos/id/521/960/600.jpg"
+    },
+    {
+      "file": "/test-board/picture-2.jpg",
+      "id": "775",
+      "author": "Austin Ban",
+      "source": "https://unsplash.com/photos/XaU08x_MKhM",
+      "download": "https://picsum.photos/id/775/960/600.jpg"
+    },
+    {
+      "file": "/test-board/picture-3.jpg",
+      "id": "702",
+      "author": "Dominik Schröder",
+      "source": "https://unsplash.com/photos/9PCmMdc4Crw",
+      "download": "https://picsum.photos/id/702/960/600.jpg"
+    }
+  ]
+}

@@ -1,0 +1,234 @@
+{
+  "format": "jeopardy/1",
+  "name": "Quick playtest — pictures & surprises",
+  "subtitle": "Two tiny boards and a final. One phone per team. About 15–20 minutes.",
+  "settings": {
+    "buzzMode": "first",
+    "autoOpenBuzzers": true,
+    "earlyPenaltyMs": 750,
+    "deductWrong": true,
+    "wrongMultiplier": 1,
+    "correctMultiplier": 1,
+    "allowNegative": true,
+    "reopenWrong": true,
+    "lockWrong": true,
+    "revealDelayMs": 800,
+    "showQuestionOnPhone": true,
+    "showScoresOnPhone": true,
+    "showLeaderboardOnStage": true,
+    "allowLateJoin": true,
+    "maxPlayers": 8,
+    "startingScore": 0,
+    "joinPin": "",
+    "requireReady": false,
+    "finalMaxWager": "score"
+  },
+  "theme": {
+    "preset": "paper",
+    "accent": "#b7482d",
+    "paper": "#ece9e0",
+    "ink": "#252620",
+    "surface": "#f6f3eb",
+    "muted": "#6e7166",
+    "line": "#c9c9be",
+    "displayFont": "serif",
+    "background": "",
+    "motion": true,
+    "sound": false,
+    "title": "Quick playtest"
+  },
+  "rounds": [
+    {
+      "id": "playtest-round-1",
+      "name": "Warm-up",
+      "type": "board",
+      "categories": [
+        {
+          "id": "r1-pictures",
+          "name": "Picture this",
+          "questions": [
+            {
+              "id": "r1-pictures-100",
+              "value": 100,
+              "prompt": "![Picture clue 1](/test-board/picture-1.jpg)\n\nWhat **colour** are the railings on both sides of the walkway?",
+              "answer": "White.",
+              "notes": "Picture loading, Markdown, first-buzz race, judging and answer reveal. Photo: Christian Holzinger, https://unsplash.com/photos/lqQlmcPt9Qg (Picsum 521).",
+              "dailyDouble": false,
+              "modifier": null
+            },
+            {
+              "id": "r1-pictures-200",
+              "value": 200,
+              "prompt": "What is **12 × 12**?",
+              "answer": "144.",
+              "notes": "Daily Double: select the wagering team, collect its wager (or set it in the host console), then lock wagers and open the question. Only that team answers; judge directly without opening buzzers.",
+              "dailyDouble": true,
+              "modifier": null
+            }
+          ]
+        },
+        {
+          "id": "r1-buzz",
+          "name": "Fast fingers",
+          "questions": [
+            {
+              "id": "r1-buzz-100",
+              "value": 100,
+              "prompt": "How many sides does a **hexagon** have?",
+              "answer": "6.",
+              "notes": "Leave this question open, then close/reopen or reset the buzzers from the host controls. There is no time limit.",
+              "dailyDouble": false,
+              "modifier": null
+            },
+            {
+              "id": "r1-buzz-200",
+              "value": 200,
+              "prompt": "",
+              "answer": "",
+              "notes": "Check that the cell looks normal on the board, reveals only a mystery when opened, and awards exactly one claimant. Record both scores before swapping; Undo is available for mistakes.",
+              "dailyDouble": false,
+              "modifier": {
+                "title": "Trading places",
+                "instructions": "Choose another team and swap your entire current scores. The presenter edits both scores manually. This is a one-time effect."
+              }
+            }
+          ]
+        },
+        {
+          "id": "r1-wild",
+          "name": "Wild cards",
+          "questions": [
+            {
+              "id": "r1-wild-100",
+              "value": 100,
+              "prompt": "What is **7 × 8**?",
+              "answer": "56.",
+              "notes": "Try one incorrect judgment, then let a different team buzz and answer correctly. The first team should be locked out for this question.",
+              "dailyDouble": false,
+              "modifier": null
+            },
+            {
+              "id": "r1-wild-200",
+              "value": 200,
+              "prompt": "",
+              "answer": "",
+              "notes": "Duration test. Keep this reminder through the round transition. On Double take / Wild cards / 400, accept 1296–1584 minutes from this team. In the final, accept 3240–3960 seconds from this team.",
+              "dailyDouble": false,
+              "modifier": {
+                "title": "Close enough",
+                "instructions": "For the next TWO rounds after this one (Double take and The last word), your team may answer numeric questions within 10% of the exact answer. The presenter judges this manually and dismisses the reminder after the final. Buzzing and wagering rules still apply."
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "playtest-round-2",
+      "name": "Double take",
+      "type": "board",
+      "categories": [
+        {
+          "id": "r2-pictures",
+          "name": "Picture this",
+          "questions": [
+            {
+              "id": "r2-pictures-300",
+              "value": 300,
+              "prompt": "![Picture clue 2](/test-board/picture-2.jpg)\n\nHow many **people** are visible in this picture?",
+              "answer": "1 person.",
+              "notes": "Check the picture on both the presenter and player screens. Photo: Austin Ban, https://unsplash.com/photos/XaU08x_MKhM (Picsum 775).",
+              "dailyDouble": false,
+              "modifier": null
+            },
+            {
+              "id": "r2-pictures-400",
+              "value": 400,
+              "prompt": "![Picture clue 3](/test-board/picture-3.jpg)\n\nWhat do you call the sandy strip of land where the waves meet the shore?",
+              "answer": "A beach. Accept sandy beach, shore or coastline.",
+              "notes": "Second Daily Double, this time with a photo. The image and question should stay hidden from players until wagering ends. Photo: Dominik Schröder, https://unsplash.com/photos/9PCmMdc4Crw (Picsum 702).",
+              "dailyDouble": true,
+              "modifier": null
+            }
+          ]
+        },
+        {
+          "id": "r2-buzz",
+          "name": "Fast fingers",
+          "questions": [
+            {
+              "id": "r2-buzz-300",
+              "value": 300,
+              "prompt": "What comes next?\n\n**2, 4, 8, 16, …**",
+              "answer": "32.",
+              "notes": "The presenter selects each question. Try closing and reopening one phone’s tab before the next question; its identity and score should return.",
+              "dailyDouble": false,
+              "modifier": null
+            },
+            {
+              "id": "r2-buzz-400",
+              "value": 400,
+              "prompt": "",
+              "answer": "",
+              "notes": "Transfer test: the combined total of the two teams must stay the same. No automatic score change should happen when this modifier is claimed.",
+              "dailyDouble": false,
+              "modifier": {
+                "title": "Pickpocket",
+                "instructions": "Choose another team. Take up to 200 points from its positive score and add exactly that amount to your score. If it has fewer than 200 positive points, take only those points. If its score is zero or negative, take nothing. The presenter edits both scores manually. One-time effect."
+              }
+            }
+          ]
+        },
+        {
+          "id": "r2-wild",
+          "name": "Wild cards",
+          "questions": [
+            {
+              "id": "r2-wild-300",
+              "value": 300,
+              "prompt": "",
+              "answer": "",
+              "notes": "Test a negative score and the updated standings. Dismiss the reminder after applying the effect; keep long-running reminders until their stated expiry.",
+              "dailyDouble": false,
+              "modifier": {
+                "title": "Sign flip",
+                "instructions": "Multiply YOUR team’s current score by −1. For example, 700 becomes −700 and −300 becomes 300. The presenter edits the score manually. One-time effect."
+              }
+            },
+            {
+              "id": "r2-wild-400",
+              "value": 400,
+              "prompt": "How many **minutes** are there in one day?",
+              "answer": "1440 minutes (24 × 60).",
+              "notes": "For a team that claimed Close enough in round 1, accept 1296–1584 inclusive. Every other team needs the exact answer.",
+              "dailyDouble": false,
+              "modifier": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "playtest-final",
+      "name": "The last word",
+      "type": "final",
+      "categories": [
+        {
+          "id": "final-time",
+          "name": "A matter of time",
+          "questions": [
+            {
+              "id": "final-seconds",
+              "value": 0,
+              "prompt": "How many **seconds** are there in one hour?",
+              "answer": "3600 seconds (60 × 60).",
+              "notes": "Private final: collect wagers, lock wagers and open the question, then have every team submit an answer on its phone. For a team with Close enough, accept 3240–3960 inclusive. Judge each team once, reveal the answer, then finish the game. Answers remain editable until the presenter reveals the answer; check that submissions are rejected after the reveal begins.",
+              "dailyDouble": false,
+              "modifier": null
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
