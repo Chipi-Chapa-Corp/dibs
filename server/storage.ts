@@ -9,7 +9,7 @@ const validId=(value:unknown):value is string=>typeof value==='string'&&/^[A-Z0-
 const object=(value:unknown):value is RecordValue=>!!value&&typeof value==='object'&&!Array.isArray(value);
 
 function restore(value:unknown):Game{
-  if(!object(value)||!validId(value.id)||typeof value.hostToken!=='string'||!value.hostToken||!Array.isArray(value.players)||!object(value.settings))throw new Error('Invalid saved game');
+  if(!object(value)||!validId(value.id)||!Array.isArray(value.players)||!object(value.settings))throw new Error('Invalid saved game');
   if(value.format&&value.format!=='jeopardy/state/1')throw new Error('Unsupported saved game format');
   if(typeof value.name!=='string'||typeof value.subtitle!=='string'||!Number.isFinite(value.createdAt)||!object(value.theme))throw new Error('Invalid saved game metadata');
   if(!['lobby','playing','finished'].includes(value.status))throw new Error('Invalid game status');
@@ -19,12 +19,10 @@ function restore(value:unknown):Game{
   if(value.current!==null&&(!object(value.current)||!object(value.current.wagers)||!Array.isArray(value.current.buzzes)||!Array.isArray(value.current.attempted)||!['question','wager','final','modifier'].includes(value.current.phase)))throw new Error('Invalid active question');
   if(value.selection!=null&&(!object(value.selection)||typeof value.selection.questionId!=='string'||!Number.isFinite(value.selection.opensAt)||value.current!==null))throw new Error('Invalid question selection');
   if(value.modifierClaims!==undefined&&!Array.isArray(value.modifierClaims))throw new Error('Invalid modifier reminders');
-  const {format:_format,modifiers:_legacyModifiers,uses:_legacyUses,chooserId:_legacyChooserId,...stored}=value;
+  const {format:_format,hostToken:_legacyHostToken,hostClaimable:_legacyHostClaimable,modifiers:_legacyModifiers,uses:_legacyUses,chooserId:_legacyChooserId,...stored}=value;
   const game=stored as Game;
   if(game.current){const {selectionPlayerId:_legacySelectionPlayer,...current}=game.current as Game['current']&RecordValue;game.current=current;}
   game.modifierClaims??=[];
-  game.hostClaimable=game.hostClaimable===true;
-  if(game.hostTransfer&&(!object(game.hostTransfer)||!/^[a-f0-9]{64}$/.test(game.hostTransfer.tokenHash)||!Number.isFinite(game.hostTransfer.expiresAt)))game.hostTransfer=null;
   normalizeStoredGameplay(game);
   for(const snapshot of game.undo)if(object(snapshot)&&object(snapshot.settings)&&Array.isArray(snapshot.rounds))normalizeStoredGameplay(snapshot as Game);
   updateDefinition(game,{rounds:game.rounds});
@@ -58,11 +56,10 @@ export function openGameStore(dataDir:string,warn:(message:string)=>void=console
     let loaded:Game|undefined;
     try{
       const value:unknown=JSON.parse(fs.readFileSync(file,'utf8'));
-      const definition=object(value)&&Array.isArray(value.rounds)&&!('hostToken' in value)&&((!value.format&&!('players' in value))||value.format==='jeopardy/1');
+      const definition=object(value)&&Array.isArray(value.rounds)&&!('players' in value)&&(!value.format||value.format==='jeopardy/1');
       const game=definition?createGame({name:value.name,definition:value}):restore(value);
-      if(definition)game.hostClaimable=true;
       add(game,file);loaded=game;
-      // Normalize definitions in place once, retaining the filename and stable access keys.
+      // Normalize definitions in place once, retaining the filename and stable game identity.
       if(definition)save(game);
     }catch(error){if(loaded){games.delete(loaded.id);files.delete(loaded.id);}warn(`[storage] Skipping ${file}: ${(error as Error).message}`);}
   }

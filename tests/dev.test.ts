@@ -47,7 +47,7 @@ test('dev watcher reloads backend, shared code and config while CSS uses HMR and
   const response=await fetch(base+path,{method:data===undefined?'GET':'POST',headers:{'Content-Type':'application/json'},body:data===undefined?undefined:JSON.stringify(data),signal:AbortSignal.timeout(1000)});
   assert(response.ok);return response.json();
  };
- const connect=(role:string,gameId:string,token:string)=>{
+ const connect=(role:string,gameId:string,token?:string)=>{
   const socket=io(base,{autoConnect:false,transports:['websocket'],reconnectionDelay:50,reconnectionDelayMax:100,randomizationFactor:0});sockets.push(socket);
   let subscriptions=0,state:GameView|undefined;
   socket.on('state',(value:GameView)=>state=value);
@@ -59,7 +59,7 @@ test('dev watcher reloads backend, shared code and config while CSS uses HMR and
   await until(async()=>!!(await request('/api/health')).ok,'Dev server did not start');
   const game=await request('/api/games',{name:'Reload persistence'});
   const player=await request(`/api/games/${game.id}/join`,{name:'Ada'});
-  const host=connect('host',game.id,game.hostToken),phone=connect('player',game.id,player.token);
+  const host=connect('host',game.id),phone=connect('player',game.id,player.token);
   await until(()=>host.subscriptions()===1&&phone.subscriptions()===1,'Clients did not subscribe');
   await command(host.socket,'adjust',{playerId:player.playerId,mode:'set',amount:450});
   await until(()=>phone.state()?.players[0]?.score===450,'Score did not synchronize');
@@ -68,7 +68,7 @@ test('dev watcher reloads backend, shared code and config while CSS uses HMR and
   await until(()=>existsSync(savedFile),'Per-game save did not appear');
   for(const route of [`/data/games/${game.id}.json`,`/@fs${savedFile}`]){
    const response=await fetch(base+route),body=await response.text();
-   assert.equal(response.status,403);assert(!body.includes(game.hostToken));
+   assert.equal(response.status,403);assert(!body.includes(player.token));
   }
 
   await fetch(base+'/src/main.tsx');await fetch(base+'/src/style.css');

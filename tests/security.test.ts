@@ -43,7 +43,7 @@ async function fixture(limits?:{maxGames?:number;mediaBytes?:number;fileBytes?:n
   return{dir,mediaDir,instance,base,port,post,create,close:async()=>{await instance.close();rmSync(dir,{recursive:true,force:true});}};
 }
 
-test('HTTP and WebSocket origin guards block unrelated websites while normal LAN hosts can create with their key',async()=>{
+test('HTTP and WebSocket origin guards block unrelated websites while normal LAN participants retain public game access',async()=>{
   const f=await fixture();
   try{
     assert.equal((await f.post('/api/games',{}, {Origin:'https://evil.test'})).status,403);
@@ -58,12 +58,9 @@ test('HTTP and WebSocket origin guards block unrelated websites while normal LAN
     const lan=localNetwork(networkInterfaces()).lan;
     if(lan){
       const remote=`http://${lan.address}:${f.port}`;
-      assert.equal((await f.post('/api/games',{}, {},remote)).status,403);
-      assert.equal((await f.post('/api/games',{}, {'X-Forwarded-For':'127.0.0.1'},remote)).status,403);
-      assert.equal((await (await fetch(remote+'/api/access')).json()).canCreateGames,false);
-      const auth={Authorization:`Bearer ${created.hostToken}`};
-      assert.equal((await (await fetch(remote+'/api/access',{headers:auth})).json()).canCreateGames,true);
-      assert.equal((await f.post('/api/games',{},auth,remote)).status,201);
+      assert.equal((await f.post('/api/games',{}, {},remote)).status,201);
+      assert.equal((await f.post('/api/games',{}, {'X-Forwarded-For':'127.0.0.1'},remote)).status,201);
+      assert.equal((await fetch(`${remote}/api/games/${created.id}/export`)).status,200);
       assert.equal((await f.post(`/api/games/${created.id}/join`,{name:'Phone'}, {},remote)).status,200);
     }
     assert.equal((await fetch(f.base+'/api/games')).headers.get('x-frame-options'),'DENY');
@@ -75,10 +72,10 @@ test('game and API limits reject excess requests without losing existing games',
   try{
     const first=await f.create(),second=await f.create();
     assert.equal((await f.post('/api/games',{})).status,409);
-    assert.equal((await fetch(`${f.base}/api/games/${second.id}`,{method:'DELETE',headers:{Authorization:`Bearer ${second.hostToken}`}})).status,200);
+    assert.equal((await fetch(`${f.base}/api/games/${second.id}`,{method:'DELETE'})).status,200);
     assert.equal((await f.post('/api/games',{})).status,201);
     let limited=false;
-    for(let i=0;i<32;i++)if((await f.post(`/api/games/${first.id}/join`,{name:`P${i}`})).status===429){limited=true;break;}
+    for(let i=0;i<125;i++)if((await f.post(`/api/games/${first.id}/join`,{name:`P${i}`})).status===429){limited=true;break;}
     assert(limited);assert(f.instance.games.has(first.id));
     for(let i=0;i<305;i++){const res=await fetch(f.base+'/api/health');if(res.status===429){assert.equal(res.headers.get('Retry-After'),'60');return;}}
     assert.fail('API requests were not limited');
@@ -86,18 +83,21 @@ test('game and API limits reject excess requests without losing existing games',
 });
 
 test('streaming media budgets handle concurrent uploads and remove oversized/failed files',async()=>{
-  const f=await fixture({fileBytes:100,mediaBytes:150});
+  const f=await fixture({fileBytes:100,mediaBytes:150});let editor:ReturnType<typeof io>|undefined;
   try{
     const g=await f.create();
-    const upload=(size:number,key=g.hostToken)=>{const data=new FormData();data.append('file',new Blob([new Uint8Array(size)],{type:'image/png'}),'test.png');return fetch(`${f.base}/api/games/${g.id}/media`,{method:'POST',headers:{Authorization:`Bearer ${key}`},body:data});};
-    assert.equal((await upload(50,'wrong')).status,403);
+    const socket=io(f.base,{transports:['websocket'],autoConnect:false});editor=socket;
+    await new Promise<void>(resolve=>{socket.once('connect',()=>resolve());socket.connect();});
+    await new Promise<void>((resolve,reject)=>socket.emit('subscribe',{gameId:g.id,role:'host',editing:true},(r:{ok:boolean})=>r.ok?resolve():reject(Error('No editor lock'))));
+    const upload=(size:number,editorId=editor!.id!)=>{const data=new FormData();data.append('file',new Blob([new Uint8Array(size)],{type:'image/png'}),'test.png');return fetch(`${f.base}/api/games/${g.id}/media`,{method:'POST',headers:{'X-Editor-Id':editorId},body:data});};
+    assert.equal((await upload(50,'wrong')).status,409);
     assert.equal((await upload(101)).status,413);assert.deepEqual(readdirSync(f.mediaDir),[]);
     const results=await Promise.all([upload(90),upload(90)]);
     assert.deepEqual(results.map(r=>r.status).sort(),[200,507]);
     const successful=await results.find(r=>r.status===200)!.json();
     assert.equal((await fetch(f.base+successful.url)).status,200);
     const multipartHeader='--budget-test\r\nContent-Disposition: form-data; name="file"; filename="chunk.png"\r\nContent-Type: image/png\r\n\r\n';
-    const rawUpload=()=>httpRequest(`${f.base}/api/games/${g.id}/media`,{method:'POST',headers:{Authorization:`Bearer ${g.hostToken}`,'Content-Type':'multipart/form-data; boundary=budget-test'}});
+    const rawUpload=()=>httpRequest(`${f.base}/api/games/${g.id}/media`,{method:'POST',headers:{'X-Editor-Id':editor!.id!,'Content-Type':'multipart/form-data; boundary=budget-test'}});
     const chunked=await new Promise<number>((resolve,reject)=>{
       const req=rawUpload();req.on('response',res=>{res.resume();resolve(res.statusCode!);});req.on('error',reject);
       req.write(multipartHeader);req.write(Buffer.alloc(80));req.end('\r\n--budget-test--\r\n');
@@ -111,5 +111,5 @@ test('streaming media budgets handle concurrent uploads and remove oversized/fai
     assert.equal(readdirSync(f.mediaDir).reduce((sum,name)=>sum+statSync(join(f.mediaDir,name)).size,0),130);
     assert.equal((await upload(30)).status,507);
     assert.equal(readdirSync(f.mediaDir).length,2);
-  }finally{await f.close();}
+  }finally{editor?.disconnect();await f.close();}
 });

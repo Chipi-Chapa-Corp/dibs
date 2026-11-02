@@ -2,7 +2,7 @@ import {useEffect,useState} from 'react';
 import {ArrowRight,Check,X} from 'lucide-react';
 import type {GameView} from '../shared/model';
 import {number} from './lib';
-import {Button,DailyDoubleStatus,Field,IconButton,RichText} from './components';
+import {AnswerChoices,Button,DailyDoubleStatus,Field,IconButton,RichText} from './components';
 
 type Command=(action:string,data?:Record<string,unknown>)=>Promise<boolean>;
 export function HostDailyDouble({g,command}:{g:GameView;command:Command}){
@@ -30,10 +30,10 @@ export function HostDailyDouble({g,command}:{g:GameView;command:Command}){
       </>}
     </div>:<>
       <div className="daily-double-assignment"><strong>{team?.name||'Assigned team'} must answer.</strong><span>{number(entry?.wager||0)} points at stake</span></div>
-      <div className="host-clue"><RichText text={q.prompt}/></div>
+      <div className="host-clue"><RichText text={q.prompt}/><AnswerChoices question={q}/></div>
       <div className="judging-console"><span>{c.closed?'Answer judged':`${team?.name||'Assigned team'} has the floor`}</span><div className="judge-buttons"><Button disabled={g.paused||c.closed||!team} onClick={()=>void command('judge',{correct:false})}><X size={24}/>Incorrect / no answer</Button><Button variant="primary" disabled={g.paused||c.closed||!team} onClick={()=>void command('judge',{correct:true})}><Check size={24}/>Correct</Button></div></div>
     </>}
-    <div className="host-answer"><div className="answer-heading"><span className="eyebrow">{c.phase==='wager'?'Host preview':'Answer · host only'}</span>{c.phase!=='wager'&&<Button disabled={!!c.revealAt} onClick={()=>void command('reveal')}>{c.revealed?'Revealed':'Reveal answer'}</Button>}</div>{c.phase==='wager'&&<><RichText text={q.prompt}/><hr/></>}<RichText text={q.answer}/>{q.notes&&<div className="host-notes"><RichText text={q.notes}/></div>}</div>
+    <div className="host-answer"><div className="answer-heading"><span className="eyebrow">{c.phase==='wager'?'Host preview':'Answer · host only'}</span>{c.phase!=='wager'&&<Button disabled={!!c.revealAt} onClick={()=>void command('reveal')}>{c.revealed?'Revealed':'Reveal answer'}</Button>}</div>{c.phase==='wager'&&<><RichText text={q.prompt}/><AnswerChoices question={q}/><hr/></>}<RichText text={q.answer}/>{q.notes&&<div className="host-notes"><RichText text={q.notes}/></div>}</div>
     <div className="question-next"><Button onClick={()=>void command('closeQuestion')}>Back to board<ArrowRight size={20}/></Button></div>
   </div>;
 }
@@ -46,7 +46,7 @@ export function PlayerDailyDouble({g,command}:{g:GameView;command:Command}){
     {c.phase==='wager'&&selected&&!g.yourFinal&&<form className="player-wager" onSubmit={e=>{e.preventDefault();void command('wager',{wager:Number(wager)});}}><Field label="Your chosen wager" hint="Enter one of the amounts the presenter offered verbally."><input type="number" min={0} max={1e7} step={1} value={wager} onChange={e=>setWager(e.target.value)}/></Field><Button variant="primary" disabled={!valid||g.paused}>Send choice to presenter<ArrowRight size={20}/></Button></form>}
     {c.phase==='wager'&&selected&&g.yourFinal&&<p className="submitted">Choice sent. The presenter will confirm it and open the question.</p>}
     {c.phase!=='wager'&&<>
-      {g.settings.showQuestionOnPhone&&<div className="phone-question"><RichText text={q.prompt}/></div>}
+      {g.settings.showQuestionOnPhone&&<div className="phone-question"><RichText text={q.prompt}/><AnswerChoices question={q}/></div>}
       {c.revealed?<div className="phone-answer"><span className="eyebrow">Answer</span><RichText text={q.answer}/></div>:<p>{selected?'Your team must answer aloud.':'The assigned team answers this question.'}</p>}
     </>}
   </section>;

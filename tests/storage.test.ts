@@ -14,6 +14,18 @@ function fixture(){
 }
 const write=(file:string,data:unknown)=>writeFileSync(file,JSON.stringify(data));
 const read=(file:string)=>JSON.parse(readFileSync(file,'utf8'));
+test('answer choices, selection, shuffle preference and the live shuffled order survive restart',()=>{
+ const f=fixture();
+ try{
+  const rounds=demoRounds();Object.assign(rounds[0].categories[0].questions[0],{answerOptions:['Mercury','Venus','Mars'],correctAnswerIndex:1,shuffleAnswers:true});
+  const g=createGame({definition:{rounds}}),q=g.rounds[0].categories[0].questions[0];
+  act(g,'start');act(g,'openQuestion',{questionId:q.id});
+  const order=structuredClone(g.current?.answerOrder),visible=view(g,'stage').currentQuestion?.answerOptions;
+  f.load().save(g);const restored=f.load().games.get(g.id)!,saved=restored.rounds[0].categories[0].questions[0];
+  assert.deepEqual(saved.answerOptions,['Mercury','Venus','Mars']);assert.equal(saved.correctAnswerIndex,1);assert.equal(saved.answer,'Venus');assert.equal(saved.shuffleAnswers,true);
+  assert.deepEqual(restored.current?.answerOrder,order);assert.deepEqual(view(restored,'stage').currentQuestion?.answerOptions,visible);
+ }finally{f.remove();}
+});
 
 test('each new game gets its own JSON file and saving one leaves the others untouched',()=>{
  const f=fixture();
@@ -27,29 +39,29 @@ test('each new game gets its own JSON file and saving one leaves the others unto
   assert.equal(f.load().games.size,2);assert(!existsSync(join(f.dir,'games.json')));
  }finally{f.remove();}
 });
-test('a dropped export loads in place once with stable identity and claimable host access',()=>{
+test('a dropped export loads in place once with stable identity and no owner credentials',()=>{
  const f=fixture();
  try{
   const file=join(f.directory,'my-board.json');write(file,{format:'jeopardy/1',name:'Dropped board',rounds:demoRounds()});
   const first=f.load(),game=[...first.games.values()][0];
-  assert.equal(game.name,'Dropped board');assert.equal(game.hostClaimable,true);
+  assert.equal(game.name,'Dropped board');assert(!('hostClaimable' in game));
   assert.deepEqual(readdirSync(f.directory),['my-board.json']);
-  assert.equal(read(file).format,'jeopardy/state/1');assert.equal(read(file).hostToken,game.hostToken);
+  assert.equal(read(file).format,'jeopardy/state/1');assert(!('hostToken' in read(file)));
   game.name='Edited board';first.save(game);
   const restored=f.load().games.get(game.id)!;
-  assert.equal(restored.name,'Edited board');assert.equal(restored.hostToken,game.hostToken);assert.equal(restored.hostClaimable,true);
+  assert.equal(restored.name,'Edited board');assert.equal(restored.id,game.id);assert(!('hostToken' in restored));
   assert.deepEqual(readdirSync(f.directory),['my-board.json']);
  }finally{f.remove();}
 });
-test('migration preserves IDs, access keys, scores and active progress and archives the combined file',()=>{
+test('migration preserves IDs, player identities, scores and active progress and archives the combined file',()=>{
  const f=fixture();
  try{
   const a=createGame({name:'Existing A',definition:{rounds:demoRounds()}}),b=createGame({name:'Existing B'}),player=addPlayer(a,'Ada');
   player.score=800;act(a,'start');act(a,'openQuestion',{questionId:a.rounds[0].categories[0].questions[0].id});
   const active=structuredClone(a.current);write(join(f.dir,'games.json'),[a,b]);
   const store=f.load(),restored=store.games.get(a.id)!;
-  assert.equal(store.games.size,2);assert.equal(restored.hostToken,a.hostToken);assert.equal(restored.players[0].token,player.token);assert.equal(restored.players[0].score,800);assert.deepEqual(restored.current,active);
-  assert.equal(restored.hostClaimable,false);assert(!existsSync(join(f.dir,'games.json')));
+  assert.equal(store.games.size,2);assert.equal(restored.id,a.id);assert.equal(restored.players[0].token,player.token);assert.equal(restored.players[0].score,800);assert.deepEqual(restored.current,active);
+  assert(!('hostClaimable' in restored));assert(!existsSync(join(f.dir,'games.json')));
   assert.deepEqual(read(join(f.dir,'games.json.migrated')),[JSON.parse(JSON.stringify(a)),JSON.parse(JSON.stringify(b))]);
   assert.deepEqual(readdirSync(f.directory).sort(),[`${a.id}.json`,`${b.id}.json`].sort());
   assert.equal(f.load().games.size,2);

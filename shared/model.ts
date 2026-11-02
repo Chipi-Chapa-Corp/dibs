@@ -1,23 +1,22 @@
 export interface HiddenModifier { title: string; instructions: string }
 export interface ModifierClaim extends HiddenModifier { id: string; questionId: string; playerId: string; roundIndex: number }
-export interface Question { modifier?: HiddenModifier|null; id: string; value: number; prompt: string; answer: string; notes: string; dailyDouble: boolean }
+export interface Question { modifier?: HiddenModifier|null; id: string; value: number; prompt: string; answer: string; answerOptions?: string[]; correctAnswerIndex?: number; shuffleAnswers?: boolean; notes: string; dailyDouble: boolean }
 export interface Category { id: string; name: string; questions: Question[] }
 export interface Round { id: string; name: string; type: 'board'|'final'; categories: Category[] }
 export interface Theme { preset: 'paper'|'ink'|'clay'|'forest'; accent: string; paper: string; ink: string; surface: string; muted: string; line: string; displayFont: 'serif'|'sans'; background: string; motion: boolean; sound: boolean; title: string }
-export interface Settings { buzzMode: 'first'|'queue'; autoOpenBuzzers: boolean; earlyPenaltyMs: number; deductWrong: boolean; wrongMultiplier: number; correctMultiplier: number; allowNegative: boolean; reopenWrong: boolean; lockWrong: boolean; revealDelayMs: number; showQuestionOnPhone: boolean; showScoresOnPhone: boolean; showLeaderboardOnStage: boolean; allowLateJoin: boolean; maxPlayers: number; startingScore: number; joinPin: string; requireReady: boolean; finalMaxWager: 'score'|'unlimited'; }
+export interface Settings { buzzMode: 'first'|'queue'; autoOpenBuzzers: boolean; earlyPenaltyMs: number; deductWrong: boolean; wrongMultiplier: number; correctMultiplier: number; allowNegative: boolean; reopenWrong: boolean; lockWrong: boolean; revealDelayMs: number; showQuestionOnPhone: boolean; showScoresOnPhone: boolean; showLeaderboardOnStage: boolean; startingScore: number; requireReady: boolean; finalMaxWager: 'score'|'unlimited'; }
 export interface Player { id: string; name: string; color: string; token: string; score: number; connected: boolean; ready: boolean; blockedUntil: number; stats: {correct: number; incorrect: number; buzzes: number}; joinedAt: number }
 export interface Buzz { playerId: string; at: number; order: number }
 export interface FinalEntry { wager: number; answer: string; submitted: boolean; judged: boolean; correct?: boolean }
-export interface Current { dailyDoubleFromId?:string|null; questionId: string; category: string; buzzOpen: boolean; buzzes: Buzz[]; answeringId: string|null; attempted: string[]; revealAt: number|null; revealed: boolean; phase: 'question'|'wager'|'final'|'modifier'; wagers: Record<string, FinalEntry>; closed: boolean }
+export interface Current { dailyDoubleFromId?:string|null; questionId: string; category: string; answerOrder?: number[]; buzzOpen: boolean; buzzes: Buzz[]; answeringId: string|null; attempted: string[]; revealAt: number|null; revealed: boolean; phase: 'question'|'wager'|'final'|'modifier'; wagers: Record<string, FinalEntry>; closed: boolean }
 export interface QuestionSelection { questionId:string; opensAt:number }
 export const QUESTION_SELECTION_MS=800;
 export interface HistoryEntry { id:string; at:number; label:string; deltas:Record<string,number> }
 export interface Announcement { id:string; title:string; detail:string; at:number }
-export interface HostTransfer { tokenHash:string; expiresAt:number }
-export interface Game { hostTransfer?:HostTransfer|null; hostClaimable?: boolean; modifierClaims: ModifierClaim[]; id:string; name:string; subtitle:string; hostToken:string; createdAt:number; status:'lobby'|'playing'|'finished'; paused:boolean; roundIndex:number; rounds:Round[]; settings:Settings; theme:Theme; players:Player[]; played:string[]; current:Current|null; history:HistoryEntry[]; undo:unknown[]; questionCount:number; selection:QuestionSelection|null; announcement:Announcement|null; revision:number }
+export interface Game { modifierClaims: ModifierClaim[]; id:string; name:string; subtitle:string;  createdAt:number; status:'lobby'|'playing'|'finished'; paused:boolean; roundIndex:number; rounds:Round[]; settings:Settings; theme:Theme; players:Player[]; played:string[]; current:Current|null; history:HistoryEntry[]; undo:unknown[]; questionCount:number; selection:QuestionSelection|null; announcement:Announcement|null; revision:number }
 export type PublicPlayer = Omit<Player,'token'>;
-export interface GameView extends Omit<Game,'hostToken'|'hostTransfer'|'players'|'undo'|'rounds'> { players:PublicPlayer[]; rounds:Round[]; selfId?:string; filledQuestionIds:string[]; role:'host'|'player'|'stage'; serverTime:number; currentQuestion:Question|null; yourFinal:FinalEntry|null }
-export interface GameSummary {hostClaimable?:boolean;id:string;name:string;subtitle:string;status:Game['status'];playerCount:number;questionTotal:number;rounds:number;accent:string;createdAt:number;locked:boolean}
+export interface GameView extends Omit<Game,'players'|'undo'|'rounds'> { editLock?:'mine'|'other'|null; players:PublicPlayer[]; rounds:Round[]; selfId?:string; filledQuestionIds:string[]; role:'host'|'player'|'stage'; serverTime:number; currentQuestion:Question|null; yourFinal:FinalEntry|null }
+export interface GameSummary {editing?:boolean;id:string;name:string;subtitle:string;status:Game['status'];playerCount:number;questionTotal:number;rounds:number;accent:string;createdAt:number}
 export const uid = () => Math.random().toString(36).slice(2,10);
 export const themes: Record<Theme['preset'], Omit<Theme,'preset'|'displayFont'|'background'|'motion'|'sound'|'title'>> = {
   paper:{accent:'#b7482d',paper:'#ece9e0',ink:'#252620',surface:'#f6f3eb',muted:'#6e7166',line:'#c9c9be'},
@@ -26,7 +25,7 @@ export const themes: Record<Theme['preset'], Omit<Theme,'preset'|'displayFont'|'
   forest:{accent:'#c4d4a2',paper:'#223d32',ink:'#f0ead9',surface:'#2c493b',muted:'#b3beab',line:'#526653'},
 };
 export const defaultTheme:Theme={preset:'paper',...themes.paper,displayFont:'serif',background:'',motion:true,sound:false,title:''};
-export const defaultSettings:Settings={buzzMode:'first',autoOpenBuzzers:false,earlyPenaltyMs:750,deductWrong:true,wrongMultiplier:1,correctMultiplier:1,allowNegative:true,reopenWrong:true,lockWrong:true,revealDelayMs:900,showQuestionOnPhone:true,showScoresOnPhone:true,showLeaderboardOnStage:true,allowLateJoin:true,maxPlayers:32,startingScore:0,joinPin:'',requireReady:false,finalMaxWager:'score'};
+export const defaultSettings:Settings={buzzMode:'first',autoOpenBuzzers:false,earlyPenaltyMs:750,deductWrong:true,wrongMultiplier:1,correctMultiplier:1,allowNegative:true,reopenWrong:true,lockWrong:true,revealDelayMs:900,showQuestionOnPhone:true,showScoresOnPhone:true,showLeaderboardOnStage:true,startingScore:0,requireReady:false,finalMaxWager:'score'};
 export const emptyQuestion=(value=100):Question=>({id:uid(),value,prompt:'',answer:'',notes:'',dailyDouble:false,modifier:null});
 export const emptyRound=(n=1):Round=>({id:uid(),name:`Round ${n}`,type:'board',categories:[]});
 const pack:string[][][]=[

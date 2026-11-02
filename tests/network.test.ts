@@ -18,7 +18,7 @@ test('Daily Double host assignment, phone wager and mandatory answer synchronize
   const rounds=demoRounds();rounds[0].categories[0].questions[0].dailyDouble=true;
   const created=await post('/api/games',{name:'Daily Double network',definition:{rounds}}),a=await post(`/api/games/${created.id}/join`,{name:'Choosing team'}),b=await post(`/api/games/${created.id}/join`,{name:'Required team'});
   const connect=async(role:string,token?:string)=>{const s=io(base,{autoConnect:false,transports:['websocket']});sockets.push(s);let latest:GameView;s.on('state',v=>latest=v);s.connect();await once(s,'connect');assert((await emit(s,'subscribe',{gameId:created.id,role,token})).ok);return{s,state:()=>latest!};};
-  const host=await connect('host',created.hostToken),selecting=await connect('player',a.token),answering=await connect('player',b.token),stage=await connect('stage');
+  const host=await connect('host'),selecting=await connect('player',a.token),answering=await connect('player',b.token),stage=await connect('stage');
   const command=(s:Socket,action:string,data?:unknown)=>emit(s,'command',{action,data});
   await command(host.s,'start');await command(host.s,'openQuestion',{questionId:rounds[0].categories[0].questions[0].id});
   await command(host.s,'assignDailyDouble',{fromId:a.playerId,playerId:b.playerId});
@@ -43,13 +43,85 @@ async function waitState(client:{s:Socket;state:()=>GameView},predicate:(v:GameV
   client.s.on('state',changed);
  });
 }
-test('real clients: discovery, auth, concurrent buzzes, synchronized scores, redaction, reconnect and persistence',async()=>{
+test('legacy room PINs and player limits are ignored when loading and importing games',async()=>{
+ const dir=mkdtempSync(join(tmpdir(),'jeopardy-open-join-'));mkdirSync(join(dir,'games'));
+ const game=createGame({name:'Legacy room'});
+ Object.assign(game.settings,{joinPin:'2468',maxPlayers:1});
+ writeFileSync(join(dir,'games',`${game.id}.json`),JSON.stringify(game));
+ const server=await startServer({port:0,dataDir:dir,dev:false,quiet:true});
+ try{
+  const base=`http://127.0.0.1:${(server.server.address()as{port:number}).port}`;
+  const post=(path:string,data:unknown)=>fetch(base+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+  const restored=server.games.get(game.id)!;
+  assert(!('joinPin' in restored.settings));assert(!('maxPlayers' in restored.settings));
+  for(let i=0;i<101;i++){
+   const response=await post(`/api/games/${game.id}/join`,{name:`Player ${i}`});
+   assert.equal(response.status,200);assert((await response.json()).token);
+  }
+  assert.equal(restored.players.length,101);
+  const imported=await (await post('/api/games',{name:'Imported room',definition:{settings:{joinPin:'secret',maxPlayers:1}}})).json();
+  const exported=await (await fetch(`${base}/api/games/${imported.id}/export`)).json();
+  assert(!('joinPin' in exported.settings));assert(!('maxPlayers' in exported.settings));
+  for(const name of ['Ada','Bea'])assert.equal((await post(`/api/games/${imported.id}/join`,{name})).status,200);
+  const listed=await (await fetch(base+'/api/games')).json();
+  assert(listed.every((summary:Record<string,unknown>)=>!('locked' in summary)));
+ }finally{await server.close();rmSync(dir,{recursive:true,force:true});}
+});
+test('editing locks serialize editors, protect uploads, and hand off automatically when a tab leaves',async()=>{
+ const dir=mkdtempSync(join(tmpdir(),'dibs-edit-lock-'));const server=await startServer({port:0,dataDir:dir,dev:false,quiet:true});const sockets:Socket[]=[];let uploaded:URL|undefined;
+ try{
+  const base=`http://127.0.0.1:${(server.server.address()as{port:number}).port}`;
+  const created=await (await fetch(base+'/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:'Shared game',definition:{rounds:demoRounds()}})})).json();
+  const connect=async(editing=false)=>{
+   const s=io(base,{autoConnect:false,transports:['websocket']});sockets.push(s);let latest:GameView;s.on('state',v=>latest=v);s.connect();await once(s,'connect');
+   assert.equal((await emit(s,'subscribe',{gameId:created.id,role:'host',editing})).ok,true);return{s,state:()=>latest!};
+  };
+  const first=await connect(true),second=await connect(true),host=await connect();
+  assert.equal(first.state().editLock,'mine');assert.equal(second.state().editLock,'other');
+  assert.equal((await emit(first.s,'command',{action:'save',data:{name:'First editor’s work'}})).ok,true);
+  for(const client of [second,host])assert.equal((await emit(client.s,'command',{action:'save',data:{name:'Must not overwrite'}})).ok,false);
+  assert.equal((await emit(host.s,'command',{action:'start'})).ok,false);
+  assert.equal((await fetch(`${base}/api/games/${created.id}`,{method:'DELETE'})).status,409);
+  assert.equal((await fetch(`${base}/api/games/${created.id}/export`)).status,200);
+  assert.equal((await fetch(`${base}/api/games/${created.id}/media`,{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'})).status,409);
+  assert.equal((await fetch(`${base}/api/games/${created.id}/media`,{method:'POST',headers:{'X-Editor-Id':second.s.id!,'Content-Type':'application/json'},body:'{}'})).status,409);
+  const form=new FormData();form.append('file',new Blob([new Uint8Array([137,80,78,71])],{type:'image/png'}),'fixture.png');
+  const response=await fetch(`${base}/api/games/${created.id}/media`,{method:'POST',headers:{'X-Editor-Id':first.s.id!},body:form});assert.equal(response.status,200);
+  const media=await response.json();uploaded=new URL('../public'+media.url,import.meta.url);assert(existsSync(uploaded));
+  const staleEditorId=first.s.id!;first.s.disconnect();
+  await waitState(second,v=>v.editLock==='mine');assert.equal(second.state().name,'First editor’s work');
+  assert.equal((await fetch(`${base}/api/games/${created.id}/media`,{method:'POST',headers:{'X-Editor-Id':staleEditorId,'Content-Type':'application/json'},body:'{}'})).status,409);
+  assert.equal((await emit(second.s,'command',{action:'save',data:{name:'Second editor’s work'}})).ok,true);
+  assert.equal((await emit(second.s,'subscribe',{gameId:created.id,role:'host',editing:false})).ok,true);
+  await waitState(host,v=>v.editLock===null);
+  assert.equal((await emit(host.s,'command',{action:'start'})).ok,true);
+  assert.equal((await emit(second.s,'command',{action:'pause'})).ok,true);
+  assert.equal(server.games.get(created.id)!.name,'Second editor’s work');
+  assert.equal((await fetch(`${base}/api/games/${created.id}`,{method:'DELETE'})).status,200);
+ }finally{sockets.forEach(s=>s.disconnect());await server.close();if(uploaded)rmSync(uploaded,{force:true});rmSync(dir,{recursive:true,force:true});}
+});
+test('editing locks are per game, release on resubscription, and do not survive a server restart',async()=>{
+ const dir=mkdtempSync(join(tmpdir(),'dibs-edit-restart-'));let server=await startServer({port:0,dataDir:dir,dev:false,quiet:true});const sockets:Socket[]=[];
+ try{
+  let base=`http://127.0.0.1:${(server.server.address()as{port:number}).port}`;
+  const create=async(name:string)=>(await (await fetch(base+'/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name})})).json()).id;
+  const a=await create('Game A'),b=await create('Game B');
+  const socket=io(base,{autoConnect:false,transports:['websocket']});sockets.push(socket);socket.connect();await once(socket,'connect');
+  assert.equal((await emit(socket,'subscribe',{gameId:a,role:'host',editing:true})).ok,true);
+  assert.equal((await emit(socket,'subscribe',{gameId:b,role:'host',editing:true})).ok,true);
+  const listed=await (await fetch(base+'/api/games')).json();assert.equal(listed.find((g:{id:string})=>g.id===a).editing,false);assert.equal(listed.find((g:{id:string})=>g.id===b).editing,true);
+  await server.close();server=await startServer({port:0,dataDir:dir,dev:false,quiet:true});base=`http://127.0.0.1:${(server.server.address()as{port:number}).port}`;
+  const restored=await (await fetch(base+'/api/games')).json();assert(restored.every((g:{editing:boolean})=>!g.editing));
+  assert.equal((await fetch(`${base}/api/games/${b}`,{method:'DELETE'})).status,200);
+ }finally{sockets.forEach(s=>s.disconnect());await server.close();rmSync(dir,{recursive:true,force:true});}
+});
+test('real clients: discovery, open hosting, concurrent buzzes, synchronized scores, redaction, reconnect and persistence',async()=>{
  const dir=mkdtempSync(join(tmpdir(),'jeopardy-test-'));const server=await startServer({port:0,dataDir:dir,dev:false,quiet:true});let sockets:Socket[]=[];let restarted:Awaited<ReturnType<typeof startServer>>|null=null;
  try{const port=(server.server.address()as{port:number}).port;const base=`http://127.0.0.1:${port}`;const request=async(path:string,data?:unknown)=>{const r=await fetch(base+path,{method:data?'POST':'GET',headers:{'Content-Type':'application/json'},body:data?JSON.stringify(data):undefined});return r.json();};
  const rounds=demoRounds(),mystery=rounds[0].categories[0].questions[1];mystery.prompt='';mystery.modifier={title:'Trading places',instructions:'Swap your score with another team.'};
- const created=await request('/api/games',{name:'Network test',definition:{rounds}});const listed=await request('/api/games');assert.equal(listed[0].id,created.id);assert(!JSON.stringify(listed).includes(created.hostToken));
+ const created=await request('/api/games',{name:'Network test',definition:{rounds}});const listed=await request('/api/games');assert.equal(listed[0].id,created.id);assert(!('hostToken' in created));
  const pa=await request(`/api/games/${created.id}/join`,{name:'Ada'}),pb=await request(`/api/games/${created.id}/join`,{name:'Bea'});const connect=async(role:string,token?:string)=>{const s=io(base,{transports:['websocket'],autoConnect:false});sockets.push(s);s.connect();await once(s,'connect');let state:GameView; s.on('state',v=>state=v);const sub=await emit(s,'subscribe',{gameId:created.id,role,token});return{s,sub,state:()=>state!};};
- const host=await connect('host',created.hostToken),a=await connect('player',pa.token),b=await connect('player',pb.token),stage=await connect('stage');assert(host.sub.ok&&a.sub.ok&&b.sub.ok&&stage.sub.ok);const fake=await connect('host','bad-key');assert.equal(fake.sub.ok,false);
+ const host=await connect('host'),a=await connect('player',pa.token),b=await connect('player',pb.token),stage=await connect('stage');assert(host.sub.ok&&a.sub.ok&&b.sub.ok&&stage.sub.ok);const anotherHost=await connect('host');assert.equal(anotherHost.sub.ok,true);
  assert.equal((await emit(a.s,'command',{action:'adjust',data:{playerId:pa.playerId,amount:99999}})).ok,false);
  const q=host.state().rounds[0].categories[0].questions[0];assert.equal(stage.state().rounds[0].categories[0].questions[0].answer,'');
  await emit(host.s,'command',{action:'start'});await emit(host.s,'command',{action:'selectQuestion',data:{questionId:q.id}});
@@ -59,7 +131,7 @@ test('real clients: discovery, auth, concurrent buzzes, synchronized scores, red
  await emit(host.s,'command',{action:'openBuzzers'});const results=await Promise.all([emit(a.s,'command',{action:'buzz'}),emit(b.s,'command',{action:'buzz'})]);assert.equal(results.filter(r=>r.ok).length,1);
  const winner=host.state().current!.answeringId!;await emit(host.s,'command',{action:'judge',data:{correct:true}});assert.equal(host.state().players.find(p=>p.id===winner)?.score,100);assert.equal(stage.state().currentQuestion?.answer,'');assert.equal(a.state().currentQuestion?.answer,'');
  const again=await request(`/api/games/${created.id}/join`,{token:pa.token,name:'Ada'});assert.equal(again.playerId,pa.playerId);assert.equal((await request(`/api/games/${created.id}`)).players.length,2);
- const json=JSON.stringify(stage.state());assert(!json.includes(created.hostToken));assert(!json.includes(pa.token));
+ const json=JSON.stringify(stage.state());assert(!('hostToken' in stage.state()));assert(!json.includes(pa.token));
  await emit(host.s,'command',{action:'closeQuestion'});assert.equal((await emit(host.s,'command',{action:'save',data:{settings:{selection:'winner'}}})).ok,false);assert(!('selection' in host.state().settings));
  assert.equal((await emit(a.s,'command',{action:'selectQuestion',data:{questionId:mystery.id}})).ok,false);
  assert.equal((await emit(b.s,'command',{action:'selectQuestion',data:{questionId:mystery.id}})).ok,false);
@@ -70,8 +142,8 @@ test('real clients: discovery, auth, concurrent buzzes, synchronized scores, red
  await waitState(stage,v=>!!v.current?.revealed);await waitState(host,v=>v.modifierClaims.length===1);
  assert.equal(stage.state().currentQuestion?.modifier?.instructions,mystery.modifier.instructions);assert.equal(host.state().modifierClaims.length,1);
  assert.equal(host.state().players.find(p=>p.id===winner)?.score,100);
- const exported=await fetch(`${base}/api/games/${created.id}/export`,{headers:{Authorization:`Bearer ${created.hostToken}`}});const definition=await exported.json();assert.equal(definition.rounds[0].categories[0].questions[1].modifier.instructions,mystery.modifier.instructions);assert(!('modifiers' in definition));assert(!('selection' in definition.settings));
- sockets.forEach(s=>s.disconnect());sockets=[];await server.close();restarted=await startServer({port:0,dataDir:dir,dev:false,quiet:true});const restored=restarted.games.get(created.id)!;assert.equal(restored.players.find(p=>p.id===winner)?.score,100);assert.equal(restored.hostToken,created.hostToken);assert(restored.players.every(p=>!p.connected));assert.equal(restored.modifierClaims.length,1);assert.equal(restored.modifierClaims[0].instructions,mystery.modifier.instructions);
+ const exported=await fetch(`${base}/api/games/${created.id}/export`);const definition=await exported.json();assert.equal(definition.rounds[0].categories[0].questions[1].modifier.instructions,mystery.modifier.instructions);assert(!('modifiers' in definition));assert(!('selection' in definition.settings));
+ sockets.forEach(s=>s.disconnect());sockets=[];await server.close();restarted=await startServer({port:0,dataDir:dir,dev:false,quiet:true});const restored=restarted.games.get(created.id)!;assert.equal(restored.players.find(p=>p.id===winner)?.score,100);assert.equal(restored.id,created.id);assert(restored.players.every(p=>!p.connected));assert.equal(restored.modifierClaims.length,1);assert.equal(restored.modifierClaims[0].instructions,mystery.modifier.instructions);
  }finally{sockets.forEach(s=>s.disconnect());if(restarted)await restarted.close();else if(server.server.listening)await server.close();rmSync(dir,{recursive:true,force:true});}
 });
 
@@ -85,32 +157,34 @@ test('older saved games load without automated rules or obsolete settings',async
  writeFileSync(join(dir,'games.json'),JSON.stringify([stored]));
  const server=await startServer({port:0,dataDir:dir,dev:false,quiet:true});
  try{
-  const restored=server.games.get(game.id)!;assert.equal(restored.hostToken,game.hostToken);assert.equal(restored.players[0].score,450);assert.equal(restored.players[0].token,player.token);assert.deepEqual(restored.modifierClaims,[]);
+  const restored=server.games.get(game.id)!;assert.equal(restored.id,game.id);assert.equal(restored.players[0].score,450);assert.equal(restored.players[0].token,player.token);assert.deepEqual(restored.modifierClaims,[]);
   const publicState=JSON.stringify(view(restored,'stage'));for(const key of ['Old rule','answerOrder','showCategoryBeforeFinal','participantModifiers','modifierIds','shield'])assert(!publicState.includes(key));
  }finally{await server.close();rmSync(dir,{recursive:true,force:true});}
 });
 
-test('a directory-loaded definition can be hosted locally once without publishing its access key',async()=>{
- const dir=mkdtempSync(join(tmpdir(),'dibs-file-host-'));mkdirSync(join(dir,'games'));
- const file=join(dir,'games','sample.json');writeFileSync(file,JSON.stringify({format:'jeopardy/1',name:'File sample',rounds:demoRounds()}));
- let server=await startServer({port:0,dataDir:dir,dev:false,quiet:true});let socket:Socket|undefined;
+test('imported games and existing owner-based saves can be hosted by anyone after restart',async()=>{
+ const dir=mkdtempSync(join(tmpdir(),'dibs-open-host-'));mkdirSync(join(dir,'games'));
+ writeFileSync(join(dir,'games','sample.json'),JSON.stringify({format:'jeopardy/1',name:'File sample',rounds:demoRounds()}));
+ const legacy=createGame({name:'Old owner game',definition:{rounds:demoRounds()}});
+ writeFileSync(join(dir,'games','legacy.json'),JSON.stringify({...legacy,hostToken:'retired-owner-key',hostClaimable:false}));
+ let server=await startServer({port:0,dataDir:dir,dev:false,quiet:true});const sockets:Socket[]=[];
  try{
-  const base=`http://127.0.0.1:${(server.server.address()as{port:number}).port}`;
-  const listed=await (await fetch(base+'/api/games')).json(),game=listed[0];
-  assert.equal(game.hostClaimable,true);assert(!JSON.stringify(listed).includes(server.games.get(game.id)!.hostToken));
-  const claimed=await fetch(`${base}/api/games/${game.id}/claim-host`,{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});assert.equal(claimed.status,200);const {hostToken}=await claimed.json();
-  assert.equal(hostToken,server.games.get(game.id)!.hostToken);assert.equal(JSON.parse(readFileSync(file,'utf8')).hostClaimable,false);
-  assert.equal((await fetch(`${base}/api/games/${game.id}/claim-host`,{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'})).status,403);
-  const created=await (await fetch(base+'/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:'Browser game'})})).json();
-  assert.equal((await fetch(`${base}/api/games/${created.id}/claim-host`,{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'})).status,403);
-  socket=io(base,{transports:['websocket'],autoConnect:false});socket.connect();await once(socket,'connect');
-  assert.equal((await emit(socket,'subscribe',{gameId:game.id,role:'host',token:hostToken})).ok,true);
-  socket.disconnect();await server.close();server=await startServer({port:0,dataDir:dir,dev:false,quiet:true});
-  assert.equal(server.games.get(game.id)!.hostToken,hostToken);assert.equal(server.games.get(game.id)!.hostClaimable,false);
- }finally{socket?.disconnect();await server.close();rmSync(dir,{recursive:true,force:true});}
+  for(let round=0;round<2;round++){
+   const base=`http://127.0.0.1:${(server.server.address()as{port:number}).port}`;
+   const listed=await (await fetch(base+'/api/games')).json();assert.equal(listed.length,2);
+   for(const game of listed){
+    const socket=io(base,{transports:['websocket'],autoConnect:false});sockets.push(socket);socket.connect();await once(socket,'connect');
+    assert.equal((await emit(socket,'subscribe',{gameId:game.id,role:'host'})).ok,true);
+    assert.equal((await fetch(`${base}/api/games/${game.id}/export`)).status,200);
+    assert(!('hostToken' in server.games.get(game.id)!));assert(!('hostClaimable' in game));
+   }
+   sockets.forEach(socket=>socket.disconnect());await server.close();
+   if(round===0)server=await startServer({port:0,dataDir:dir,dev:false,quiet:true});
+  }
+ }finally{sockets.forEach(socket=>socket.disconnect());await server.close();rmSync(dir,{recursive:true,force:true});}
 });
 
-test('host deletion removes the file, notifies every connected role, and survives pending saves and restarts', {timeout:10000},async()=>{
+test('anyone can delete a game: removes the file, notifies every connected role, and survives pending saves and restarts', {timeout:10000},async()=>{
  const dir=mkdtempSync(join(tmpdir(),'dibs-delete-'));mkdirSync(join(dir,'games'));
  const file=join(dir,'games','named-board.json');writeFileSync(file,JSON.stringify({format:'jeopardy/1',name:'Delete fixture',rounds:demoRounds()}));
  let server=await startServer({port:0,dataDir:dir,dev:false,quiet:true});const sockets:Socket[]=[];
@@ -119,18 +193,17 @@ test('host deletion removes the file, notifies every connected role, and survive
   const game=[...server.games.values()][0];
   const keep=await (await fetch(base+'/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:'Keep fixture'})})).json();
   const player=await (await fetch(`${base}/api/games/${game.id}/join`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:'Ada'})})).json();
-  const remove=(token?:string)=>fetch(`${base}/api/games/${game.id}`,{method:'DELETE',headers:token?{Authorization:`Bearer ${token}`}:{}});
-  for(const token of [undefined,'wrong-token',player.token,keep.hostToken])assert.equal((await remove(token)).status,403);
+  const remove=()=>fetch(`${base}/api/games/${game.id}`,{method:'DELETE'});
   assert(server.games.has(game.id));assert(existsSync(file));
   const connect=async(role:string,token?:string)=>{
    const socket=io(base,{autoConnect:false,transports:['websocket']});sockets.push(socket);socket.connect();await once(socket,'connect');
    assert.equal((await emit(socket,'subscribe',{gameId:game.id,role,token})).ok,true);return socket;
   };
-  const host=await connect('host',game.hostToken),phone=await connect('player',player.token),stage=await connect('stage');
+  const host=await connect('host'),phone=await connect('player',player.token),stage=await connect('stage');
   const deleted=Promise.all([once(host,'deleted'),once(phone,'deleted'),once(stage,'deleted')]);
   const listUpdated=new Promise<void>(resolve=>stage.on('games',list=>{if(!list.some((entry:{id:string})=>entry.id===game.id))resolve();}));
   await emit(host,'command',{action:'adjust',data:{playerId:player.playerId,amount:100}});
-  const response=await remove(game.hostToken);assert.equal(response.status,200);assert.equal((await response.json()).ok,true);
+  const response=await remove();assert.equal(response.status,200);assert.equal((await response.json()).ok,true);
   assert((await deleted).every(message=>message==='This game was deleted by the host.'));await listUpdated;
   assert(!server.games.has(game.id));assert(server.games.has(keep.id));assert(!existsSync(file));
   assert.equal((await fetch(`${base}/api/games/${game.id}`)).status,404);
@@ -147,7 +220,7 @@ test('a newly created game can be deleted before its first autosave',async()=>{
  try{
   const base=`http://127.0.0.1:${(server.server.address()as{port:number}).port}`;
   const created=await (await fetch(base+'/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:'Unsaved'})})).json();
-  assert.equal((await fetch(`${base}/api/games/${created.id}`,{method:'DELETE',headers:{Authorization:`Bearer ${created.hostToken}`}})).status,200);
+  assert.equal((await fetch(`${base}/api/games/${created.id}`,{method:'DELETE'})).status,200);
   await server.close();assert(!existsSync(join(dir,'games',`${created.id}.json`)));assert.equal(server.games.size,0);
  }finally{await server.close();rmSync(dir,{recursive:true,force:true});}
 });
@@ -164,14 +237,14 @@ test('reset returns host and stage to the lobby, revokes players, preserves the 
    const s=io(base,{autoConnect:false,transports:['websocket']});sockets.push(s);let latest:GameView;s.on('state',v=>latest=v);s.connect();await once(s,'connect');
    const sub=await emit(s,'subscribe',{gameId:created.id,role,token});return{s,sub,state:()=>latest!};
   };
-  const host=await connect('host',created.hostToken),a=await connect('player',pa.token),b=await connect('player',pb.token),stage=await connect('stage');
+  const host=await connect('host'),a=await connect('player',pa.token),b=await connect('player',pb.token),stage=await connect('stage');
   for(const client of [a,stage])assert.equal((await emit(client.s,'command',{action:'reset'})).ok,false);
   await emit(host.s,'command',{action:'start'});
   const q=host.state().rounds[0].categories[0].questions[0];
   await emit(host.s,'command',{action:'openQuestion',data:{questionId:q.id}});
   await emit(host.s,'command',{action:'adjust',data:{playerId:pa.playerId,amount:800}});
   await emit(host.s,'command',{action:'closeQuestion'});await emit(host.s,'command',{action:'finish'});
-  const exportBoard=async()=>(await fetch(`${base}/api/games/${created.id}/export`,{headers:{Authorization:`Bearer ${created.hostToken}`}})).json();
+  const exportBoard=async()=>(await fetch(`${base}/api/games/${created.id}/export`)).json();
   const definition=await exportBoard();
   const revoked=Promise.all([once(a.s,'revoked'),once(b.s,'revoked')]);
   const updatedList=new Promise<void>(resolve=>stage.s.on('games',list=>{const g=list.find((v:{id:string})=>v.id===created.id);if(g?.status==='lobby'&&g.playerCount===0)resolve();}));
@@ -186,9 +259,9 @@ test('reset returns host and stage to the lobby, revokes players, preserves the 
   sockets.forEach(s=>s.disconnect());await server.close();
   server=await startServer({port:0,dataDir:dir,dev:false,quiet:true});base=`http://127.0.0.1:${(server.server.address()as{port:number}).port}`;
   const restored=server.games.get(created.id)!;
-  assert.equal(server.games.size,2);assert(server.games.has(keep.id));assert.equal(restored.hostToken,created.hostToken);assert.equal(restored.status,'lobby');assert.equal(restored.roundIndex,0);assert.equal(restored.players.length,0);assert.equal(restored.played.length,0);assert.equal(restored.current,null);assert.equal(restored.undo.length,0);
+  assert.equal(server.games.size,2);assert(server.games.has(keep.id));assert.equal(restored.id,created.id);assert.equal(restored.status,'lobby');assert.equal(restored.roundIndex,0);assert.equal(restored.players.length,0);assert.equal(restored.played.length,0);assert.equal(restored.current,null);assert.equal(restored.undo.length,0);
   assert.deepEqual(await exportBoard(),definition);
-  assert.equal((await connect('host',created.hostToken)).sub.ok,true);assert.equal((await connect('player',pa.token)).sub.ok,false);
+  assert.equal((await connect('host')).sub.ok,true);assert.equal((await connect('player',pa.token)).sub.ok,false);
   const fresh=await post(`/api/games/${created.id}/join`,{name:'Ada'});assert(fresh.token);assert.notEqual(fresh.token,pa.token);
   const phone=await connect('player',fresh.token);assert(phone.sub.ok);assert.equal(phone.state().players.find(p=>p.id===fresh.playerId)?.score,0);assert.equal(phone.state().players.find(p=>p.id===fresh.playerId)?.ready,false);
  }finally{sockets.forEach(s=>s.disconnect());await server.close();rmSync(dir,{recursive:true,force:true});}
@@ -200,26 +273,28 @@ test('library preparation saves before hosting; stale editors cannot change a ru
   const base=`http://127.0.0.1:${(server.server.address()as{port:number}).port}`;
   const post=async(path:string,data:unknown)=>(await fetch(base+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})).json();
   const created=await post('/api/games',{name:'Prepared in advance'});
-  const connect=async(token:string,gameId=created.id)=>{
+  const connect=async(editing=false,gameId=created.id)=>{
    const s=io(base,{autoConnect:false,transports:['websocket']});sockets.push(s);s.connect();await once(s,'connect');
-   assert.equal((await emit(s,'subscribe',{gameId,role:'host',token})).ok,true);return s;
+   assert.equal((await emit(s,'subscribe',{gameId,role:'host',editing})).ok,true);return s;
   };
-  const editor=await connect(created.hostToken),host=await connect(created.hostToken);
-  const rounds=demoRounds();rounds[0].categories[0].questions[0].notes='Keep these notes';rounds[0].categories[0].questions[1].dailyDouble=true;
+  const editor=await connect(true),host=await connect();
+  const rounds=demoRounds();Object.assign(rounds[0].categories[0].questions[0],{answerOptions:['First choice','Correct choice','Third choice'],correctAnswerIndex:1});rounds[0].categories[0].questions[0].notes='Keep these notes';rounds[0].categories[0].questions[1].dailyDouble=true;
   rounds[1].categories[0].questions[0].modifier={title:'Prepared surprise',instructions:'Apply this manually.'};
   assert.equal((await emit(editor,'command',{action:'save',data:{rounds,settings:{revealDelayMs:0},theme:{title:'Prepared theme'}}})).ok,true);
-  const before=await (await fetch(`${base}/api/games/${created.id}/export`,{headers:{Authorization:`Bearer ${created.hostToken}`}})).json();
+  const before=await (await fetch(`${base}/api/games/${created.id}/export`)).json();
+  assert.deepEqual(before.rounds[0].categories[0].questions[0].answerOptions,['First choice','Correct choice','Third choice']);assert.equal(before.rounds[0].categories[0].questions[0].answer,'Correct choice');assert.equal(before.rounds[0].categories[0].questions[0].correctAnswerIndex,1);
   const list=await (await fetch(base+'/api/games')).json();assert.equal(list.find((g:{id:string})=>g.id===created.id).questionTotal,41);
   const player=await post(`/api/games/${created.id}/join`,{name:'Ada'});
+  assert.equal((await emit(editor,'subscribe',{gameId:created.id,role:'host',editing:false})).ok,true);
   await emit(host,'command',{action:'start'});await emit(host,'command',{action:'adjust',data:{playerId:player.playerId,amount:700}});
   const rejected=await emit(editor,'command',{action:'save',data:{rounds:[],name:'Must not change',settings:{startingScore:999},theme:{title:'Must not change'}}});
   assert.equal(rejected.ok,false);assert.match(rejected.error,/Make a copy to edit/);
-  assert.equal((await fetch(`${base}/api/games/${created.id}/media`,{method:'POST',headers:{Authorization:`Bearer ${created.hostToken}`,'Content-Type':'application/json'},body:'{}'})).status,400);
-  const exported=await (await fetch(`${base}/api/games/${created.id}/export`,{headers:{Authorization:`Bearer ${created.hostToken}`}})).json();assert.deepEqual(exported,before);
+  assert.equal((await fetch(`${base}/api/games/${created.id}/media`,{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'})).status,400);
+  const exported=await (await fetch(`${base}/api/games/${created.id}/export`)).json();assert.deepEqual(exported,before);
   const copied=await post('/api/games',{name:before.name+' (copy)',definition:{...before,name:before.name+' (copy)'}});
-  assert.notEqual(copied.id,created.id);assert.notEqual(copied.hostToken,created.hostToken);
+  assert.notEqual(copied.id,created.id);assert(!('hostToken' in copied));
   const copy=server.games.get(copied.id)!;assert.equal(copy.status,'lobby');assert.deepEqual(copy.players,[]);assert.deepEqual(copy.played,[]);assert.equal(copy.current,null);assert.deepEqual(copy.undo,[]);assert.deepEqual(copy.rounds,before.rounds);assert.deepEqual(copy.settings,before.settings);assert.deepEqual(copy.theme,before.theme);
-  const copyEditor=await connect(copied.hostToken,copied.id);assert.equal((await emit(copyEditor,'command',{action:'save',data:{name:'Next event'}})).ok,true);
+  const copyEditor=await connect(true,copied.id);assert.equal((await emit(copyEditor,'command',{action:'save',data:{name:'Next event'}})).ok,true);
   assert.equal(server.games.get(created.id)!.players[0].score,700);assert.equal(server.games.get(created.id)!.name,before.name);assert.equal(copy.name,'Next event');
  }finally{sockets.forEach(s=>s.disconnect());await server.close();rmSync(dir,{recursive:true,force:true});}
 });
