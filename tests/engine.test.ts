@@ -3,7 +3,14 @@ import assert from 'node:assert/strict';
 import {act,addPlayer,createGame,tick,updateDefinition,view} from '../server/engine.ts';
 import {demoRounds} from '../shared/model.ts';
 function fixture(){const g=createGame({name:'Test',definition:{rounds:demoRounds()}});const a=addPlayer(g,'Ada'),b=addPlayer(g,'Bea'),c=addPlayer(g,'Cam');act(g,'start');return{g,a,b,c,q:g.rounds[0].categories[0].questions[0]};}
-test('public snapshots never contain future answers, private notes, host keys, player tokens or PINs',()=>{const{g,a,q}=fixture();g.settings.joinPin='secret-pin';q.notes='secret-host-notes';act(g,'openQuestion',{questionId:q.id});for(const role of ['stage','player']as const){const v=view(g,role,a.id);const json=JSON.stringify(v);assert(!json.includes(q.answer));assert(!json.includes('secret-host-notes'));assert(!json.includes(g.hostToken));assert(!json.includes(a.token));assert(!json.includes('secret-pin'));assert.equal(v.rounds[0].categories[1].questions[0].prompt,'');assert.equal(v.currentQuestion?.prompt,q.prompt);}assert.equal(view(g,'host').currentQuestion?.answer,q.answer);});
+test('public snapshots never contain future answers, private notes or player tokens',()=>{const{g,a,q}=fixture();q.notes='secret-host-notes';act(g,'openQuestion',{questionId:q.id});for(const role of ['stage','player']as const){const v=view(g,role,a.id);const json=JSON.stringify(v);assert(!json.includes(q.answer));assert(!json.includes('secret-host-notes'));assert(!('hostToken' in v));assert(!json.includes(a.token));assert.equal(v.rounds[0].categories[1].questions[0].prompt,'');assert.equal(v.currentQuestion?.prompt,q.prompt);}assert.equal(view(g,'host').currentQuestion?.answer,q.answer);});
+test('players can always join running and paused games, including old definitions that disabled late joining',()=>{
+ const g=createGame({definition:{rounds:demoRounds(),settings:{allowLateJoin:false}}});
+ assert(!('allowLateJoin' in g.settings));
+ act(g,'start');assert.equal(addPlayer(g,'Late player').name,'Late player');
+ act(g,'pause');assert.equal(addPlayer(g,'Paused player').name,'Paused player');
+ act(g,'finish');assert.throws(()=>addPlayer(g,'After the end'),/ended/);
+});
 test('answer reveal is withheld until the configured server-side deadline',()=>{const{g,q}=fixture();act(g,'openQuestion',{questionId:q.id},'host',null,1000);act(g,'reveal',{},'host',null,1100);assert.equal(view(g,'stage',undefined,1500).currentQuestion?.answer,'');tick(g,2001);assert.equal(view(g,'stage').currentQuestion?.answer,q.answer);});
 test('first buzz wins; a second player cannot steal the floor',()=>{const{g,a,b,q}=fixture();act(g,'openQuestion',{questionId:q.id});act(g,'openBuzzers');act(g,'buzz',{},'player',a.id,1000);assert.throws(()=>act(g,'buzz',{},'player',b.id,1001));assert.equal(g.current?.answeringId,a.id);assert.equal(g.current?.buzzes.length,1);});
 test('a wrong answer reopens the floor but locks out the player who missed',()=>{const{g,a,b,q}=fixture();act(g,'openQuestion',{questionId:q.id});act(g,'openBuzzers');act(g,'buzz',{},'player',a.id);act(g,'judge',{correct:false});assert.equal(a.score,-100);assert(g.current?.buzzOpen);assert.throws(()=>act(g,'buzz',{},'player',a.id));act(g,'buzz',{},'player',b.id);act(g,'judge',{correct:true});assert.equal(g.players.find(p=>p.id===b.id)?.score,100);assert(g.current?.closed);assert.throws(()=>act(g,'judge',{correct:true,playerId:b.id}));});
@@ -145,7 +152,7 @@ test('host reset clears the session in every game state and preserves the comple
   const {g,a,q}=fixture();
   q.notes='Keep host notes';q.dailyDouble=true;
   const modifier=g.rounds[1].categories[0].questions[0];modifier.modifier={title:'Keep this modifier',instructions:'Swap scores manually.'};
-  g.subtitle='Keep subtitle';g.theme.title='Keep this screen';g.settings.joinPin='2468';g.settings.allowLateJoin=false;
+  g.subtitle='Keep subtitle';g.theme.title='Keep this screen';
   a.score=900;a.ready=true;a.connected=true;a.stats.correct=3;
   g.played=[q.id];g.questionCount=7;g.modifierClaims=[{id:'claim',questionId:modifier.id,playerId:a.id,roundIndex:1,...modifier.modifier}];
   act(g,'round',{index:2});act(g,'finalBegin');act(g,'finalAnswer',{answer:'Old answer'},'player',a.id);
@@ -153,10 +160,10 @@ test('host reset clears the session in every game state and preserves the comple
   if(status==='lobby')g.status='lobby';
   if(status==='paused')act(g,'pause');
   if(status==='finished')act(g,'finish');
-  const definition=structuredClone({id:g.id,hostToken:g.hostToken,createdAt:g.createdAt,name:g.name,subtitle:g.subtitle,rounds:g.rounds,settings:g.settings,theme:g.theme});
+  const definition=structuredClone({id:g.id,createdAt:g.createdAt,name:g.name,subtitle:g.subtitle,rounds:g.rounds,settings:g.settings,theme:g.theme});
   const revision=g.revision;
   act(g,'reset');
-  assert.deepEqual({id:g.id,hostToken:g.hostToken,createdAt:g.createdAt,name:g.name,subtitle:g.subtitle,rounds:g.rounds,settings:g.settings,theme:g.theme},definition);
+  assert.deepEqual({id:g.id,createdAt:g.createdAt,name:g.name,subtitle:g.subtitle,rounds:g.rounds,settings:g.settings,theme:g.theme},definition);
   assert.equal(g.status,'lobby');assert.equal(g.roundIndex,0);assert.equal(g.paused,false);assert.equal(g.current,null);assert.equal(g.questionCount,0);assert.equal(g.announcement,null);assert.equal(g.revision,revision+1);
   for(const key of ['players','played','modifierClaims','history','undo']as const)assert.deepEqual(g[key],[]);
   assert(!JSON.stringify(g).includes(a.token));assert(!JSON.stringify(g).includes('Old answer'));

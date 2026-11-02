@@ -12,24 +12,24 @@ export const currentQuestion=(g:Game)=>g.rounds.flatMap(r=>r.categories.flatMap(
 const scores=(g:Game)=>Object.fromEntries(g.players.map(p=>[p.id,p.score]));
 const colors=['#bd4b31','#587058','#636f9a','#9e7639','#8a6080','#427e85','#8b6653','#4d5865'];
 export function createGame(input:Input={}):Game {
-  const g:Game={id:randomBytes(3).toString('hex').toUpperCase(),name:text(input.name)||'Untitled game',subtitle:'',hostToken:token(),createdAt:Date.now(),status:'lobby',paused:false,roundIndex:0,rounds:[emptyRound()],modifierClaims:[],settings:clone(defaultSettings),theme:clone(defaultTheme),players:[],played:[],current:null,history:[],undo:[],questionCount:0,selection:null,announcement:null,revision:0};
+  const g:Game={id:randomBytes(3).toString('hex').toUpperCase(),name:text(input.name)||'Untitled game',subtitle:'',createdAt:Date.now(),status:'lobby',paused:false,roundIndex:0,rounds:[emptyRound()],modifierClaims:[],settings:clone(defaultSettings),theme:clone(defaultTheme),players:[],played:[],current:null,history:[],undo:[],questionCount:0,selection:null,announcement:null,revision:0};
   if(input.definition)updateDefinition(g,input.definition);
   return g;
 }
 export function addPlayer(g:Game,name:string):Player {
-  assert(g.status!=='finished','This game has ended');assert(g.players.length<g.settings.maxPlayers,'This room is full');
-  assert(g.status==='lobby'||g.settings.allowLateJoin,'Joining is closed');
+  assert(g.status!=='finished','This game has ended');
   name=text(name.trim(),32);assert(name,'Enter your name');assert(!g.players.some(p=>p.name.toLowerCase()===name.toLowerCase()),'This name is already taken');
   const p:Player={id:uid(),token:token(),name,color:colors[g.players.length%colors.length],score:g.settings.startingScore,connected:false,ready:false,blockedUntil:0,stats:{correct:0,incorrect:0,buzzes:0},joinedAt:Date.now()};g.players.push(p);g.revision++;return p;
 }
 export function normalizeSettings(data:Input,old=defaultSettings):Settings {
   const s={...defaultSettings};for(const key of Object.keys(defaultSettings)as(keyof Settings)[]){const value=key in data?data[key]:old[key];if(value===undefined)continue;const def=defaultSettings[key];if(typeof def==='boolean')(s as Input)[key]=!!value;else if(typeof def==='number')(s as Input)[key]=finite(value,Number(def));else (s as Input)[key]=text(value,32);}
-  s.maxPlayers=Math.round(finite(s.maxPlayers,32,1,100));s.revealDelayMs=finite(s.revealDelayMs,900,0,10000);s.earlyPenaltyMs=finite(s.earlyPenaltyMs,750,0,10000);
+  s.revealDelayMs=finite(s.revealDelayMs,900,0,10000);s.earlyPenaltyMs=finite(s.earlyPenaltyMs,750,0,10000);
   s.correctMultiplier=finite(s.correctMultiplier,1,0,100);s.wrongMultiplier=finite(s.wrongMultiplier,1,0,100);
   if(!['first','queue'].includes(s.buzzMode))s.buzzMode='first';if(!['score','unlimited'].includes(s.finalMaxWager))s.finalMaxWager='score';return s;
 }
-/** Discard retired countdown fields in saved games and undo snapshots. */
+/** Discard retired settings and countdown fields in saved games and undo snapshots. */
 export function normalizeStoredGameplay(state:Pick<Game,'settings'|'rounds'|'current'>&Partial<Pick<Game,'selection'>>){
+  delete(state as unknown as Input).hostToken;delete(state as unknown as Input).hostClaimable;
   state.settings=normalizeSettings(state.settings);state.selection??=null;
   for(const round of state.rounds)for(const category of round.categories)for(const question of category.questions)delete(question as unknown as Input).timer;
   if(state.current)delete(state.current as unknown as Input).timer;
@@ -160,9 +160,9 @@ export function tick(g:Game,now=Date.now()):boolean{
   if(changed)g.revision++;return changed;
 }
 export function view(g:Game,role:GameView['role'],playerId?:string,now=Date.now()):GameView{
-  const{hostToken,undo,players,modifiers:_legacyModifiers,uses:_legacyUses,...base}=g as Game&{modifiers?:unknown;uses?:unknown};const q=currentQuestion(g);const reveal=role==='host'||!!g.current?.revealed;
+  const{hostToken:_legacyHostToken,hostClaimable:_legacyHostClaimable,undo,players,modifiers:_legacyModifiers,uses:_legacyUses,...base}=g as Game&{hostToken?:unknown;hostClaimable?:unknown;modifiers?:unknown;uses?:unknown};const q=currentQuestion(g);const reveal=role==='host'||!!g.current?.revealed;
   const rounds=g.rounds.map(r=>({...r,categories:r.categories.map(c=>({...c,questions:c.questions.map(q=>role==='host'?clone(q):{...q,prompt:'',answer:'',notes:'',modifier:null})}))}));
   const cur=g.current?clone(g.current):null;if(cur&&role!=='host')cur.wagers=Object.fromEntries(Object.entries(cur.wagers).map(([id,e])=>[id,{wager:reveal?e.wager:0,answer:reveal?e.answer:'',submitted:e.submitted,judged:e.judged,correct:reveal?e.correct:undefined}]));
   let cq=q?clone(q):null;if(cq&&role!=='host'){if(!reveal){cq.answer='';cq.modifier=null;}cq.notes='';if(cur?.phase==='wager')cq.prompt='';if(cur?.phase==='modifier'){cq.prompt='';cq.answer='';if(!reveal)cq.modifier=null;}}
-  return{...clone(base),modifierClaims:clone(g.modifierClaims||[]).filter(m=>role==='host'||m.questionId!==cur?.questionId||cur.revealed),filledQuestionIds:g.rounds.flatMap(r=>r.categories.flatMap(c=>c.questions.filter(isQuestionFilled).map(q=>q.id))),settings:{...g.settings,joinPin:role==='host'?g.settings.joinPin:g.settings.joinPin?'required':''},rounds,players:(players as (Player&{shield?:number})[]).map(({token,shield:_legacyShield,...p})=>clone(p)),current:cur,role,serverTime:now,selfId:playerId,currentQuestion:cq,yourFinal:playerId&&g.current?.wagers[playerId]?clone(g.current.wagers[playerId]):null};
+  return{...clone(base),modifierClaims:clone(g.modifierClaims||[]).filter(m=>role==='host'||m.questionId!==cur?.questionId||cur.revealed),filledQuestionIds:g.rounds.flatMap(r=>r.categories.flatMap(c=>c.questions.filter(isQuestionFilled).map(q=>q.id))),settings:normalizeSettings(g.settings),rounds,players:(players as (Player&{shield?:number})[]).map(({token,shield:_legacyShield,...p})=>clone(p)),current:cur,role,serverTime:now,selfId:playerId,currentQuestion:cq,yourFinal:playerId&&g.current?.wagers[playerId]?clone(g.current.wagers[playerId]):null};
 }

@@ -16,10 +16,7 @@
     "showQuestionOnPhone": true,
     "showScoresOnPhone": true,
     "showLeaderboardOnStage": true,
-    "allowLateJoin": true,
-    "maxPlayers": 8,
     "startingScore": 0,
-    "joinPin": "",
     "requireReady": false,
     "finalMaxWager": "score"
   },
