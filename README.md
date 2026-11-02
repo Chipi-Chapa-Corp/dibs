@@ -48,11 +48,15 @@ After updating the dev command itself, stop and start `npm run dev` once to acti
 
 Open the home list and choose **Create game** or **Edit**. Anyone on the local network can create, host, copy, export or delete a game; games have no owner, account or host password. Questions, hidden modifiers, appearance and settings are edited on a separate preparation page. Changes save automatically; **Done** waits for pending saves before returning to the list. The server lets one editor change a game at a time. Other editor tabs show disabled fields and become editable automatically when the current editor leaves or disconnects. Starting or deleting a game waits until editing finishes.
 
+The library labels each game **Not started**, **Ongoing**, or **Finished** and updates as the host starts, finishes, resumes or resets it. Use the status filter to narrow the list; **All games** includes finished games.
+
 When your board is ready, choose **Host**, invite players and start. The host screen contains the board, buzzers, judging, scores and player status. It has no question, appearance or settings editor. **More** contains pause/resume, finish and reset. The host uses on-screen buttons for all game controls.
 
 After a game starts, its definition is locked, including in editor tabs left open elsewhere. Choose **Copy & edit** in the library to prepare a fresh version while keeping the current game's players, scores and results. A reset returns the original to the lobby and allows preparation again.
 
-In the question popup, **Daily double** uses the same checkbox control as **Show ended**. Enter the question, then choose **Answer** or **Modifier**. Answers start with two rows; **Add answer** adds more choices, with a radio button marking the correct one. Deleting the correct answer selects the next remaining choice. **Shuffle answers** is on by default and randomizes the shared order when a question opens; turn it off to keep the written order. The Answer / Modifier toolbar also offers media insertion and preview. Choices appear with the question during play, and the correct answer is revealed by the host. Host notes are always visible in the popup.
+Each category has its own **+ Question** button and can contain a different number of questions. New categories start empty. Default values increase by 100 in round one, 200 in round two, 300 in round three, and so on, continuing after the highest value in that category. Existing values remain editable. **Delete question** in the question popup removes only that question.
+
+In the question popup, check **Daily double** for a wager question. Enter the question, then choose **Answer** or **Modifier**. Answers start with two rows; **Add answer** adds more choices, with a radio button marking the correct one. Deleting the correct answer selects the next remaining choice. **Shuffle answers** is on by default and randomizes the shared order when a question opens; turn it off to keep the written order. The Answer / Modifier toolbar also offers media insertion and preview. Choices appear with the question during play, and the correct answer is revealed by the host. Host notes are always visible in the popup.
 
 ## Media references
 

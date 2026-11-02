@@ -1,7 +1,7 @@
 import {useRef,useState} from 'react';
 import {Plus,Trash2,Check,ArrowRight,ArrowLeft,Copy,Eye,Code2,Shuffle} from 'lucide-react';
 import type {GameView,Question,Round,Settings,Theme} from '../shared/model';
-import {emptyQuestion,emptyRound,isQuestionFilled,themes,uid} from '../shared/model';
+import {emptyQuestion,emptyRound,isQuestionFilled,nextBoardValue,themes,uid} from '../shared/model';
 import {number} from './lib';
 import {Button,Checkbox,Field,IconButton,Modal,Radio,RichText,StageContent,Switch,UploadMedia} from './components';
 import {useAutosave} from './autosave';
@@ -13,46 +13,43 @@ export function QuestionsEditor({g,save,editorId}:EditorProps){
   const [rounds,setRounds]=useState<Round[]>(()=>structuredClone(g.rounds));
   const [index,setIndex]=useState(g.roundIndex);
   const [edit,setEdit]=useState<{q:Question;c:string}|null>(null);
-  const [pendingRemove,setPendingRemove]=useState<number|null>(null);
+  const [pendingRemove,setPendingRemove]=useState<{q:Question;c:string}|null>(null);
   const [newRound,setNewRound]=useState(false),[roundName,setRoundName]=useState(''),[roundType,setRoundType]=useState<'board'|'final'>('board');
   const autosave=useAutosave(save);
   const r=rounds[index];
   const update=(next:Round[],delay=0)=>{setRounds(next);autosave.schedule({rounds:next},delay);};
   const patch=(fn:(r:Round)=>Round,delay=0)=>update(rounds.map((r,i)=>i===index?fn(r):r),delay);
-  const rowCount=Math.max(0,...r.categories.map(c=>c.questions.length));
-  const rowValue=(row:number)=>r.categories.find(c=>c.questions[row])?.questions[row].value??(row+1)*100;
-  const removeRow=(row:number)=>{
-    patch(r=>({...r,categories:r.categories.map(c=>({...c,questions:c.questions.filter((_,i)=>i!==row)}))}));
+  const removeQuestion=({q,c}:{q:Question;c:string})=>{
+    patch(r=>({...r,categories:r.categories.map(category=>category.id===c?{...category,questions:category.questions.filter(x=>x.id!==q.id)}:category)}));
+    setEdit(null);
     setPendingRemove(null);
   };
-  const requestRemoveRow=(row:number)=>{
-    const hasContent=r.categories.some(c=>{
-      const q=c.questions[row];
-      return q&&(q.prompt.trim()||q.answer.trim()||q.answerOptions?.some(option=>option.trim())||q.notes.trim()||q.modifier?.title.trim()||q.modifier?.instructions.trim());
-    });
-    if(hasContent)setPendingRemove(row);else removeRow(row);
+  const requestRemoveQuestion=(q:Question)=>{
+    const target={q,c:edit!.c};
+    setEdit(target);
+    if(q.prompt.trim()||q.answer.trim()||q.answerOptions?.some(option=>option.trim())||q.notes.trim()||q.modifier?.title.trim()||q.modifier?.instructions.trim())setPendingRemove(target);else removeQuestion(target);
   };
   const addQuestion=(categoryId:string)=>{
-    const value=Math.max(0,...r.categories.map(c=>c.questions.at(-1)?.value||0))+100;
-    const categories=r.categories.map(c=>({...c,questions:[...Array.from({length:rowCount},(_,i)=>c.questions[i]||emptyQuestion(rowValue(i))),emptyQuestion(value)]}));
+    const category=r.categories.find(c=>c.id===categoryId)!;
+    const q=emptyQuestion(r.type==='final'?0:nextBoardValue(category.questions,index));
+    const categories=r.categories.map(c=>c.id===categoryId?{...c,questions:[...c.questions,q]}:c);
     patch(r=>({...r,categories}));
-    setEdit({q:categories.find(c=>c.id===categoryId)!.questions[rowCount],c:categoryId});
+    setEdit({q,c:categoryId});
   };
   const duplicate=()=>{const n=structuredClone(r);n.id=uid();n.name+=' (copy)';n.categories=n.categories.map(c=>({...c,id:uid(),questions:c.questions.map(q=>({...q,id:uid()}))}));update([...rounds.slice(0,index+1),n,...rounds.slice(index+1)]);setIndex(index+1);};
   const changeQuestion=(q:Question,delay=450)=>patch(r=>({...r,categories:r.categories.map(c=>c.id===edit?.c?{...c,questions:c.questions.map(x=>x.id===q.id?q:x)}:c)}),delay);
   return <>
     <div className="round-tabs">{rounds.map((r,i)=><button key={r.id} onClick={()=>setIndex(i)} className={index===i?'active':''}><span>{String(i+1).padStart(2,'0')}</span>{r.name}{r.type==='final'&&<span className="tag">Final</span>}</button>)}<Button className="add-round" disabled={rounds.length>=20} onClick={()=>{setRoundName(`Round ${rounds.length+1}`);setNewRound(true);}}><Plus size={20}/>Round</Button></div>
     <div className="round-edit-toolbar"><Field label="Round name"><input value={r.name} onChange={e=>patch(r=>({...r,name:e.target.value}),450)} maxLength={60}/></Field><div className="toolbar-actions"><AutosaveStatus autosave={autosave}/><IconButton title="Move round earlier" disabled={index===0} onClick={()=>{const n=[...rounds];[n[index-1],n[index]]=[n[index],n[index-1]];update(n);setIndex(index-1);}}><ArrowLeft/></IconButton><IconButton title="Move round later" disabled={index===rounds.length-1} onClick={()=>{const n=[...rounds];[n[index+1],n[index]]=[n[index],n[index+1]];update(n);setIndex(index+1);}}><ArrowRight/></IconButton><IconButton title="Duplicate round" onClick={duplicate}><Copy/></IconButton><IconButton title="Remove round" disabled={rounds.length===1} onClick={()=>{update(rounds.filter((_,i)=>i!==index));setIndex(Math.max(0,index-1));}}><Trash2/></IconButton></div></div>
-    <div className="question-grid-scroll"><div className="question-editor-grid" style={{'--question-grid-rows':rowCount+2}as React.CSSProperties}>{r.categories.map((c,ci)=><div className="question-category" key={c.id}>
+    <div className="question-grid-scroll"><div className="question-editor-grid">{r.categories.map((c,ci)=><div className="question-category" key={c.id}>
       <div className="category-editor-head"><input aria-label={`Category ${ci+1} name`} value={c.name} onChange={e=>patch(r=>({...r,categories:r.categories.map(x=>x.id===c.id?{...x,name:e.target.value}:x)}),450)} maxLength={60}/><div className="category-tools"><IconButton title={`Move ${c.name} left`} disabled={ci===0} onClick={()=>patch(r=>{const n=[...r.categories];[n[ci-1],n[ci]]=[n[ci],n[ci-1]];return{...r,categories:n};})}><ArrowLeft size={18}/></IconButton><IconButton title={`Delete ${c.name}`} onClick={()=>patch(r=>({...r,categories:r.categories.filter(x=>x.id!==c.id)}))}><Trash2 size={18}/></IconButton></div></div>
-      {Array.from({length:rowCount},(_,row)=>{const q=c.questions[row];return q?<button key={q.id} className={`question-editor-cell ${isQuestionFilled(q)?'filled':''}`} onClick={()=>setEdit({q:structuredClone(q),c:c.id})}><strong>{r.type==='final'?'Final':number(q.value)}</strong><span>{q.modifier?`Modifier · ${q.modifier.title||'Untitled'}`:q.prompt.trim()?q.prompt.replace(/[#*\[\]!_`]/g,'').slice(0,65):'No question'}</span>{q.dailyDouble&&<span className="dd-label">DD</span>}</button>:<div key={`empty-${row}`} aria-hidden="true"/>;})}
-      <Button className="add-question" disabled={rowCount>=(r.type==='final'?1:12)} onClick={()=>addQuestion(c.id)}><Plus size={20}/>Question</Button>
-    </div>)}<div className="question-category question-row-actions">
-      <div className="category-editor-head">{r.type!=='final'&&r.categories.length<10&&<Button className="add-category" onClick={()=>patch(r=>({...r,categories:[...r.categories,{id:uid(),name:`Category ${r.categories.length+1}`,questions:Array.from({length:rowCount},(_,i)=>emptyQuestion(rowValue(i)))}]}))}><Plus size={20}/>Category</Button>}{r.type==='final'&&r.categories.length===0&&<Button className="add-category" onClick={()=>patch(r=>({...r,categories:[{id:uid(),name:'Final category',questions:[]}]}))}><Plus size={20}/>Category</Button>}</div>
-      {Array.from({length:rowCount},(_,row)=><div className="question-row-action" key={row}><Button className="remove-question-row" onClick={()=>requestRemoveRow(row)}><Trash2 size={20}/>Remove {r.type==='final'?'final':number(rowValue(row))}</Button></div>)}
+      {c.questions.map(q=><button key={q.id} aria-label={`${c.name}, ${q.value}`} className={`question-editor-cell ${isQuestionFilled(q)?'filled':''}`} onClick={()=>setEdit({q:structuredClone(q),c:c.id})}><strong>{r.type==='final'?'Final':number(q.value)}</strong><span>{q.modifier?`Modifier · ${q.modifier.title||'Untitled'}`:q.prompt.trim()?q.prompt.replace(/[#*\[\]!_`]/g,'').slice(0,65):'No question'}</span>{q.dailyDouble&&<span className="dd-label">DD</span>}</button>)}
+      <Button className="add-question" aria-label={`Add question to ${c.name}`} disabled={c.questions.length>=(r.type==='final'?1:12)} onClick={()=>addQuestion(c.id)}><Plus size={20}/>Question</Button>
+    </div>)}<div className="question-category">
+      <div className="category-editor-head">{r.categories.length<(r.type==='final'?1:10)&&<Button className="add-category" onClick={()=>patch(r=>({...r,categories:[...r.categories,{id:uid(),name:r.type==='final'?'Final category':`Category ${r.categories.length+1}`,questions:[]}]}))}><Plus size={20}/>Category</Button>}</div>
     </div></div></div>
-    {pendingRemove!==null&&<Modal title="Remove question row?" onClose={()=>setPendingRemove(null)}><p>Remove the {r.type==='final'?'final':number(rowValue(pendingRemove))} row from every category? Questions, answers, modifiers and host notes in this row will be deleted.</p><div className="modal-actions"><Button onClick={()=>setPendingRemove(null)}>Cancel</Button><Button variant="danger" onClick={()=>removeRow(pendingRemove)}><Trash2 size={20}/>Remove row</Button></div></Modal>}
-    {edit&&<QuestionEditor key={edit.q.id} g={g} editorId={editorId} allowModifier={r.type!=='final'} question={edit.q} onClose={()=>setEdit(null)} onChange={changeQuestion} onDelete={q=>{changeQuestion({...emptyQuestion(q.value),id:q.id},0);setEdit(null);}}/>}
+    {edit&&!pendingRemove&&<QuestionEditor key={edit.q.id} g={g} editorId={editorId} allowModifier={r.type!=='final'} question={edit.q} onClose={()=>setEdit(null)} onChange={changeQuestion} onDelete={requestRemoveQuestion}/>}
+    {pendingRemove&&<Modal title="Delete question?" onClose={()=>setPendingRemove(null)}><p>Delete the {r.type==='final'?'final':number(pendingRemove.q.value)} question from {r.categories.find(c=>c.id===pendingRemove.c)?.name}? Its answers, modifier and host notes will also be deleted.</p><div className="modal-actions"><Button onClick={()=>setPendingRemove(null)}>Cancel</Button><Button variant="danger" onClick={()=>removeQuestion(pendingRemove)}><Trash2 size={20}/>Delete question</Button></div></Modal>}
     {newRound&&<Modal title="Add round" onClose={()=>setNewRound(false)}><Field label="Name"><input autoFocus value={roundName} onChange={e=>setRoundName(e.target.value)} maxLength={60}/></Field><Field label="Format"><select value={roundType} onChange={e=>setRoundType(e.target.value as 'board'|'final')}><option value="board">Question board</option><option value="final">Final · private wagers & answers</option></select></Field><div className="modal-actions"><span/><Button variant="primary" onClick={()=>{const n=emptyRound(rounds.length+1);n.name=roundName||n.name;n.type=roundType;update([...rounds,n]);setIndex(rounds.length);setNewRound(false);}}><Plus size={20}/>Add round</Button></div></Modal>}
   </>;
 }
@@ -115,7 +112,7 @@ function QuestionEditor({g,editorId,question,allowModifier,onChange,onDelete,onC
       </fieldset>}
     </section>
     <div className="question-host-notes"><Field label="Host notes"><textarea rows={3} value={q.notes} onChange={e=>patch({notes:e.target.value})}/></Field></div>
-    <div className="modal-actions"><Button variant="danger" onClick={()=>onDelete(q)}><Trash2 size={20}/>Clear question</Button><Button variant="primary" onClick={onClose}><Check size={20}/>Done</Button></div>
+    <div className="modal-actions"><Button variant="danger" onClick={()=>onDelete(q)}><Trash2 size={20}/>Delete question</Button><Button variant="primary" onClick={onClose}><Check size={20}/>Done</Button></div>
   </Modal>;
 }
 

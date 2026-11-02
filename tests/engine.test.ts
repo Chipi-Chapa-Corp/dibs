@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {act,addPlayer,createGame,tick,updateDefinition,view} from '../server/engine.ts';
-import {demoRounds} from '../shared/model.ts';
+import {demoRounds,emptyQuestion,emptyRound,nextBoardValue} from '../shared/model.ts';
 function fixture(){const g=createGame({name:'Test',definition:{rounds:demoRounds()}});const a=addPlayer(g,'Ada'),b=addPlayer(g,'Bea'),c=addPlayer(g,'Cam');act(g,'start');return{g,a,b,c,q:g.rounds[0].categories[0].questions[0]};}
 test('public snapshots never contain future answers, private notes or player tokens',()=>{const{g,a,q}=fixture();q.notes='secret-host-notes';act(g,'openQuestion',{questionId:q.id});for(const role of ['stage','player']as const){const v=view(g,role,a.id);const json=JSON.stringify(v);assert(!json.includes(q.answer));assert(!json.includes('secret-host-notes'));assert(!('hostToken' in v));assert(!json.includes(a.token));assert.equal(v.rounds[0].categories[1].questions[0].prompt,'');assert.equal(v.currentQuestion?.prompt,q.prompt);}assert.equal(view(g,'host').currentQuestion?.answer,q.answer);});
 test('players can always join running and paused games, including old definitions that disabled late joining',()=>{
@@ -90,6 +90,30 @@ test('new games have no precreated categories or questions; empty drafts can be 
  const rounds=structuredClone(g.rounds);rounds[0].categories=[{id:'empty-category',name:'First',questions:[]}];
  act(g,'save',{rounds});assert.equal(g.rounds[0].categories[0].questions.length,0);
  act(g,'save',{rounds:[{...g.rounds[0],categories:[]}]});assert.equal(g.rounds[0].categories.length,0);
+});
+test('category values progress independently with round-specific defaults and uneven boards survive export/import',()=>{
+ const rounds=[0,1,2].map(roundIndex=>{
+  const round=emptyRound(roundIndex+1);
+  round.categories=[{id:`long-${roundIndex}`,name:'Long',questions:[]},{id:`short-${roundIndex}`,name:'Short',questions:[]},{id:`empty-${roundIndex}`,name:'Empty',questions:[]}];
+  for(const [categoryIndex,count]of [4,1,0].entries())for(let i=0;i<count;i++){
+   const category=round.categories[categoryIndex];
+   category.questions.push({...emptyQuestion(nextBoardValue(category.questions,roundIndex)),prompt:`Question ${i}`,answer:'Answer'});
+  }
+  assert.deepEqual(round.categories[0].questions.map(q=>q.value),[1,2,3,4].map(n=>n*(roundIndex+1)*100));
+  assert.deepEqual(round.categories[1].questions.map(q=>q.value),[(roundIndex+1)*100]);
+  return round;
+ });
+ // Removing a middle question keeps the others' values and the next addition unique.
+ rounds[0].categories[0].questions.splice(1,1);
+ assert.equal(nextBoardValue(rounds[0].categories[0].questions,0),500);
+ const g=createGame({definition:{rounds}});
+ const imported=createGame({definition:JSON.parse(JSON.stringify({rounds:g.rounds}))});
+ assert.deepEqual(imported.rounds,rounds);
+ for(const role of ['host','stage','player']as const)assert.deepEqual(view(imported,role).rounds.map(r=>r.categories.map(c=>c.questions.length)),[[3,1,0],[4,1,0],[4,1,0]]);
+ addPlayer(imported,'Ada');act(imported,'start');act(imported,'round',{index:2});
+ const question=imported.rounds[2].categories[1].questions[0];
+ act(imported,'openQuestion',{questionId:question.id});act(imported,'answerer',{playerId:imported.players[0].id});act(imported,'judge',{correct:true});
+ assert.equal(imported.players[0].score,300);
 });
 test('blank and whitespace-only questions cannot be selected in a game',()=>{
  const {g,q}=fixture();q.prompt='   ';assert.throws(()=>act(g,'openQuestion',{questionId:q.id}),/empty/);assert.equal(g.current,null);

@@ -6,9 +6,10 @@ import {api,download,go,number,playerKey,sortedPlayers,themeStyle,useGame,useGam
 import {flushAutosaves} from './autosave';
 import {useSoundCues} from './useSoundCues';
 import {HostDailyDouble,PlayerDailyDouble} from './DailyDouble';
-import {AnswerChoices,Board,Button,Checkbox,Connection,Empty,Field,IconButton,Invite,Logo,Modal,RichText,Scores,SelectionCue,StageContent} from './components';
+import {AnswerChoices,Board,Button,Connection,Empty,Field,IconButton,Invite,Logo,Modal,RichText,Scores,SelectionCue,StageContent} from './components';
 import {QuestionsEditor,AppearanceEditor,SettingsEditor} from './editors';
 type Command=(action:string,data?:Record<string,unknown>)=>Promise<boolean>;
+const gameStatuses={lobby:'Not started',playing:'Ongoing',finished:'Finished'};
 
 export default function App(){const parts=location.pathname.split('/').filter(Boolean);if(parts[0]==='edit'&&parts[1])return <GameEditor id={parts[1].toUpperCase()}/>;if(parts[0]==='host'&&parts[1])return <Host id={parts[1].toUpperCase()}/>;if(parts[0]==='stage'&&parts[1])return <Stage id={parts[1].toUpperCase()}/>;if(parts[0]==='play'&&parts[1])return <PlayerEntry id={parts[1].toUpperCase()}/>;return <Lobby joinOnly={parts[0]==='play'}/>;}
 async function copyGameForEditing(id:string){
@@ -19,9 +20,10 @@ async function copyGameForEditing(id:string){
 }
 function Lobby({joinOnly}:{joinOnly:boolean}){
   const{games,connected}=useGames();
-  const[create,setCreate]=useState(false),[showEnded,setShowEnded]=useState(true),[share,setShare]=useState(false),[opening,setOpening]=useState<string|null>(null),[pendingDelete,setPendingDelete]=useState<GameSummary|null>(null);
+  const[create,setCreate]=useState(false),[statusFilter,setStatusFilter]=useState<GameSummary['status']|'all'>('all'),[share,setShare]=useState(false),[opening,setOpening]=useState<string|null>(null),[pendingDelete,setPendingDelete]=useState<GameSummary|null>(null);
   const toast=useToast();
-  const visible=games.filter(g=>(showEnded||g.status!=='finished')&&(!joinOnly||g.questionTotal>0));
+  const available=games.filter(g=>!joinOnly||g.questionTotal>0);
+  const visible=available.filter(g=>statusFilter==='all'||g.status===statusFilter);
   const openGame=async(game:GameSummary,edit:boolean)=>{
     setOpening(game.id);
     try{
@@ -30,15 +32,14 @@ function Lobby({joinOnly}:{joinOnly:boolean}){
     }catch(error){toast((error as Error).message);setOpening(null);}
   };
   return <div className="lobby-page">
-    <header className="masthead lobby-header"><Logo/><div className="lobby-header-controls">{!joinOnly&&<Button variant="primary" onClick={()=>setCreate(true)}><Plus size={20}/>Create game</Button>}<Checkbox label="Show ended" checked={showEnded} onChange={setShowEnded}/></div><div className="header-actions"><Connection connected={connected}/><IconButton title="Join on your phone" onClick={()=>setShare(true)}><QrCode/></IconButton></div></header>
+    <header className="masthead lobby-header"><Logo/><div className="lobby-header-controls">{!joinOnly&&<Button variant="primary" onClick={()=>setCreate(true)}><Plus size={20}/>Create game</Button>}<select aria-label="Filter games by status" value={statusFilter} onChange={e=>setStatusFilter(e.target.value as typeof statusFilter)}><option value="all">All games</option>{Object.entries(gameStatuses).map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></div><div className="header-actions"><Connection connected={connected}/><IconButton title="Join on your phone" onClick={()=>setShare(true)}><QrCode/></IconButton></div></header>
     <main className="lobby compact-lobby" aria-label={joinOnly?'Available games':'Games'}>
-      {visible.length===0?<Empty>{joinOnly?'No games to join yet':'Create your first game to start preparing a board.'}</Empty>:<table className="game-list" aria-label={joinOnly?'Available games':'Games'}><thead className="visually-hidden"><tr><th scope="col">Number</th><th scope="col">Game</th><th scope="col">Status</th><th scope="col">Delete</th><th scope="col">Edit</th><th scope="col">Play</th></tr></thead><tbody>{visible.map((g,i)=>{
+      {visible.length===0?<Empty>{available.length?'No games match this status.':joinOnly?'No games to join yet':'Create your first game to start preparing a board.'}</Empty>:<table className="game-list" aria-label={joinOnly?'Available games':'Games'}><thead className="visually-hidden"><tr><th scope="col">Number</th><th scope="col">Game</th><th scope="col">Status</th><th scope="col">Delete</th><th scope="col">Edit</th><th scope="col">Play</th></tr></thead><tbody>{visible.map((g,i)=>{
         const canManage=!joinOnly;
-        const status=g.status==='lobby'?(g.questionTotal?'ready':'draft'):g.status;
         return <tr className="game-row" key={g.id}>
           <td className="game-index">{String(i+1).padStart(2,'0')}</td>
           <td className="game-name"><h2>{g.name}</h2><span className="game-meta">{g.rounds} {g.rounds===1?'round':'rounds'}<span>·</span>{g.questionTotal} {g.questionTotal===1?'question':'questions'}{g.playerCount>0&&<><span>·</span><Users size={18}/>{g.playerCount}</>}</span></td>
-          <td className="game-status-cell"><span className={`game-status status-${status}`}><i/>{g.status==='lobby'?(joinOnly?'Waiting':g.questionTotal?'Ready to host':'Draft'):g.status==='playing'?'In progress':'Ended'}</span></td>
+          <td className="game-status-cell"><span className={`game-status status-${g.status}`}><i aria-hidden="true"/>{gameStatuses[g.status]}</span></td>
           <td className="game-delete-cell">{canManage&&<IconButton title={`Delete ${g.name}`} disabled={!!g.editing} onClick={()=>setPendingDelete(g)}><Trash2 size={18}/></IconButton>}</td>
           <td className="game-edit-cell">{canManage&&<Button disabled={opening===g.id||!!g.editing} title={g.editing?'Someone is editing this game':undefined} onClick={()=>void openGame(g,true)}>{g.status==='lobby'?<><Pencil size={18}/>Edit</>:<><Copy size={18}/>Copy & edit</>}</Button>}</td>
           <td className="game-play-cell">{canManage?<Button className="game-host" variant="primary" disabled={opening===g.id||!g.questionTotal} title={!g.questionTotal?'Add questions before hosting':undefined} onClick={()=>void openGame(g,false)}>Host<ArrowUpRight size={20}/></Button>:<a className="button game-action" href={g.status==='finished'?`/stage/${g.id}`:`/play/${g.id}`}>{g.status==='finished'?'Results':'Join'}<ArrowUpRight size={20}/></a>}</td>
