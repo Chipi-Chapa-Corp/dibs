@@ -74,3 +74,38 @@ test('Continue rejects player access, stale questions, unresolved regular questi
   assert.throws(()=>act(game,'continueQuestion',{questionId:q.id}),/Judge the answering team/);
   act(game,'round',{index:2});assert.throws(()=>act(game,'continueQuestion',{questionId:game.current!.questionId}),/Open the question/);
 });
+
+for(const exhausted of [false,true])test(`End question reveals without scoring and waits for Continue (${exhausted?'all teams wrong':'active answerer'})`,()=>{
+  const{game,q,red,blue,green,resolve,next}=fixture();
+  if(exhausted)for(const team of [red,blue,green])resolve(team.id,false);
+  else act(game,'buzz',{},'player',red.id);
+  const scores=game.players.map(t=>({score:t.score,stats:{...t.stats}}));
+  act(game,'endQuestion',{questionId:q.id},'host',null,1000);
+  assert.equal(game.current?.closed,true);assert.equal(game.current?.answeringId,null);assert.equal(game.current?.answerToken,null);assert.equal(game.current?.buzzOpen,false);
+  assert.equal(game.current?.revealAt,1900);assert(!game.played.includes(q.id));assert.equal(view(game,'stage').currentQuestion?.answer,'');
+  assert.throws(()=>act(game,'buzz',{},'player',blue.id),/No active question/);
+  assert.throws(()=>next(1100),/Wait until the answer/);
+  act(game,'endQuestion',{questionId:q.id},'host',null,1200);assert.equal(game.current?.revealAt,1900);
+  tick(game,1900);assert.equal(view(game,'stage').currentQuestion?.answer,q.answer);assert.equal(game.current?.questionId,q.id);
+  assert.deepEqual(game.players.map(t=>({score:t.score,stats:t.stats})),scores);
+  next(1901);assert.equal(game.current,null);assert(game.played.includes(q.id));
+});
+
+test('ended question survives a restart with its reveal and Continue state intact',()=>{
+  const{game,q}=fixture('board',0);act(game,'endQuestion',{questionId:q.id});
+  assert.deepEqual(game.players.map(t=>t.score),[1000,0,0]);assert.equal(game.current?.answeringId,null);
+  const dir=mkdtempSync(join(tmpdir(),'dibs-ended-question-'));
+  try{
+    openGameStore(dir).save(game);const restored=openGameStore(dir).games.get(game.id)!;
+    assert.equal(restored.current?.closed,true);assert.equal(restored.current?.buzzOpen,false);assert.equal(view(restored,'stage').currentQuestion?.answer,q.answer);
+    assert(!restored.played.includes(q.id));act(restored,'continueQuestion',{questionId:q.id});assert.equal(restored.current,null);
+  }finally{rmSync(dir,{recursive:true,force:true});}
+});
+
+test('End question rejects players, stale questions, paused games and special questions',()=>{
+  const{game,q,red}=fixture();
+  assert.throws(()=>act(game,'endQuestion',{questionId:q.id},'player',red.id),/Host access/);
+  assert.throws(()=>act(game,'endQuestion',{questionId:'old-question'}),/no longer active/);
+  act(game,'pause');assert.throws(()=>act(game,'endQuestion',{questionId:q.id}),/No active question/);
+  const special=fixture('dailyDouble');assert.throws(()=>act(special.game,'endQuestion',{questionId:special.q.id}),/special question/);
+});

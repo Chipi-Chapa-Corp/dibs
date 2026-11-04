@@ -60,7 +60,7 @@ export function QR({value,size=180}:{value:string;size?:number}){
   },[value,size]);
   return result?.value===value?(result.src?<img className="qr" src={result.src} alt="Scan to open the game list" width={size} height={size}/>:<p role="alert">Could not generate the QR code. Open the link below instead.</p>):null;
 }
-export function Invite({onClose,title='Invite teams'}:{onClose:()=>void;title?:string}){
+export function Invite({onClose,title='Invite'}:{onClose:()=>void;title?:string}){
   const[network,set]=useState<string[]|null>(null),[error,setError]=useState(''),[attempt,setAttempt]=useState(0);
   const toast=useToast();
   useEffect(()=>{

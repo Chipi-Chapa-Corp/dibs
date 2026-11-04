@@ -66,7 +66,7 @@ export function normalizeStoredGameplay(state:Pick<Game,'settings'|'rounds'|'cur
 export function normalizeBuzzerFlow(g:Game){
   const c=g.current,q=currentQuestion(g);
   if(!c||!q||q.modifier||q.dailyDouble||g.rounds[g.roundIndex].type==='final'||c.phase!=='question')return;
-  if(c.closed&&hasCorrectResult(c)){
+  if(c.closed){
     c.buzzOpen=false;c.answerToken=null;
     if(!c.revealed&&c.revealAt===null)reveal(g,Date.now());
     return;
@@ -239,11 +239,20 @@ export function act(g:Game,action:string,data:Input={},role:'host'|'player'='hos
         assert(g.status==='playing'&&!g.paused&&c,'No active question');
         assert(data.questionId===c!.questionId,'This question is no longer active');
         assert(c!.phase==='question'||c!.phase==='final','Open the question before continuing');
-        assert(q?.dailyDouble||g.rounds[g.roundIndex].type==='final'||c!.closed&&hasCorrectResult(c!),'Judge the answering team or end this question');
+        assert(q?.dailyDouble||g.rounds[g.roundIndex].type==='final'||c!.closed||c!.revealed||c!.revealAt!==null,'Judge the answering team or end this question');
         assert(c!.revealAt===null||c!.revealed,'Wait until the answer is revealed');
         if(hasCorrectResult(c!)&&!c!.revealed){reveal(g,now);label='Answer revealed';}
         else{if(!g.played.includes(c!.questionId))g.played.push(c!.questionId);g.current=null;label='Question closed';}
         break;
+      }
+      case'endQuestion':{
+        assert(g.status==='playing'&&!g.paused&&c&&q&&c.phase==='question','No active question');
+        assert(!q!.dailyDouble&&!q!.modifier&&g.rounds[g.roundIndex].type==='board','Use the controls for this special question');
+        assert(data.questionId===c!.questionId,'This question is no longer active');
+        c!.closed=true;c!.buzzOpen=false;c!.answerToken=null;c!.buzzes=[];
+        if(!hasCorrectResult(c!))c!.answeringId=null;
+        if(!c!.revealed&&c!.revealAt===null)reveal(g,now);
+        label='Question ended · answer revealed';break;
       }
       case'closeQuestion':assert(c,'No active question');if(!g.played.includes(c!.questionId))g.played.push(c!.questionId);g.current=null;label='Question closed';break;
       case'openBuzzers':assert(!q?.dailyDouble,'Daily Double has one required answerer');assert(c&&!c.revealed&&!c.revealAt&&c.phase==='question'&&!c.closed&&!g.paused,'No active question');c!.buzzOpen=true;c!.answeringId=null;c!.buzzes=[];label='Buzzers opened';break;
