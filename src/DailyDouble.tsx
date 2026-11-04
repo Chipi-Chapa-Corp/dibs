@@ -3,7 +3,7 @@ import {ArrowRight,Check,ChevronDown,X} from 'lucide-react';
 import type {GameView} from '../shared/model';
 import {ContinueQuestion} from './ContinueQuestion';
 import {dailyDoubleStep} from '../shared/daily-double';
-import {AnswerChoices,Button,HostDailyDoubleStatus,Field,IconButton,RichText} from './components';
+import {AnswerChoices,Button,HostDailyDoubleStatus,Field,RichText} from './components';
 
 type Command=(action:string,data?:Record<string,unknown>)=>Promise<boolean>;
 const validWager=(value:string)=>value.trim()!==''&&Number.isInteger(Number(value))&&Number(value)>=0&&Number(value)<=1e7;
@@ -21,7 +21,7 @@ export function HostDailyDouble({g,command}:{g:GameView;command:Command}){
   const run=async(action:string,data?:Record<string,unknown>)=>{setBusy(true);try{return await command(action,data);}finally{setBusy(false);}};
   const choose=(playerId:string)=>{void run('setDailyDoubleChooser',{playerId});};
   return <div className="host-question daily-double">
-    <div className="question-meta"><span>{c.category}</span><span>Daily Double</span><IconButton title="Close question" onClick={()=>void run('closeQuestion')} disabled={busy}><X/></IconButton></div>
+    <div className="question-meta"><span>{c.category}</span><span>Daily Double</span></div>
     <HostDailyDoubleStatus g={g}/>
     {step==='chooser'&&<>{g.players.length<2?<p className="dd-notice">Add another team to play.</p>:<TeamChoices g={g} disabled={disabled} onChoose={choose}/>}</>}
     {step==='opponent'&&from&&<TeamChoices g={g} exclude={from.id} disabled={disabled} onChoose={playerId=>void run('assignDailyDouble',{fromId:from.id,playerId})}/>}

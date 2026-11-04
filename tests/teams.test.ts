@@ -41,6 +41,40 @@ test('teams stay fixed through play, pause, finish, resume and undo; reset start
   act(g,'addTeam',{name:'Fresh team'});assert.equal(g.players.length,1);
 });
 
+test('player names are unique across teams, including disconnected players and case or space variants',()=>{
+  const g=createGame(),red=addPlayer(g,'Red'),blue=addPlayer(g,'Blue');
+  const alice=joinMember(g,{name:'Alice',teamId:red.id});
+  for(const team of [red,blue])for(const name of ['Alice','ALICE',' alice ','Ａｌｉｃｅ']){
+    const before=structuredClone(g);
+    assert.throws(()=>joinMember(g,{name,teamId:team.id}),/player with this name has already joined/);
+    assert.deepEqual(g,before);
+  }
+  const sasha=joinMember(g,{name:'Саша',teamId:blue.id});
+  assert.throws(()=>joinMember(g,{name:' сАША ',teamId:red.id}),/player with this name has already joined/);
+  assert.equal(joinMember(g,{token:alice.token}),alice);assert.equal(joinMember(g,{token:sasha.token}),sasha);
+  removeMember(g,alice.id);assert.notEqual(joinMember(g,{name:'Alice',teamId:blue.id}).token,alice.token);
+  const other=createGame(),otherTeam=addPlayer(other,'Red');assert.equal(joinMember(other,{name:'Alice',teamId:otherTeam.id}).name,'Alice');
+});
+
+test('concurrent HTTP joins cannot create duplicate player names',async()=>{
+  const dir=mkdtempSync(join(tmpdir(),'dibs-unique-names-')),server=await startServer({port:0,dataDir:dir,dev:false,quiet:true});
+  try{
+    const g=createGame(),red=addPlayer(g,'Red'),blue=addPlayer(g,'Blue');server.games.set(g.id,g);
+    const base=`http://127.0.0.1:${(server.server.address()as{port:number}).port}`;
+    const join=async(name:string,teamId:string)=>{
+      const response=await fetch(`${base}/api/games/${g.id}/join`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,teamId})});
+      return{status:response.status,body:await response.json()};
+    };
+    const results=await Promise.all([join('Alice',red.id),join(' alice ',blue.id)]);
+    assert.deepEqual(results.map(r=>r.status).sort(),[200,400]);assert.equal(g.members.length,1);
+    assert.match(results.find(r=>r.status===400)!.body.error,/player with this name has already joined/);
+    await server.close();
+    const restored=openGameStore(dir).games.get(g.id)!;
+    assert.throws(()=>joinMember(restored,{name:'ALICE',teamId:red.id}),/player with this name has already joined/);
+    assert.equal(joinMember(restored,{token:g.members[0].token}).id,g.members[0].id);
+  }finally{await server.close();rmSync(dir,{recursive:true,force:true});}
+});
+
 test('membership changes cannot reset team progress or be undone to resurrect revoked credentials',()=>{
   const g=createGame({definition:{rounds:demoRounds(),settings:{earlyPenaltyMs:0}}}),team=addPlayer(g,'Red');
   const alice=joinMember(g,{name:'Alice',teamId:team.id}),bob=joinMember(g,{name:'Bob',teamId:team.id});

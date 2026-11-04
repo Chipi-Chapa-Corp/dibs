@@ -6,7 +6,7 @@ import {join} from 'node:path';
 import {act,addPlayer,createGame,joinMember,removeMember,tick,view} from '../server/engine.ts';
 import {openGameStore} from '../server/storage.ts';
 import {demoRounds} from '../shared/model.ts';
-import {startReadyGame} from './helpers.ts';
+import {collectMissingFinalWagers,lockFinalAnswers,startReadyGame} from './helpers.ts';
 
 function fixture(kind:'board'|'dailyDouble'|'final'='board',delay=900){
   const rounds=demoRounds();if(kind==='dailyDouble')rounds[0].categories[0].questions[0].dailyDouble=true;
@@ -15,7 +15,7 @@ function fixture(kind:'board'|'dailyDouble'|'final'='board',delay=900){
   const member=joinMember(game,{name:'Alice',teamId:red.id});startReadyGame(game);
   if(kind==='final')act(game,'round',{index:2});else act(game,'openQuestion',{questionId:rounds[0].categories[0].questions[0].id});
   if(kind==='dailyDouble')act(game,'assignDailyDouble',{fromId:blue.id,playerId:red.id});
-  if(kind!=='board'){act(game,'hostWager',{playerId:red.id,wager:300});act(game,'finalBegin');}
+  if(kind!=='board'){act(game,'hostWager',{playerId:red.id,wager:300});if(kind==='final')collectMissingFinalWagers(game);act(game,'finalBegin');if(kind==='final')lockFinalAnswers(game);}
   const q=view(game,'host').currentQuestion!;
   const grade=(result:string)=>act(game,'gradeTeam',{questionId:q.id,playerId:red.id,result});
   const resolve=(teamId:string,correct:boolean)=>{act(game,'buzz',{},'player',teamId);act(game,'resolveAnswer',{questionId:q.id,playerId:teamId,answerToken:game.current!.answerToken,correct});};
@@ -23,7 +23,7 @@ function fixture(kind:'board'|'dailyDouble'|'final'='board',delay=900){
   return{game,red,blue,green,member,q,grade,resolve,next};
 }
 
-for(const kind of ['dailyDouble','final']as const)test(`${kind}: scoring stays private until Continue and remains on screen until the next Continue`,()=>{
+for(const kind of ['dailyDouble']as const)test(`${kind}: scoring stays private until Continue and remains on screen until the next Continue`,()=>{
   const{game,q,grade,next}=fixture(kind,0);grade('correct');
   assert.equal(game.current?.revealAt,null);assert.equal(view(game,'stage').currentQuestion?.answer,'');
   grade('incorrect');assert.equal(view(game,'stage').currentQuestion?.answer,'');grade('correct');next();
@@ -31,10 +31,38 @@ for(const kind of ['dailyDouble','final']as const)test(`${kind}: scoring stays p
   next();assert.equal(game.current,null);assert.equal(game.players[0].score,1300);
 });
 
-test('special-question Continue waits for the reveal instead of closing during the animation',()=>{
-  const{game,q,grade,next}=fixture('final');grade('correct');next(1000);
+test('Daily Double Continue waits for the reveal instead of closing during the animation',()=>{
+  const{game,q,grade,next}=fixture('dailyDouble');grade('correct');next(1000);
   assert.equal(game.current?.revealAt,1900);assert.throws(()=>next(1100),/Wait until the answer/);
   tick(game,1900);assert.equal(view(game,'stage').currentQuestion?.answer,q.answer);next(1901);assert.equal(game.current,null);
+});
+
+for(const allWrong of [false,true])test(`final Finish game reveals the answer and finishes directly (${allWrong?'all wrong':'mixed results'})`,()=>{
+  const{game,q,red,blue,green,grade,next}=fixture('final');
+  assert.throws(()=>next(),/Mark every team/);
+  grade(allWrong?'incorrect':'correct');assert.throws(()=>next(),/Mark every team/);
+  for(const team of [blue,green])act(game,'gradeTeam',{questionId:q.id,playerId:team.id,result:'incorrect'});
+  const scores=game.players.map(team=>team.score);
+  assert.equal(view(game,'stage').currentQuestion?.answer,'');assert.deepEqual(view(game,'stage').players.map(team=>team.score),[1000,0,0]);
+  next(1000);
+  assert.equal(game.status,'finished');assert.equal(game.current?.questionId,q.id);assert.equal(game.current?.revealed,true);assert.equal(game.current?.closed,true);assert(game.played.includes(q.id));
+  assert.equal(view(game,'stage').currentQuestion?.answer,q.answer);assert.deepEqual(view(game,'stage').players.map(team=>team.score),scores);
+  const finishedAt=game.history[0].at;assert.equal(game.history[0].label,'Game finished');assert.throws(()=>next(),/No active question/);
+  assert.deepEqual(game.players.map(team=>team.score),scores);assert.equal(game.history[0].at,finishedAt);
+  const dir=mkdtempSync(join(tmpdir(),'dibs-finished-final-'));
+  try{
+    openGameStore(dir).save(game);const restored=openGameStore(dir).games.get(game.id)!;
+    assert.equal(restored.status,'finished');assert.equal(view(restored,'stage').currentQuestion?.answer,q.answer);assert.equal(restored.history[0].at,finishedAt);
+  }finally{rmSync(dir,{recursive:true,force:true});}
+});
+
+test('final Finish game rejects paused games, stale questions, players and unlocked wagers',()=>{
+  const{game,q,red}=fixture('final');
+  assert.throws(()=>act(game,'continueQuestion',{questionId:q.id},'player',red.id),/Host access/);
+  assert.throws(()=>act(game,'continueQuestion',{questionId:'stale'}),/no longer active/);
+  act(game,'pause');assert.throws(()=>act(game,'continueQuestion',{questionId:q.id}),/No active question/);
+  act(game,'pause');act(game,'round',{index:2});assert.throws(()=>act(game,'continueQuestion',{questionId:game.current!.questionId}),/Open the question/);
+  assert.equal(game.status,'playing');assert.equal(game.current?.revealed,false);
 });
 
 test('Undo cancels the question selection and its scores, preserving memberships and pause state',()=>{

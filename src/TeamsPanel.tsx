@@ -2,7 +2,7 @@ import {useState} from 'react';
 import {Check,Minus,Plus} from 'lucide-react';
 import type {GameView} from '../shared/model';
 import {Button,Modal} from './components';
-import {useToast} from './lib';
+import {number,useToast} from './lib';
 
 type Command=(action:string,data?:Record<string,unknown>)=>Promise<boolean>;
 export function TeamsPanel({g,command,onClose}:{g:GameView;command:Command;onClose:()=>void}){
@@ -28,7 +28,8 @@ export function TeamsPanel({g,command,onClose}:{g:GameView;command:Command;onClo
         return <section className="team-management-row" key={team.id} aria-label={team.name}>
           <div className="team-management-score">
             <h3><i className="player-marker" style={{background:team.color}}/>{team.name}</h3>
-            <label className="field"><span>Score</span><input aria-label={`Score for ${team.name}`} type="number" required step={100} value={value} disabled={busy} onChange={e=>setScore(team.id,e.target.value)}/></label>
+            <div className="team-score-current"><span>Current score</span><strong>{number(team.score)}</strong></div>
+            <label className="field"><span>New score</span><input aria-label={`Score for ${team.name}`} type="number" required step={100} value={value} disabled={busy} onChange={e=>setScore(team.id,e.target.value)}/></label>
             <div className="team-score-steps">{[-500,-100,100,500].map(amount=><Button key={amount} type="button" disabled={busy} aria-label={`${amount>0?'Add':'Subtract'} ${Math.abs(amount)} points ${amount>0?'to':'from'} ${team.name}`} onClick={()=>setScore(team.id,String((Number(value)||0)+amount))}>{amount>0?<Plus size={16}/>:<Minus size={16}/>} {Math.abs(amount)}</Button>)}</div>
             {canEditTeams&&<Button type="button" variant="danger" disabled={busy} onClick={async()=>{
               if(removeTeam!==team.id){setRemoveTeam(team.id);return;}

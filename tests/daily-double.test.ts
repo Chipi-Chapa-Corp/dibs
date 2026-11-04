@@ -29,7 +29,7 @@ test('Daily Double requires a distinct opposing team and a chosen wager before r
   assert.throws(()=>act(g,'hostWager',{playerId:other.id,wager:500}),/assigned team/);
   assert.throws(()=>act(g,'finalBegin'),/collect/);
   // Host offers any point amounts aloud, independent of score and Final wager limits.
-  for(const bad of [-1,NaN,Infinity,1.5,10000001])assert.throws(()=>act(g,'hostWager',{playerId:b.id,wager:bad}),/Enter a wager/);
+  for(const bad of [-1,NaN,Infinity,1.5,10000001])assert.throws(()=>act(g,'hostWager',{playerId:b.id,wager:bad}),/Enter a whole wager/);
   act(g,'hostWager',{playerId:b.id,wager:750});
   assert.equal(b.score,0);assert.equal(g.current?.wagers[b.id].wager,750);
   assert.equal(view(g,'stage').current?.wagers[b.id].wager,750);

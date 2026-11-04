@@ -7,8 +7,10 @@ import {api,download,go,number,playerKey,sortedPlayers,themeStyle,useGame,useGam
 import {flushAutosaves} from './autosave';
 import {useSoundCues} from './useSoundCues';
 import {HostDailyDouble} from './DailyDouble';
-import {TeamJudging} from './TeamJudging';
-import {ContinueQuestion} from './ContinueQuestion';
+import {FinalWagers} from './FinalWagers';
+import {FinalResults} from './FinalResults';
+import {FinalAnswers} from './FinalAnswers';
+import {FinalSubmission} from './FinalSubmission';
 import {AnswerDecision} from './AnswerDecision';
 import {TeamsPanel} from './TeamsPanel';
 import {AnswerChoices,Board,Button,Connection,Empty,Field,IconButton,Invite,Logo,Modal,RichText,Scores,StageContent} from './components';
@@ -158,24 +160,36 @@ function ResetGameDialog({name,command,onClose,onReset}:{name:string;command:Com
   </Modal>;
 }
 
-function HostQuestion({g,command}:{g:GameView;command:Command}){const c=g.current!,q=g.currentQuestion!;const[wager,setWager]=useState(0),[wagerPlayer,setWagerPlayer]=useState(g.players[0]?.id||'');const final=g.rounds[g.roundIndex].type==='final';if(q.dailyDouble&&!final)return <HostDailyDouble g={g} command={command}/>;if(c.phase==='modifier')return <HostModifier g={g} command={command}/>;return <div className="host-question"><div className="question-meta"><span>{c.category}</span><span>{q.dailyDouble?'Daily double':number(q.value)}</span><IconButton title={final?"Close question":"End question"} disabled={!final&&(g.paused||c.closed||c.revealed||c.revealAt!==null)} onClick={()=>void command(final?'closeQuestion':'endQuestion',{questionId:c.questionId})}><X/></IconButton></div>{c.phase==='wager'?<><div className="wager-console"><h2>{q.dailyDouble?'Daily double':'Final wagers'}</h2><div className="inline-form"><select aria-label="Wagering team" value={wagerPlayer} onChange={e=>setWagerPlayer(e.target.value)}><option value="">Team</option>{g.players.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select><input aria-label="Wager amount" type="number" value={wager} min={0} onChange={e=>setWager(Number(e.target.value))}/><Button onClick={()=>void command('hostWager',{playerId:wagerPlayer,wager})}>Set wager</Button></div>{g.players.map(p=><div className="wager-person" key={p.id}><span>{p.name}</span><strong>{c.wagers[p.id]?number(c.wagers[p.id].wager):'Waiting'}</strong></div>)}<Button variant="primary" onClick={()=>void command('finalBegin')}>Lock wagers & open question<ArrowRight size={20}/></Button></div><div className="host-answer"><span className="eyebrow">Host preview</span><RichText text={q.prompt}/><hr/><RichText text={q.answer}/></div></>:<><div className="host-clue"><RichText text={q.prompt}/><AnswerChoices question={q}/></div><div className="host-answer"><div className="answer-heading"><span className="eyebrow">Answer · host only</span>{final&&<Button onClick={()=>void command('reveal')} disabled={!!c.revealAt}>{c.revealed?'Revealed':c.revealAt?'Revealing…':'Reveal answer'}<ArrowUpRight size={18}/></Button>}</div><RichText text={q.answer}/>{q.notes&&<div className="host-notes"><RichText text={q.notes}/></div>}</div>{final?<TeamJudging g={g} command={command}/>:<AnswerDecision key={`${c.questionId}:${c.answerToken||'waiting'}`} g={g} command={command}/>}</>}{final&&c.phase!=='wager'&&<ContinueQuestion g={g} command={command}/>}</div>}
+function HostQuestion({g,command}:{g:GameView;command:Command}){const c=g.current!,q=g.currentQuestion!;const final=g.rounds[g.roundIndex].type==='final';if(q.dailyDouble&&!final)return <HostDailyDouble g={g} command={command}/>;if(c.phase==='modifier')return <HostModifier g={g} command={command}/>;return <div className="host-question"><div className="question-meta"><span>{c.category}</span><span>{q.dailyDouble?'Daily double':number(q.value)}</span></div>{c.phase==='wager'?<><FinalWagers g={g} command={command}/><div className="host-answer"><span className="eyebrow">Host preview</span><RichText text={q.prompt}/><hr/><RichText text={q.answer}/></div></>:<><div className="host-clue"><RichText text={q.prompt}/><AnswerChoices question={q}/></div><div className="host-answer"><div className="answer-heading"><span className="eyebrow">Answer · host only</span></div><RichText text={q.answer}/>{q.notes&&<div className="host-notes"><RichText text={q.notes}/></div>}</div>{final?<FinalAnswers g={g} command={command}/>:<AnswerDecision key={`${c.questionId}:${c.answerToken||'waiting'}`} g={g} command={command}/>}</>}</div>}
 function PlayerList({g,command,onAdjust}:{g:GameView;command:Command;onAdjust:(id:string)=>void}){
   const[adding,setAdding]=useState(false),[name,setName]=useState('');
+  const addTeamButton=useRef<HTMLButtonElement>(null);
+  const restoreAddTeamFocus=useRef(false);
   const lobby=g.status==='lobby',canEditTeams=lobby&&!g.teamsLocked;
   const ready=g.players.filter(p=>p.ready).length;
+  useEffect(()=>{
+    if(!adding&&restoreAddTeamFocus.current){addTeamButton.current?.focus();restoreAddTeamFocus.current=false;}
+    if(!adding||!canEditTeams)return;
+    const dismiss=(event:KeyboardEvent)=>{
+      if(event.key!=='Escape'||event.defaultPrevented||(event.target instanceof Element&&event.target.closest('[role="dialog"]')))return;
+      event.preventDefault();restoreAddTeamFocus.current=true;setAdding(false);
+    };
+    document.addEventListener('keydown',dismiss);return()=>document.removeEventListener('keydown',dismiss);
+  },[adding,canEditTeams]);
   return <section className="player-list" aria-label="Teams">
-    {canEditTeams&&<div className="side-heading"><Button onClick={()=>setAdding(!adding)}><Plus size={20}/>Add team</Button></div>}
     {lobby&&<div className="player-lobby-summary"><p role="status">{ready} / {g.players.length} teams ready</p></div>}
-    {canEditTeams&&adding&&<form className="inline-form" onSubmit={async e=>{e.preventDefault();if(await command('addTeam',{name})){setName('');setAdding(false);}}}><input aria-label="Team name" autoFocus placeholder="Team name" value={name} onChange={e=>setName(e.target.value)} maxLength={32}/><IconButton title="Add team" disabled={!name.trim()}><ArrowRight/></IconButton></form>}
-    {g.players.length?<div>{sortedPlayers(g.players).map(p=>{
+    {g.players.length?<div>{g.players.map(p=>{
       const player=g.players.find(x=>x.id===p.id)!,members=g.members.filter(m=>m.teamId===p.id);
       const incorrect=g.current?.incorrectTeamIds?.includes(p.id),passed=g.current?.passedTeamIds?.includes(p.id);
-      return <button className={`player-row${incorrect?' incorrect':passed?' passed':''}`} key={p.id} onClick={()=>onAdjust(p.id)}>
+      const correct=g.current?.judgments?.[p.id]?.result==='correct'||g.current?.wagers[p.id]?.judged===true&&g.current.wagers[p.id].correct===true;
+      const pending=g.current?.phase==='final'&&!correct&&!incorrect&&!passed;
+      return <button className={`player-row${correct?' correct':incorrect?' incorrect':passed?' passed':''}`} key={p.id} onClick={()=>onAdjust(p.id)}>
         <i aria-hidden="true" className="player-marker" style={{background:p.color}}/>
-        <span className="player-row-identity"><span className="player-row-name">{p.name}</span>{lobby&&<span className="player-row-status"><span className={player.ready?'player-ready':''}>{player.ready&&<Check size={16}/>} {player.ready?'Ready':'Not ready'}</span></span>}{(incorrect||passed)&&<span className="player-answer-status" role="status">{incorrect?<X size={18} aria-hidden="true"/>:null}{incorrect?'Incorrect':'Passed'}</span>}<span className="player-row-status">{members.filter(m=>m.connected).length} / {members.length} players connected</span></span>
+        <span className="player-row-identity"><span className="player-row-name">{p.name}</span>{lobby&&<span className="player-row-status"><span className={player.ready?'player-ready':''}>{player.ready&&<Check size={16}/>} {player.ready?'Ready':'Not ready'}</span></span>}{(correct||incorrect||passed||pending)&&<span className={`player-answer-status${pending?' pending':''}`} role="status">{correct?<Check size={18} aria-hidden="true"/>:incorrect?<X size={18} aria-hidden="true"/>:null}{correct?'Correct':incorrect?'Incorrect':passed?'Passed':'Not judged'}</span>}<span className="player-row-status">{members.filter(m=>m.connected).length} / {members.length} players connected</span></span>
         <strong>{number(p.score)}</strong><MoreHorizontal size={18}/>
       </button>;
     })}</div>:<Empty>Create teams before starting</Empty>}
+    {canEditTeams&&<div className="side-heading">{adding?<form className="add-team-form" onSubmit={async e=>{e.preventDefault();if(name.trim()&&await command('addTeam',{name})){setName('');restoreAddTeamFocus.current=true;setAdding(false);}}}><input aria-label="Team name" autoFocus placeholder="Team name" value={name} onChange={e=>setName(e.target.value)} maxLength={32}/><IconButton title="Add team" disabled={!name.trim()}><ArrowRight/></IconButton></form>:<button type="button" className="button" ref={addTeamButton} aria-expanded={false} onClick={()=>setAdding(true)}><Plus size={20}/>Add team</button>}</div>}
   </section>;
 }
 
@@ -245,8 +259,8 @@ function PlayerGame({id,rejoin}:{id:string;rejoin:()=>void}){
     <header className="player-header"><AppLink href="/play" aria-label="Back to games"><ArrowLeft/></AppLink><span>{g.name}</span><Connection connected={connected}/><Button disabled={!connected||leaving} onClick={async()=>{setLeaving(true);if(await command('leaveGame'))rejoin();else setLeaving(false);}}><LogOut size={18}/>{leaving?'Leaving…':'Leave game'}</Button></header>
     <main className="player-main">
       <p className="player-team-identity">{member?.name} · <strong>{self.name}</strong></p>
-      {g.status==='finished'?<Scores g={g}/>:<div className="my-score"><strong>{number(self.score)}</strong><span>points</span></div>}
-      <div className="buzz-area"><button aria-label={lobby?(self.ready?'Mark team not ready':'Mark team ready'):'Buzz in'} aria-pressed={lobby?self.ready:undefined} className={`buzz-button ${selected||lobby&&self.ready?'has-floor':''}`} disabled={!connected||!lobby&&!canBuzz} onPointerDown={e=>{if(connected&&(lobby||canBuzz)){e.preventDefault();press();}}} onClick={e=>{if(e.detail===0)press();}}><Hand strokeWidth={1.2}/><span>{label}</span></button></div>
+      {g.status==='finished'?(g.rounds[g.roundIndex].type==='final'?<FinalResults g={g}/>:<Scores g={g}/>):<div className="my-score"><strong>{number(self.score)}</strong><span>points</span></div>}
+      {g.status==='finished'?null:g.status==='playing'&&g.rounds[g.roundIndex].type==='final'&&c?<FinalSubmission key={`${c.questionId}:${c.phase}`} g={g} connected={connected} command={command}/>:<div className="buzz-area"><button aria-label={lobby?(self.ready?'Mark team not ready':'Mark team ready'):'Buzz in'} aria-pressed={lobby?self.ready:undefined} className={`buzz-button ${selected||lobby&&self.ready?'has-floor':''}`} disabled={!connected||!lobby&&!canBuzz} onPointerDown={e=>{if(connected&&(lobby||canBuzz)){e.preventDefault();press();}}} onClick={e=>{if(e.detail===0)press();}}><Hand strokeWidth={1.2}/><span>{label}</span></button></div>}
     </main>
   </div>;
 }

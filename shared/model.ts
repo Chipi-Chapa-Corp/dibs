@@ -11,10 +11,10 @@ export interface TeamMember { id:string; teamId:string; name:string; token:strin
 export type PublicMember = Omit<TeamMember,'token'>;
 export interface Player { id: string; name: string; color: string; token: string; score: number; connected: boolean; ready: boolean; blockedUntil: number; stats: {correct: number; incorrect: number; buzzes: number}; joinedAt: number }
 export interface Buzz { playerId: string; at: number; order: number }
-export interface FinalEntry { wager: number; answer: string; submitted: boolean; judged: boolean; correct?: boolean }
+export interface FinalEntry { wager: number; answer: string; submitted: boolean; judged: boolean; answerSubmitted?: boolean; wagerVersion?:number; answerVersion?:number; correct?: boolean }
 export type TeamResult = 'correct'|'incorrect'|'pass';
 export interface TeamJudgment { result:TeamResult; delta:number|null }
-export interface Current { incorrectTeamIds?:string[]; passedTeamIds?:string[]; answerToken?:string|null; judgments?:Record<string,TeamJudgment>; dailyDoubleFromId?:string|null; questionId: string; category: string; answerOrder?: number[]; buzzOpen: boolean; buzzes: Buzz[]; answeringId: string|null; attempted: string[]; revealAt: number|null; revealed: boolean; phase: 'question'|'wager'|'final'|'modifier'; wagers: Record<string, FinalEntry>; closed: boolean }
+export interface Current { answersLocked?:boolean; incorrectTeamIds?:string[]; passedTeamIds?:string[]; answerToken?:string|null; judgments?:Record<string,TeamJudgment>; dailyDoubleFromId?:string|null; questionId: string; category: string; answerOrder?: number[]; buzzOpen: boolean; buzzes: Buzz[]; answeringId: string|null; attempted: string[]; revealAt: number|null; revealed: boolean; phase: 'question'|'wager'|'final'|'modifier'; wagers: Record<string, FinalEntry>; closed: boolean }
 export function hasCorrectResult(current:Current):boolean{
   if(current.phase!=='question'&&current.phase!=='final')return false;
   return Object.values(current.judgments||{}).some(j=>j.result==='correct')
@@ -25,7 +25,7 @@ export interface QuestionSelection { questionId:string; opensAt:number }
 export const QUESTION_SELECTION_MS=800;
 export interface HistoryEntry { id:string; at:number; label:string; deltas:Record<string,number> }
 export interface Announcement { id:string; title:string; detail:string; at:number }
-export interface Game { modifierClaims: ModifierClaim[]; id:string; name:string; subtitle:string;  createdAt:number; status:'lobby'|'playing'|'finished'; paused:boolean; roundIndex:number; rounds:Round[]; settings:Settings; theme:Theme; teamsLocked:boolean; members:TeamMember[]; players:Player[]; played:string[]; current:Current|null; history:HistoryEntry[]; undo:unknown[]; questionCount:number; selection:QuestionSelection|null; announcement:Announcement|null; revision:number }
+export interface Game { finalPresentation?:{roundId:string;scores:Record<string,number>;wagers:Record<string,number>}; modifierClaims: ModifierClaim[]; id:string; name:string; subtitle:string;  createdAt:number; status:'lobby'|'playing'|'finished'; paused:boolean; roundIndex:number; rounds:Round[]; settings:Settings; theme:Theme; teamsLocked:boolean; members:TeamMember[]; players:Player[]; played:string[]; current:Current|null; history:HistoryEntry[]; undo:unknown[]; questionCount:number; selection:QuestionSelection|null; announcement:Announcement|null; revision:number }
 export type PublicPlayer = Omit<Player,'token'>;
 export interface GameView extends Omit<Game,'players'|'members'|'undo'|'rounds'> { canUndo:boolean; editLock?:'mine'|'other'|null; players:PublicPlayer[]; members:PublicMember[]; rounds:Round[]; selfId?:string; selfMemberId?:string; filledQuestionIds:string[]; role:'host'|'player'|'stage'; serverTime:number; currentQuestion:Question|null; yourFinal:FinalEntry|null }
 export interface GameSummary {editing?:boolean;hosting?:boolean;id:string;name:string;subtitle:string;status:Game['status'];playerCount:number;questionTotal:number;rounds:number;accent:string;createdAt:number}

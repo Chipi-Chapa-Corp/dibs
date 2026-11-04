@@ -29,6 +29,8 @@ export function joinMember(g:Game,input:Input):TeamMember {
   assert(g.status!=='finished','This game has ended');
   assert(g.players.some(t=>t.id===input.teamId),'Choose a team created by the host');
   const name=text(input.name,32).trim();assert(name,'Enter your name');
+  const nameKey=name.normalize('NFKC').toLowerCase();
+  assert(!g.members.some(m=>m.name.trim().normalize('NFKC').toLowerCase()===nameKey),'A player with this name has already joined. Choose a different name.');
   assert(g.members.length<500,'This game has too many players');
   const member:TeamMember={id:uid(),teamId:input.teamId,name,token:token(),connected:false,joinedAt:Date.now()};
   g.members.push(member);g.revision++;return member;
@@ -56,6 +58,8 @@ export function normalizeStoredGameplay(state:Pick<Game,'settings'|'rounds'|'cur
   if(state.current){
     delete(state.current as unknown as Input).timer;
     const round=state.rounds.find(r=>r.categories.some(c=>c.questions.some(q=>q.id===state.current!.questionId)));const q=round?.categories.flatMap(c=>c.questions).find(q=>q.id===state.current!.questionId);
+    if(round?.type==='final'&&state.current.phase==='final'&&state.current.answersLocked===undefined)state.current.answersLocked=state.current.closed||state.current.revealed||!!state.current.revealAt||Object.values(state.current.wagers).some(e=>e.judged);
+    for(const entry of Object.values(state.current.wagers))entry.answerSubmitted??=!!entry.answer.trim();
     // Legacy active Daily Doubles return to assignment before accepting another wager.
     if(q?.dailyDouble&&round?.type!=='final'&&!state.current.closed&&!state.current.dailyDoubleFromId){
       Object.assign(state.current,{dailyDoubleFromId:null,phase:'wager',answeringId:null,wagers:{},buzzOpen:false,buzzes:[],revealAt:null,revealed:false});
@@ -64,6 +68,7 @@ export function normalizeStoredGameplay(state:Pick<Game,'settings'|'rounds'|'cur
 }
 /** Resume saved regular questions in the first-buzz decision flow. */
 export function normalizeBuzzerFlow(g:Game){
+  syncFinalPresentation(g);
   const c=g.current,q=currentQuestion(g);
   if(!c||!q||q.modifier||q.dailyDouble||g.rounds[g.roundIndex].type==='final'||c.phase!=='question')return;
   if(c.closed){
@@ -147,6 +152,20 @@ function recoverJudgmentDelta(g:Game,team:Player,result:'correct'|'incorrect',am
   const points=result==='correct'?amount*g.settings.correctMultiplier:penalty?-amount*g.settings.wrongMultiplier:0;
   return !g.settings.allowNegative&&points<0&&team.score===0?0:Math.round(points);
 }
+/** Keep the pre-final scores visible while the presenter privately records results. */
+function syncFinalPresentation(g:Game){
+  const round=g.rounds[g.roundIndex];
+  if(g.status==='lobby'||round.type!=='final'){delete g.finalPresentation;return;}
+  if(!g.finalPresentation||g.finalPresentation.roundId!==round.id){
+    g.finalPresentation={roundId:round.id,wagers:{},scores:Object.fromEntries(g.players.map(team=>{
+      const judgment=g.current?.judgments?.[team.id],entry=g.current?.wagers[team.id];
+      const result=judgment?.result||(entry?.judged?(entry.correct?'correct':'incorrect'):null);
+      const delta=typeof judgment?.delta==='number'?judgment.delta:result&&result!=='pass'?recoverJudgmentDelta(g,team,result,entry?.wager||0):0;
+      return[team.id,team.score-delta];
+    }))};
+  }
+  if(g.current)for(const[id,entry]of Object.entries(g.current.wagers))g.finalPresentation.wagers[id]=entry.wager;
+}
 function selectableQuestion(g:Game,qid:string){
   const r=g.rounds[g.roundIndex];const c=r.categories.find(c=>c.questions.some(q=>q.id===qid));const q=c?.questions.find(q=>q.id===qid);assert(q&&c,'Question not found');assert(!g.played.includes(qid),'This question has already been played');assert(isQuestionFilled(q!),'This question is empty');
   return {r,c:c!,q:q!};
@@ -161,13 +180,26 @@ function open(g:Game,qid:string,now:number){
   }
 }
 function reveal(g:Game,now:number){assert(g.current,'Open a question first');g.current!.buzzOpen=false;g.current!.revealAt=now+g.settings.revealDelayMs;g.current!.revealed=g.settings.revealDelayMs===0;}
-function nextRound(g:Game,index:number,now:number){assert(g.players.length,'Create at least one team before starting');if(g.status==='lobby')assert(g.players.every(p=>p.ready),'Wait until all teams are ready');assert(index>=0&&index<g.rounds.length,'No such round');g.roundIndex=index;g.current=null;g.selection=null;g.paused=false;g.status='playing';g.teamsLocked=true;g.undo=[];if(g.rounds[index].type==='final'){const q=g.rounds[index].categories.flatMap(c=>c.questions).find(q=>q.prompt.trim());if(q)open(g,q.id,now);}}
+function finish(g:Game,now:number){
+  assert(g.status!=='finished','This game has already ended');
+  if(g.current&&g.rounds[g.roundIndex].type==='final')assert(g.current.phase==='final'&&g.current.answersLocked&&g.players.length&&g.players.every(t=>g.current!.wagers[t.id]?.judged),'Lock answers and mark every team Correct or Incorrect before finishing');
+  g.undo=[];g.status='finished';g.paused=false;g.selection=null;
+  if(g.current){
+    g.current.buzzOpen=false;
+    if(g.rounds[g.roundIndex].type==='final'&&g.current.phase==='final'){
+      g.current.closed=true;g.current.revealed=true;g.current.revealAt=now;
+      if(!g.played.includes(g.current.questionId))g.played.push(g.current.questionId);
+    }
+  }
+}
+function nextRound(g:Game,index:number,now:number){assert(g.players.length,'Create at least one team before starting');if(g.status==='lobby')assert(g.players.every(p=>p.ready),'Wait until all teams are ready');assert(index>=0&&index<g.rounds.length,'No such round');g.roundIndex=index;g.current=null;g.selection=null;g.paused=false;g.status='playing';g.teamsLocked=true;g.undo=[];syncFinalPresentation(g);if(g.rounds[index].type==='final'){const q=g.rounds[index].categories.flatMap(c=>c.questions).find(q=>q.prompt.trim());if(q)open(g,q.id,now);}}
 
 /** All gameplay mutations run synchronously on the server. No client supplies a score or a buzz timestamp. */
 export function act(g:Game,action:string,data:Input={},role:'host'|'player'='host',playerId:string|null=null,now=Date.now()){
   assert(role==='host'||['buzz','ready','wager','finalAnswer'].includes(action),'Host access required');
   const self=g.players.find(p=>p.id===playerId);if(role==='player')assert(self,'Join the game first');
   if(action==='reset'){
+    delete g.finalPresentation;
     Object.assign(g,{status:'lobby',paused:false,roundIndex:0,teamsLocked:false,members:[],players:[],played:[],current:null,modifierClaims:[],history:[],undo:[],questionCount:0,selection:null,announcement:null,revision:g.revision+1});
     return;
   }
@@ -190,11 +222,28 @@ export function act(g:Game,action:string,data:Input={},role:'host'|'player'='hos
     assert(!c!.attempted.includes(playerId!),'Your team already attempted this question');assert(!c!.buzzes.some(b=>b.playerId===playerId),'Your team already buzzed');assert(!c!.answeringId,'Another team is answering');
     c!.buzzes.push({playerId:playerId!,at:now,order:c!.buzzes.length+1});self!.stats.buzzes++;if(!c!.answeringId){c!.answeringId=playerId;c!.answerToken=uid();c!.buzzOpen=false;}g.revision++;return;
   }
-  if(action==='wager'){
-    assert(g.status==='playing'&&!g.paused,'Game is not running');const c=g.current,q=currentQuestion(g);assert(c&&c.phase==='wager'&&self,'Wagers are closed');assert(!q?.dailyDouble,'The presenter records Daily Double wagers');assert(!c!.wagers[playerId!]?.submitted,'Wager is already submitted; ask the presenter to correct it');const max=g.settings.finalMaxWager==='unlimited'?1e7:Math.max(0,self!.score);const wager=Math.round(finite(data.wager,0,0,max));c!.wagers[playerId!]={wager,answer:'',submitted:true,judged:false};g.revision++;return;
-  }
-  if(action==='finalAnswer'){
-    assert(g.status==='playing'&&!g.paused,'Game is not running');const c=g.current;assert(c&&c.phase==='final'&&!c.revealAt&&!c.revealed&&!c.closed,'Answers are closed');const entry=c!.wagers[playerId!];assert(entry,'Submit your wager first');entry.answer=text(data.answer,5000);entry.submitted=true;g.revision++;return;
+  if(action==='wager'||action==='finalAnswer'){
+    assert(g.status==='playing'&&!g.paused,'Game is not running');
+    const c=g.current,q=currentQuestion(g);
+    assert(!q?.dailyDouble,'The presenter records Daily Double wagers');
+    assert(c&&data.questionId===c.questionId,'This question is no longer active');
+    assert(g.rounds[g.roundIndex].type==='final','No active final');
+    const entry=c!.wagers[playerId!];
+    if(action==='wager'){
+      assert(c!.phase==='wager'&&!c!.closed,'Wagers are closed');
+      assert(data.version===(entry?.wagerVersion||0),'Your teammate updated the wager. Review the saved wager and try again.');
+      const max=g.settings.finalMaxWager==='unlimited'?1e7:Math.max(0,g.finalPresentation?.scores[playerId!]??self!.score);
+      assert(Number.isInteger(data.wager)&&data.wager>=0&&data.wager<=max,`Enter a whole wager between 0 and ${max}`);
+      c!.wagers[playerId!]={wager:data.wager,answer:'',submitted:true,judged:false,wagerVersion:(entry?.wagerVersion||0)+1,answerVersion:entry?.answerVersion||0,answerSubmitted:false};
+      syncFinalPresentation(g);
+    }else{
+      assert(c!.phase==='final'&&!c!.answersLocked&&!c!.revealAt&&!c!.revealed&&!c!.closed,'Answers are closed');
+      assert(entry?.submitted,'Submit your wager first');
+      assert(data.version===(entry!.answerVersion||0),'Your teammate updated the answer. Review the saved answer and try again.');
+      assert(typeof data.answer==='string'&&data.answer.length<=5000,'Use up to 5000 characters');
+      entry!.answer=data.answer;entry!.answerSubmitted=!!data.answer.trim();entry!.answerVersion=(entry!.answerVersion||0)+1;
+    }
+    g.revision++;return;
   }
   if(action==='undo'){
     normalizeQuestionUndo(g);
@@ -239,6 +288,10 @@ export function act(g:Game,action:string,data:Input={},role:'host'|'player'='hos
         assert(g.status==='playing'&&!g.paused&&c,'No active question');
         assert(data.questionId===c!.questionId,'This question is no longer active');
         assert(c!.phase==='question'||c!.phase==='final','Open the question before continuing');
+        if(g.rounds[g.roundIndex].type==='final'){
+          assert(c!.phase==='final'&&c!.answersLocked&&g.players.length&&g.players.every(team=>c!.wagers[team.id]?.judged),'Mark every team Correct or Incorrect before finishing');
+          finish(g,now);label='Game finished';break;
+        }
         assert(q?.dailyDouble||g.rounds[g.roundIndex].type==='final'||c!.closed||c!.revealed||c!.revealAt!==null,'Judge the answering team or end this question');
         assert(c!.revealAt===null||c!.revealed,'Wait until the answer is revealed');
         if(hasCorrectResult(c!)&&!c!.revealed){reveal(g,now);label='Answer revealed';}
@@ -254,7 +307,7 @@ export function act(g:Game,action:string,data:Input={},role:'host'|'player'='hos
         if(!c!.revealed&&c!.revealAt===null)reveal(g,now);
         label='Question ended · answer revealed';break;
       }
-      case'closeQuestion':assert(c,'No active question');if(!g.played.includes(c!.questionId))g.played.push(c!.questionId);g.current=null;label='Question closed';break;
+      case'closeQuestion':assert(g.rounds[g.roundIndex].type!=='final','Finish the game after judging all final answers');assert(c,'No active question');if(!g.played.includes(c!.questionId))g.played.push(c!.questionId);g.current=null;label='Question closed';break;
       case'openBuzzers':assert(!q?.dailyDouble,'Daily Double has one required answerer');assert(c&&!c.revealed&&!c.revealAt&&c.phase==='question'&&!c.closed&&!g.paused,'No active question');c!.buzzOpen=true;c!.answeringId=null;c!.buzzes=[];label='Buzzers opened';break;
       case'closeBuzzers':assert(c,'No question');c!.buzzOpen=false;label='Buzzers closed';break;
       case'resetBuzzers':assert(!q?.dailyDouble,'Daily Double has one required answerer');assert(c&&c.phase==='question'&&!c.revealed&&!c.revealAt&&!c.closed,'Question is closed');c!.buzzes=[];c!.answeringId=null;c!.attempted=[];c!.buzzOpen=true;label='Buzzers reset';break;
@@ -322,7 +375,7 @@ export function act(g:Game,action:string,data:Input={},role:'host'|'player'='hos
           assert(c!.dailyDoubleFromId&&c!.answeringId===team!.id&&entry?.submitted,'Only the assigned team answers the Daily Double');
           assert(data.result!=='pass','The assigned team must answer the Daily Double');
         }
-        if(isFinal)assert(entry?.submitted,'Record and lock the wager first');
+        if(isFinal){assert(c!.answersLocked,'Lock answers before judging');assert(data.result!=='pass','Choose Correct or Incorrect');assert(entry?.submitted,'Record and lock the wager first');}
         const result=data.result as 'correct'|'incorrect'|'pass';
         const amount=isFinal||dailyDouble?entry!.wager:q!.value;
         const points=result==='correct'?amount*g.settings.correctMultiplier:result==='incorrect'&&(g.settings.deductWrong||isFinal||dailyDouble)?-amount*g.settings.wrongMultiplier:0;
@@ -350,21 +403,62 @@ export function act(g:Game,action:string,data:Input={},role:'host'|'player'='hos
       }
       case'judge':{
         assert(c?.phase!=='modifier','Modifiers are applied manually');
-        assert(g.status==='playing'&&!g.paused&&c&&q&&!c.closed,'No active question');assert(c!.phase!=='wager','Finish wagering first');const p=g.players.find(p=>p.id===(data.playerId||c!.answeringId));assert(p,'Choose a team');const isFinal=g.rounds[g.roundIndex].type==='final',entry=c!.wagers[p!.id];if(q!.dailyDouble&&!isFinal)assert(p!.id===c!.answeringId&&c!.dailyDoubleFromId&&entry?.submitted,'Only the assigned team can answer the Daily Double');if(isFinal)assert(entry&&!entry.judged,'This final answer has already been judged');else assert(!c!.attempted.includes(p!.id),'This team has already answered');
+        assert(g.status==='playing'&&!g.paused&&c&&q&&!c.closed,'No active question');assert(c!.phase!=='wager','Finish wagering first');const p=g.players.find(p=>p.id===(data.playerId||c!.answeringId));assert(p,'Choose a team');const isFinal=g.rounds[g.roundIndex].type==='final',entry=c!.wagers[p!.id];if(q!.dailyDouble&&!isFinal)assert(p!.id===c!.answeringId&&c!.dailyDoubleFromId&&entry?.submitted,'Only the assigned team can answer the Daily Double');if(isFinal){assert(c!.answersLocked,'Lock answers before judging');assert(entry&&!entry.judged,'This final answer has already been judged');}else assert(!c!.attempted.includes(p!.id),'This team has already answered');
         const amount=isFinal||q!.dailyDouble?(entry?.wager||0):q!.value;const correct=!!data.correct;const delta=correct?amount*g.settings.correctMultiplier:g.settings.deductWrong||isFinal||q!.dailyDouble?-amount*g.settings.wrongMultiplier:0;
         const oldScore=p!.score;setScore(g,p!,p!.score+delta);(c!.judgments??={})[p!.id]={result:correct?'correct':'incorrect',delta:p!.score-oldScore};p!.stats[correct?'correct':'incorrect']++;if(isFinal||q!.dailyDouble){entry.judged=true;entry.correct=correct;}if(!isFinal){c!.attempted.push(p!.id);if(correct||q!.dailyDouble){c!.closed=true;c!.buzzOpen=false;}else{c!.answeringId=null;if(g.settings.lockWrong)c!.buzzes=c!.buzzes.filter(b=>b.playerId!==p!.id&&!c!.attempted.includes(b.playerId));else{c!.attempted=c!.attempted.filter(id=>id!==p!.id);c!.buzzes=[];}const queued=g.settings.buzzMode==='queue'?c!.buzzes.find(b=>!c!.attempted.includes(b.playerId)):null;if(queued){c!.answeringId=queued.playerId;}c!.buzzOpen=g.settings.reopenWrong&&!queued;}}
         label=`${p!.name} · ${correct?'correct':'incorrect'}`;break;
       }
-      case'reveal':assert(!(q?.dailyDouble&&c?.phase==='wager'),'Assign a team and lock the wager first');assert(c?.phase!=='modifier'||c.answeringId,'Wait for someone to claim the modifier');reveal(g,now);label='Answer revealed';break;
-      case'finalBegin':assert(c&&c.phase==='wager','No wagering round');if(q?.dailyDouble){assert(g.status==='playing'&&!g.paused,'Start or resume the game first');assert(c!.dailyDoubleFromId&&c!.dailyDoubleFromId!==c!.answeringId&&g.players.some(p=>p.id===c!.dailyDoubleFromId)&&c!.answeringId&&g.players.some(p=>p.id===c!.answeringId)&&c!.wagers[c!.answeringId]?.submitted,'Assign another team and collect its chosen wager');c!.phase='question';c!.buzzOpen=false;}else{for(const p of g.players)if(!c!.wagers[p.id])c!.wagers[p.id]={wager:0,answer:'',submitted:true,judged:false};c!.phase='final';}label='Wagers locked';break;
-      case'hostWager':{assert(c&&c.phase==='wager','Wagers are closed');const p=g.players.find(p=>p.id===data.playerId);assert(p,'Choose a team');if(q?.dailyDouble){assert(g.status==='playing'&&!g.paused,'Start or resume the game first');assert(c!.dailyDoubleFromId&&c!.answeringId===p!.id,'Record the wager for the assigned team');assert(Number.isInteger(data.wager)&&data.wager>=0&&data.wager<=1e7,'Enter a wager between 0 and 10000000');}const max=q?.dailyDouble||g.settings.finalMaxWager==='unlimited'?1e7:Math.max(0,p!.score);c!.wagers[p!.id]={wager:Math.round(finite(data.wager,0,0,max)),answer:'',submitted:true,judged:false};label=`${p!.name} · wager set`;break;}
+      case'reveal':assert(g.rounds[g.roundIndex].type!=='final','Finish the game to reveal the final answer');assert(!(q?.dailyDouble&&c?.phase==='wager'),'Assign a team and lock the wager first');assert(c?.phase!=='modifier'||c.answeringId,'Wait for someone to claim the modifier');reveal(g,now);label='Answer revealed';break;
+      case'finalBegin':{
+        assert(g.status==='playing'&&!g.paused&&c?.phase==='wager','No wagering round');
+        if(q?.dailyDouble){
+          assert(c!.dailyDoubleFromId&&c!.dailyDoubleFromId!==c!.answeringId&&g.players.some(p=>p.id===c!.dailyDoubleFromId)&&c!.answeringId&&g.players.some(p=>p.id===c!.answeringId)&&c!.wagers[c!.answeringId]?.submitted,'Assign another team and collect its chosen wager');c!.phase='question';c!.buzzOpen=false;
+        }else{
+          assert(g.players.length&&g.players.every(p=>c!.wagers[p.id]?.submitted),'Record a wager for every team before locking');
+          c!.phase='final';c!.answersLocked=false;
+        }
+        label='Wagers locked';break;
+      }
+      case'lockFinalAnswers':{
+        assert(g.status==='playing'&&!g.paused&&c?.phase==='final'&&!c.closed&&!c.answersLocked&&data.questionId===c.questionId,'Answers are closed');
+        c!.answersLocked=true;label='Answers locked';break;
+      }
+      case'hostFinalEntry':{
+        assert(g.status==='playing'&&!g.paused&&c&&g.rounds[g.roundIndex].type==='final'&&!c.closed&&data.questionId===c.questionId,'No active final');
+        assert(c!.phase==='wager'||c!.phase==='final','No active final');
+        const team=g.players.find(t=>t.id===data.playerId);assert(team,'Team not found');
+        const entry=c!.wagers[team!.id];
+        assert(data.wagerVersion===(entry?.wagerVersion||0)&&data.answerVersion===(entry?.answerVersion||0),'This submission changed. Review the saved submission and try again.');
+        const max=g.settings.finalMaxWager==='unlimited'?1e7:Math.max(0,g.finalPresentation?.scores[team!.id]??team!.score);
+        assert(Number.isInteger(data.wager)&&data.wager>=0&&data.wager<=max,`Enter a whole wager between 0 and ${max}`);
+        assert(typeof data.answer==='string'&&data.answer.length<=5000,'Use up to 5000 characters');
+        assert(c!.phase!=='wager'||!data.answer,'Lock wagers before recording an answer');
+        if(entry?.judged){
+          const result=entry.correct?'correct':'incorrect',previous=c!.judgments?.[team!.id];
+          const delta=typeof previous?.delta==='number'?previous.delta:recoverJudgmentDelta(g,team!,result,entry.wager);
+          const beforeScore=team!.score,points=data.wager*(entry.correct?g.settings.correctMultiplier:-g.settings.wrongMultiplier);
+          setScore(g,team!,beforeScore-delta+points);
+          (c!.judgments??={})[team!.id]={result,delta:team!.score-(beforeScore-delta)};
+        }
+        c!.wagers[team!.id]={wager:data.wager,answer:data.answer,submitted:true,answerSubmitted:!!data.answer.trim(),judged:entry?.judged||false,correct:entry?.correct,wagerVersion:(entry?.wagerVersion||0)+1,answerVersion:(entry?.answerVersion||0)+1};
+        label='Final submission updated';break;
+      }
+      case'hostWager':{
+        assert(g.status==='playing'&&!g.paused&&c?.phase==='wager','Wagers are closed');
+        const p=g.players.find(p=>p.id===data.playerId);assert(p,'Choose a team');
+        if(q?.dailyDouble)assert(c!.dailyDoubleFromId&&c!.answeringId===p!.id,'Record the wager for the assigned team');
+        const max=q?.dailyDouble||g.settings.finalMaxWager==='unlimited'?1e7:Math.max(0,p!.score);
+        assert(Number.isInteger(data.wager)&&data.wager>=0&&data.wager<=max,`Enter a whole wager between 0 and ${max}`);
+        const old=c!.wagers[p!.id];
+        c!.wagers[p!.id]={wager:data.wager,answer:'',submitted:true,judged:false,answerSubmitted:false,wagerVersion:(old?.wagerVersion||0)+1,answerVersion:old?.answerVersion||0};label='Wager set';break;
+      }
       case'pause':g.paused=!g.paused;label=g.paused?'Game paused':'Game resumed';break;
       case'round':nextRound(g,Math.round(finite(data.index)),now);label=`Round · ${g.rounds[g.roundIndex].name}`;break;
       case'dismissModifier':{
         assert(g.modifierClaims?.some(m=>m.id===data.id),'Modifier not found');
         g.modifierClaims=g.modifierClaims.filter(m=>m.id!==data.id);label='Modifier reminder dismissed';break;
       }
-      case'finish':g.undo=[];g.status='finished';g.paused=false;g.selection=null;if(c)c.buzzOpen=false;label='Game finished';break;
+      case'finish':finish(g,now);label='Game finished';break;
       case'resume':assert(g.players.length,'Create at least one team before starting');if(g.status==='lobby')assert(g.players.every(p=>p.ready),'Wait until all teams are ready');g.teamsLocked=true;g.status='playing';g.paused=false;label='Game resumed';break;
       case'adjust':{const p=g.players.find(p=>p.id===data.playerId);assert(p,'Team not found');setScore(g,p!,data.mode==='set'?finite(data.amount):p!.score+finite(data.amount));label=`${p!.name} · score adjusted`;break;}
       case'adjustScores':{
@@ -382,6 +476,7 @@ export function act(g:Game,action:string,data:Input={},role:'host'|'player'='hos
       }
       default:throw new Error('Unknown action');
     }
+    syncFinalPresentation(g);
     log(g,label,before);
   }catch(error){Object.assign(g,backup);throw error;}
 }
@@ -393,7 +488,7 @@ export function tick(g:Game,now=Date.now()):boolean{
   if(changed)g.revision++;return changed;
 }
 export function view(g:Game,role:GameView['role'],playerId?:string,now=Date.now(),memberId?:string):GameView{
-  const{hostTransfer:_legacyHostTransfer,hostToken:_legacyHostToken,hostClaimable:_legacyHostClaimable,undo,players,members,modifiers:_legacyModifiers,uses:_legacyUses,...base}=g as Game&{hostTransfer?:unknown;hostToken?:unknown;hostClaimable?:unknown;modifiers?:unknown;uses?:unknown};const q=currentQuestion(g);const reveal=role==='host'||!!g.current?.revealed;
+  const{hostTransfer:_legacyHostTransfer,hostToken:_legacyHostToken,hostClaimable:_legacyHostClaimable,undo,players,members,modifiers:_legacyModifiers,uses:_legacyUses,...base}=g as Game&{hostTransfer?:unknown;hostToken?:unknown;hostClaimable?:unknown;modifiers?:unknown;uses?:unknown};const q=currentQuestion(g);const reveal=role==='host'||(g.rounds[g.roundIndex].type==='final'?g.status==='finished':!!g.current?.revealed);const final=g.rounds[g.roundIndex].type==='final';const holdFinal=role!=='host'&&final&&g.status!=='finished';
   const rounds=g.rounds.map(r=>({...r,categories:r.categories.map(c=>({...c,questions:c.questions.map(q=>{
     if(role==='host')return clone(q);
     const{answerOptions:_options,correctAnswerIndex:_correct,...question}=q;
@@ -405,10 +500,15 @@ export function view(g:Game,role:GameView['role'],playerId?:string,now=Date.now(
     cur.passedTeamIds=g.players.filter(t=>judgments[t.id]?.result==='pass').map(t=>t.id);
     cur.incorrectTeamIds=g.players.filter(t=>judgments[t.id]?.result==='incorrect'||!judgments[t.id]&&cur.attempted.includes(t.id)&&!(cur.closed&&cur.answeringId===t.id)).map(t=>t.id);
   }
-  if(cur&&role!=='host'){delete cur.answerOrder;delete cur.judgments;delete cur.answerToken;cur.wagers=Object.fromEntries(Object.entries(cur.wagers).map(([id,e])=>[id,{wager:reveal||q?.dailyDouble?e.wager:0,answer:reveal?e.answer:'',submitted:e.submitted,judged:e.judged,correct:reveal?e.correct:undefined}]));}
+  if(cur&&holdFinal){cur.incorrectTeamIds=[];cur.passedTeamIds=[];}
+  if(cur&&role!=='host'){delete cur.answerOrder;delete cur.judgments;delete cur.answerToken;cur.wagers=Object.fromEntries(Object.entries(cur.wagers).map(([id,e])=>[id,{wager:reveal||q?.dailyDouble||role==='player'&&id===playerId?e.wager:0,answer:reveal||role==='player'&&id===playerId?e.answer:'',submitted:e.submitted,answerSubmitted:e.answerSubmitted,judged:holdFinal?false:e.judged,correct:reveal&&!holdFinal?e.correct:undefined}]));}
   let cq=q?clone(q):null;
   const order=g.current?.answerOrder;
   if(cq?.answerOptions&&order){const options=cq.answerOptions;cq.answerOptions=order.map(i=>options[i]);cq.correctAnswerIndex=order.indexOf(cq.correctAnswerIndex??0);}
   if(cq&&role!=='host'){delete cq.correctAnswerIndex;if(!reveal){cq.answer='';cq.modifier=null;}cq.notes='';if(cur?.phase==='wager'){cq.prompt='';delete cq.answerOptions;}if(cur?.phase==='modifier'){cq.prompt='';cq.answer='';delete cq.answerOptions;if(!reveal)cq.modifier=null;}}
-  return{...clone(base),canUndo:role==='host'&&g.undo.length>0,modifierClaims:clone(g.modifierClaims||[]).filter(m=>role==='host'||m.questionId!==cur?.questionId||cur.revealed),filledQuestionIds:g.rounds.flatMap(r=>r.categories.flatMap(c=>c.questions.filter(isQuestionFilled).map(q=>q.id))),settings:normalizeSettings(g.settings),rounds,members:(members||[]).filter(m=>role==='host'||role==='player'&&m.teamId===playerId).map(({token,...m})=>clone(m)),selfMemberId:memberId,players:(players as (Player&{shield?:number})[]).map(({token,shield:_legacyShield,...p})=>clone(p)),current:cur,role,serverTime:now,selfId:playerId,currentQuestion:cq,yourFinal:playerId&&g.current?.wagers[playerId]?clone(g.current.wagers[playerId]):null};
+  const publicBase=clone(base);
+  if(holdFinal){publicBase.history=[];publicBase.announcement=null;if(publicBase.finalPresentation)publicBase.finalPresentation.wagers={};}
+  const own=role==='player'&&playerId&&g.current?.wagers[playerId]?clone(g.current.wagers[playerId]):null;
+  if(own&&holdFinal){own.judged=false;delete own.correct;}
+  return{...publicBase,canUndo:role==='host'&&g.undo.length>0,modifierClaims:clone(g.modifierClaims||[]).filter(m=>role==='host'||m.questionId!==cur?.questionId||cur.revealed),filledQuestionIds:g.rounds.flatMap(r=>r.categories.flatMap(c=>c.questions.filter(isQuestionFilled).map(q=>q.id))),settings:normalizeSettings(g.settings),rounds,members:(members||[]).filter(m=>role==='host'||role==='player'&&m.teamId===playerId).map(({token,...m})=>clone(m)),selfMemberId:memberId,players:(players as (Player&{shield?:number})[]).map(({token,shield:_legacyShield,...p})=>({...clone(p),score:holdFinal?g.finalPresentation?.scores[p.id]??p.score:p.score,...(holdFinal?{stats:{correct:0,incorrect:0,buzzes:0}}:{})})),current:cur,role,serverTime:now,selfId:playerId,currentQuestion:cq,yourFinal:own};
 }

@@ -1,4 +1,4 @@
-import {startReadyGame} from './helpers.ts';
+import {collectMissingFinalWagers,lockFinalAnswers,startReadyGame} from './helpers.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {act,addPlayer,joinMember,createGame,normalizeStoredGameplay,tick,updateDefinition,view} from '../server/engine.ts';
@@ -85,9 +85,9 @@ test('Final Free Response accepts private submissions and never offers a modifie
  const rounds=demoRounds();Object.assign(rounds[2].categories[0].questions[0],{responseType:'free',answer:'The final answer',answerOptions:['Old','Choices'],modifier:{title:'Invalid',instructions:'Not allowed'},dailyDouble:true});
  const g=createGame({definition:{rounds}}),a=addPlayer(g,'Ada');a.score=500;
  const q=g.rounds[2].categories[0].questions[0];assert.equal(q.modifier,null);assert.equal(q.dailyDouble,false);assert.equal(q.answer,'The final answer');assert(!q.answerOptions);
- startReadyGame(g);act(g,'round',{index:2});act(g,'wager',{wager:200},'player',a.id);act(g,'finalBegin');
+ startReadyGame(g);act(g,'round',{index:2});act(g,'wager',{wager:200,version:0,questionId:g.current!.questionId},'player',a.id);act(g,'finalBegin');
  assert.equal(g.current?.phase,'final');assert.equal(view(g,'player',a.id).currentQuestion?.responseType,'free');assert(!view(g,'player',a.id).currentQuestion?.answerOptions);
- act(g,'finalAnswer',{answer:'My final response'},'player',a.id);assert.equal(view(g,'host').current?.wagers[a.id].answer,'My final response');assert.equal(view(g,'stage').current?.wagers[a.id].answer,'');
+ act(g,'finalAnswer',{answer:'My final response',version:0,questionId:g.current!.questionId},'player',a.id);assert.equal(view(g,'host').current?.wagers[a.id].answer,'My final response');assert.equal(view(g,'stage').current?.wagers[a.id].answer,'');
 });
 test('answer option imports retain single answers, infer and clamp selection, and reject malformed lists atomically',()=>{
  const rounds=demoRounds(),q=rounds[0].categories[0].questions[0];
@@ -114,7 +114,15 @@ test('questions remain open without time limits and game pause still blocks play
  act(g,'pause');assert.throws(()=>act(g,'buzz',{},'player',a.id,86400001),/not running/);
  act(g,'pause');act(g,'buzz',{},'player',a.id,86400002);assert.equal(g.current?.answeringId,a.id);
 });
-test('private final wagers, private submissions, scoring exactly once and final results',()=>{const{g,a,b}=fixture();a.score=500;b.score=-100;act(g,'round',{index:2});act(g,'wager',{wager:800},'player',a.id);act(g,'wager',{wager:200},'player',b.id);assert.equal(g.current?.wagers[a.id].wager,500);assert.equal(g.current?.wagers[b.id].wager,0);assert.equal(view(g,'stage').current?.wagers[a.id].wager,0);act(g,'finalBegin');act(g,'finalAnswer',{answer:'A light-year'},'player',a.id);assert.equal(view(g,'stage').current?.wagers[a.id].answer,'');assert.equal(view(g,'host').current?.wagers[a.id].answer,'A light-year');act(g,'judge',{playerId:a.id,correct:true});assert.equal(a.score,1000);assert.throws(()=>act(g,'judge',{playerId:a.id,correct:true}));act(g,'finish');assert.equal(g.status,'finished');});
+test('private final wagers, private submissions, scoring exactly once and final results',()=>{
+ const{g,a,b,c}=fixture();a.score=500;b.score=-100;act(g,'round',{index:2});const questionId=g.current!.questionId;
+ assert.throws(()=>act(g,'wager',{wager:800,version:0,questionId},'player',a.id),/whole wager/);
+ act(g,'wager',{wager:500,version:0,questionId},'player',a.id);act(g,'wager',{wager:0,version:0,questionId},'player',b.id);act(g,'hostWager',{playerId:c.id,wager:0});
+ assert.equal(view(g,'stage').current?.wagers[a.id].wager,0);act(g,'finalBegin');act(g,'finalAnswer',{answer:'A light-year',version:0,questionId},'player',a.id);
+ assert.equal(view(g,'stage').current?.wagers[a.id].answer,'');assert.equal(view(g,'host').current?.wagers[a.id].answer,'A light-year');
+ lockFinalAnswers(g);act(g,'judge',{playerId:a.id,correct:true});assert.equal(a.score,1000);assert.throws(()=>act(g,'judge',{playerId:a.id,correct:true}));
+ for(const team of [b,c])act(g,'gradeTeam',{questionId,playerId:team.id,result:'incorrect'});act(g,'finish');assert.equal(g.status,'finished');
+});
 test('Daily Double presenter records the spoken wager and scores only the assigned team',()=>{const{g,a,b,q}=fixture();q.dailyDouble=true;a.score=500;act(g,'openQuestion',{questionId:q.id});act(g,'assignDailyDouble',{fromId:b.id,playerId:a.id});assert.equal(g.current?.phase,'wager');assert.throws(()=>act(g,'wager',{wager:100},'player',b.id));act(g,'hostWager',{playerId:a.id,wager:400});act(g,'finalBegin');act(g,'judge',{correct:true});assert.equal(a.score,900);});
 test('malformed definitions cannot partially overwrite valid data',()=>{const{g}=fixture();const original=structuredClone(g.rounds);assert.throws(()=>updateDefinition(g,{rounds:[{name:'broken',categories:null}],name:'oops'}));assert.deepEqual(g.rounds,original);assert.equal(g.name,'Test');});
 test('player permissions reject score changes, judging, settings and arbitrary actor impersonation',()=>{const{g,a,b}=fixture();for(const action of ['adjust','judge','save','round','finish','undo'])assert.throws(()=>act(g,action,{playerId:b.id,amount:9999},'player',a.id));assert.equal(b.score,0);});
@@ -254,16 +262,14 @@ test('the first answerer retains the floor until judged and other teams must buz
  act(g,'buzz',{},'player',b.id,86400002);assert(!tick(g,172800000));assert.equal(g.current?.answeringId,b.id);
  act(g,'judge',{correct:true},'host',null,172800001);assert.equal(b.score,100);
 });
-test('final answers remain editable until the presenter reveals the answer',()=>{
- const {g,a}=fixture();act(g,'round',{index:2},'host',null,1000);act(g,'finalBegin',{},'host',null,2000);
+test('final answers remain editable without a deadline until the host locks answers',()=>{
+ const {g,a}=fixture();act(g,'round',{index:2},'host',null,1000);collectMissingFinalWagers(g);act(g,'finalBegin',{},'host',null,2000);const questionId=g.current!.questionId;
  assert(!('timer' in g.current!));assert(!tick(g,86400000));
- act(g,'finalAnswer',{answer:'First answer'},'player',a.id,86400001);
- act(g,'finalAnswer',{answer:'Edited answer'},'player',a.id,172800000);
- assert.equal(g.current?.wagers[a.id].answer,'Edited answer');
- act(g,'reveal',{},'host',null,172800001);
- assert.throws(()=>act(g,'finalAnswer',{answer:'After reveal'},'player',a.id,172800002),/Answers are closed/);
- tick(g,172801000);assert(g.current?.revealed);
- assert.throws(()=>act(g,'finalAnswer',{answer:'After reveal'},'player',a.id,172801001),/Answers are closed/);
+ act(g,'finalAnswer',{answer:'First answer',version:0,questionId},'player',a.id,86400001);
+ act(g,'finalAnswer',{answer:'Edited answer',version:1,questionId},'player',a.id,172800000);
+ assert.equal(g.current?.wagers[a.id].answer,'Edited answer');lockFinalAnswers(g);
+ assert.throws(()=>act(g,'finalAnswer',{answer:'Too late',version:2,questionId},'player',a.id),/Answers are closed/);
+ assert.throws(()=>act(g,'reveal'),/Finish the game/);assert(!tick(g,172801000));assert(!g.current?.revealed);
 });
 test('Daily Double answerers have no deadline',()=>{
  const {g,a,b,q}=fixture();q.dailyDouble=true;
@@ -287,11 +293,11 @@ test('host reset clears the session in every game state and preserves the comple
   g.subtitle='Keep subtitle';g.theme.title='Keep this screen';
   a.score=900;a.ready=true;a.connected=true;a.stats.correct=3;
   g.played=[q.id];g.questionCount=7;g.modifierClaims=[{id:'claim',questionId:modifier.id,playerId:a.id,roundIndex:1,...modifier.modifier}];
-  act(g,'round',{index:2});act(g,'finalBegin');act(g,'finalAnswer',{answer:'Old answer'},'player',a.id);
+  act(g,'round',{index:2});collectMissingFinalWagers(g);act(g,'finalBegin');act(g,'finalAnswer',{answer:'Old answer',version:0,questionId:g.current!.questionId},'player',a.id);
   g.announcement={id:'old',title:'Old announcement',detail:'Old progress',at:1};
   if(status==='lobby')g.status='lobby';
   if(status==='paused')act(g,'pause');
-  if(status==='finished')act(g,'finish');
+  if(status==='finished'){lockFinalAnswers(g);for(const team of g.players)act(g,'gradeTeam',{questionId:g.current!.questionId,playerId:team.id,result:'incorrect'});act(g,'finish');}
   const definition=structuredClone({id:g.id,createdAt:g.createdAt,name:g.name,subtitle:g.subtitle,rounds:g.rounds,settings:g.settings,theme:g.theme});
   const revision=g.revision;
   act(g,'reset');

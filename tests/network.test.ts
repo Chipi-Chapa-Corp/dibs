@@ -73,7 +73,7 @@ for(const buzzMode of ['queue','first']as const)test(`group phones share one sco
   };
   const created=await (await fetch(base+'/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({definition:{rounds:demoRounds(),settings:{buzzMode,earlyPenaltyMs:0}}})})).json();
   const joinPath=`/api/games/${created.id}/join`;
-  const team=await post(joinPath,{name:'Team Ada'}),teammate=await post(joinPath,{name:' team ADA '}),opponent=await post(joinPath,{name:'Team Bea'});
+  const team=await post(joinPath,{name:'Team Ada'}),teammate=await post(joinPath,{name:'Ada teammate',teamId:team.playerId}),opponent=await post(joinPath,{name:'Team Bea'});
   assert.equal(teammate.playerId,team.playerId);assert.notEqual(teammate.token,team.token);assert.notEqual(teammate.memberId,team.memberId);
   const connect=async(role:string,token?:string)=>{
    const s=io(base,{autoConnect:false,transports:['websocket']});sockets.push(s);let latest:GameView;
@@ -96,7 +96,7 @@ for(const buzzMode of ['queue','first']as const)test(`group phones share one sco
    assert(phone.state().current?.attempted.includes(team.playerId));assert.equal((await command(phone.s,'buzz')).ok,false);
   }
   // Another phone joining after a miss cannot bypass the group's lockout.
-  const late=await post(joinPath,{name:'Team Ada'}),c=await connect('player',late.token);
+  const late=await post(joinPath,{name:'Late teammate',teamId:team.playerId}),c=await connect('player',late.token);
   assert.equal(late.playerId,team.playerId);assert.equal((await command(c.s,'buzz')).ok,false);
   assert.equal((await command(other.s,'buzz')).ok,true);assert.equal((await command(host.s,'judge',{correct:true})).ok,true);
   await waitState(stage,v=>v.players.find(p=>p.id===opponent.playerId)?.score===100);
@@ -411,5 +411,46 @@ test('library preparation saves before hosting; stale editors cannot change a ru
   const copy=server.games.get(copied.id)!;assert.equal(copy.status,'lobby');assert.deepEqual(copy.players,[]);assert.deepEqual(copy.played,[]);assert.equal(copy.current,null);assert.deepEqual(copy.undo,[]);assert.deepEqual(copy.rounds,before.rounds);assert.deepEqual(copy.settings,before.settings);assert.deepEqual(copy.theme,before.theme);
   const copyEditor=await connect(true,copied.id);assert.equal((await emit(copyEditor,'command',{action:'save',data:{name:'Next event'}})).ok,true);
   assert.equal(server.games.get(created.id)!.players[0].score,700);assert.equal(server.games.get(created.id)!.name,before.name);assert.equal(copy.name,'Next event');
+ }finally{sockets.forEach(s=>s.disconnect());await server.close();rmSync(dir,{recursive:true,force:true});}
+});
+
+test('private final synchronizes teammates, rejects stale writes, reconnects and keeps other sockets and HTTP views spoiler-free',async()=>{
+ const dir=mkdtempSync(join(tmpdir(),'dibs-private-final-network-')),server=await startServer({port:0,dataDir:dir,dev:false,quiet:true}),sockets:Socket[]=[];
+ try{
+  const base=`http://127.0.0.1:${(server.server.address()as{port:number}).port}`;
+  const post=async(path:string,data:unknown)=>(await fixtureRequest(server,base,path,data)).json();
+  const created=await post('/api/games',{name:'Private final',definition:{rounds:demoRounds()}}),game=server.games.get(created.id)!;
+  const red=addPlayer(game,'Red'),blue=addPlayer(game,'Blue');red.score=1000;blue.score=800;
+  const alice=await post(`/api/games/${created.id}/join`,{name:'Alice',teamId:red.id}),alex=await post(`/api/games/${created.id}/join`,{name:'Alex',teamId:red.id}),bob=await post(`/api/games/${created.id}/join`,{name:'Bob',teamId:blue.id});
+  const connect=async(role:string,token?:string)=>{const s=io(base,{autoConnect:false,transports:['websocket']});sockets.push(s);let latest:GameView;s.on('state',v=>latest=v);s.connect();await once(s,'connect');assert((await emit(s,'subscribe',{gameId:created.id,role,token})).ok);return{s,state:()=>latest!};};
+  const host=await connect('host'),first=await connect('player',alice.token),second=await connect('player',alex.token),other=await connect('player',bob.token),stage=await connect('stage');
+  const cmd=(s:Socket,action:string,data?:unknown)=>emit(s,'command',{action,data});
+  markTeamsReady(game);assert((await cmd(host.s,'start')).ok);assert((await cmd(host.s,'round',{index:2})).ok);
+  const questionId=game.current!.questionId;
+  assert((await cmd(first.s,'wager',{questionId,version:0,wager:731,playerId:blue.id})).ok);
+  await waitState(second,v=>v.yourFinal?.wager===731);assert.equal(second.state().yourFinal?.wagerVersion,1);
+  assert.equal((await cmd(second.s,'wager',{questionId,version:0,wager:100})).ok,false);
+  assert((await cmd(other.s,'wager',{questionId,version:0,wager:319})).ok);
+  await waitState(stage,v=>Object.keys(v.current!.wagers).length===2);assert.equal(stage.state().current?.wagers[red.id].wager,0);
+  assert((await cmd(host.s,'finalBegin')).ok);
+  assert((await cmd(first.s,'finalAnswer',{questionId,version:0,answer:'RED PRIVATE FINAL'})).ok);
+  await waitState(second,v=>v.yourFinal?.answer==='RED PRIVATE FINAL');
+  first.s.disconnect();const rejoined=await post(`/api/games/${created.id}/join`,{token:alice.token});assert.equal(rejoined.memberId,alice.memberId);
+  const reconnect=await connect('player',alice.token);assert.equal(reconnect.state().yourFinal?.answer,'RED PRIVATE FINAL');
+  assert((await cmd(second.s,'finalAnswer',{questionId,version:1,answer:'RED REVISED FINAL'})).ok);
+  await waitState(reconnect,v=>v.yourFinal?.answer==='RED REVISED FINAL');
+  assert((await cmd(other.s,'finalAnswer',{questionId,version:0,answer:'BLUE PRIVATE FINAL'})).ok);
+  assert((await cmd(host.s,'lockFinalAnswers',{questionId})).ok);
+  assert.equal((await cmd(second.s,'finalAnswer',{questionId,version:2,answer:'Late'})).ok,false);
+  assert((await cmd(host.s,'gradeTeam',{questionId,playerId:red.id,result:'correct'})).ok);
+  assert((await cmd(host.s,'gradeTeam',{questionId,playerId:blue.id,result:'incorrect'})).ok);
+  await waitState(host,v=>v.players[0].score===1731&&v.players[1].score===481);
+  for(const client of [stage,other]){
+    const snapshot=client.state();assert.equal(snapshot.current?.wagers[red.id].wager,0);assert(!JSON.stringify(snapshot).includes('RED REVISED FINAL'));assert.deepEqual(snapshot.players.map(p=>p.score),[1000,800]);assert.deepEqual(snapshot.history,[]);
+  }
+  const http=await(await fetch(`${base}/api/games/${game.id}`)).json();assert.equal(http.current.wagers[red.id].wager,0);assert(!JSON.stringify(http).includes('RED REVISED FINAL'));assert.deepEqual(http.finalPresentation.wagers,{});
+  assert.equal(reconnect.state().yourFinal?.judged,false);assert.equal(reconnect.state().yourFinal?.correct,undefined);
+  assert((await cmd(host.s,'continueQuestion',{questionId})).ok);
+  await waitState(stage,v=>v.status==='finished');assert.equal(stage.state().current?.wagers[red.id].answer,'RED REVISED FINAL');assert.equal(stage.state().current?.wagers[red.id].wager,731);
  }finally{sockets.forEach(s=>s.disconnect());await server.close();rmSync(dir,{recursive:true,force:true});}
 });
