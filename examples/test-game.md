@@ -24,7 +24,7 @@ The three fetched random photos are saved in `public/test-board/` and referenced
 | Double take | Fast fingers | 400 | Hidden modifier: Pickpocket |
 | Double take | Wild cards | 300 | Hidden modifier: Sign flip |
 | Double take | Wild cards | 400 | 1440 minutes per day |
-| The last word | A matter of time | — | Private final: 3600 seconds per hour |
+| The last word | A matter of time | — | Final: 3600 seconds per hour |
 
 The presenter can open cells in any order; this table is for the host only.
 
@@ -34,10 +34,10 @@ The presenter can open cells in any order; this table is for the host only.
 2. On a normal question, judge one team incorrect and let another team buzz. Check the first team stays locked out.
 3. Leave the hexagon question open, then try pausing/resuming the game and closing, reopening or resetting buzzers.
 4. Open a hidden modifier: neither its name nor effect should be visible to players before the first claim. Buzz at the same time; only one team should win. Apply its instructions manually using the score controls. Undo a score edit if needed.
-5. For a Daily Double, record the selecting team and a different team they give it to, then click **Confirm teams**. Offer wager amounts verbally; the assigned team chooses one on its phone, or the presenter records it. Confirm the choice, then click **Lock wager & open question**. That team must answer. Judge **Correct** or **Incorrect / no answer**; there is no buzzer race.
+5. For a Daily Double, the presenter taps the team that chose the cell. That team names an opponent aloud, and the opponent chooses a wager from the amounts offered aloud. The presenter records both choices on the host screen. The presenter clicks **Open question** and judges **Correct** or **Incorrect**. Use **Change** to correct an earlier choice. There is no buzzer race.
 6. Keep **Close enough** as a reminder through the next board and final. Its numeric tolerance is explained in each relevant question’s host notes. Dismiss one-time modifiers after applying them.
-7. Close and reopen one phone’s tab in the same browser. Its identity, score and modifier reminders should return.
-8. Move to the final, collect private wagers and answers, and reveal the answer and check that further answer edits are rejected. Judge each team once and finish to show standings.
+7. Close and reopen one phone’s tab in the same browser. Its identity and score should return.
+8. Move to the final, record the wagers spoken to the presenter, then open the question. Teams answer aloud; judge each team once and finish to show standings.
 
 ## Photo credits
 

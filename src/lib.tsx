@@ -24,4 +24,4 @@ export const sortedPlayers=(players:Pick<Player,'id'|'name'|'score'|'color'>[])=
 export function useNow(){const[now,set]=useState(Date.now());useEffect(()=>{const t=setInterval(()=>set(Date.now()),100);return()=>clearInterval(t);},[]);return now;}
 export async function copy(value:string){try{await navigator.clipboard.writeText(value);}catch{const el=document.createElement('textarea');el.value=value;document.body.append(el);el.select();document.execCommand('copy');el.remove();}}
 export function download(name:string,data:unknown){const a=document.createElement('a');const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
-export const go=(url:string)=>{location.href=url;};
+export {go} from './navigation';

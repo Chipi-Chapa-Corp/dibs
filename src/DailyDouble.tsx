@@ -1,53 +1,42 @@
 import {useEffect,useState} from 'react';
-import {ArrowRight,Check,X} from 'lucide-react';
+import {ArrowRight,Check,ChevronDown,X} from 'lucide-react';
 import type {GameView} from '../shared/model';
-import {number} from './lib';
-import {AnswerChoices,Button,DailyDoubleStatus,Field,IconButton,RichText} from './components';
+import {dailyDoubleStep} from '../shared/daily-double';
+import {AnswerChoices,Button,HostDailyDoubleStatus,Field,IconButton,RichText} from './components';
 
 type Command=(action:string,data?:Record<string,unknown>)=>Promise<boolean>;
-export function HostDailyDouble({g,command}:{g:GameView;command:Command}){
-  const c=g.current!,q=g.currentQuestion!;
-  const[from,setFrom]=useState(c.dailyDoubleFromId||''),[to,setTo]=useState(c.answeringId||''),[wager,setWager]=useState('');
-  const team=g.players.find(p=>p.id===c.answeringId),entry=team?c.wagers[team.id]:undefined;
-  useEffect(()=>{setFrom(c.dailyDoubleFromId||'');setTo(c.answeringId||'');},[c.dailyDoubleFromId,c.answeringId]);
-  useEffect(()=>setWager(entry?String(entry.wager):''),[c.answeringId,entry?.wager]);
-  const validWager=wager.trim()!==''&&Number.isInteger(Number(wager))&&Number(wager)>=0&&Number(wager)<=1e7;
-  return <div className="host-question">
-    <div className="question-meta"><span>{c.category}</span><span>Daily Double</span><IconButton title="Return to board" onClick={()=>void command('closeQuestion')}><X/></IconButton></div>
-    {c.phase==='wager'?<div className="daily-double-console">
-      <h2>Give it to another team.</h2><p>Record who selected the question and which opposing team they give it to. That team must answer.</p>
-      {g.players.length<2&&<p role="status">Add at least two teams to play this Daily Double.</p>}
-      <form onSubmit={e=>{e.preventDefault();void command('assignDailyDouble',{fromId:from,playerId:to});}}>
-        <div className="form-grid"><Field label="Selected by"><select value={from} onChange={e=>{setFrom(e.target.value);if(to===e.target.value)setTo('');}}><option value="">Choose selecting team</option>{g.players.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></Field>
-        <Field label="Must answer"><select value={to} onChange={e=>setTo(e.target.value)}><option value="">Choose another team</option>{g.players.filter(p=>p.id!==from).map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></Field></div>
-        <Button type="submit" disabled={g.paused||!from||!to||from===to||from===c.dailyDoubleFromId&&to===c.answeringId}>Confirm teams</Button>
-      </form>
-      {team&&c.dailyDoubleFromId&&<>
-        <div className="daily-double-assignment"><strong>{team.name} must answer.</strong><p>Give the wager options verbally. {team.name} chooses one and enters it on their phone, or you can record it below.</p></div>
-        <form className="inline-form" onSubmit={e=>{e.preventDefault();void command('hostWager',{playerId:team.id,wager:Number(wager)});}}><Field label="Chosen wager"><input type="number" min={0} max={1e7} step={1} value={wager} onChange={e=>setWager(e.target.value)}/></Field><Button type="submit" disabled={g.paused||!validWager}>{entry?'Update wager':'Record wager'}</Button></form>
-        <p role="status">{entry?`${number(entry.wager)} points chosen · confirm this matches an option you offered.`:`Waiting for ${team.name} to choose a wager.`}</p>
-        <Button variant="primary" disabled={g.paused||!entry?.submitted} onClick={()=>void command('finalBegin')}>Lock wager & open question<ArrowRight size={20}/></Button>
-      </>}
-    </div>:<>
-      <div className="daily-double-assignment"><strong>{team?.name||'Assigned team'} must answer.</strong><span>{number(entry?.wager||0)} points at stake</span></div>
-      <div className="host-clue"><RichText text={q.prompt}/><AnswerChoices question={q}/></div>
-      <div className="judging-console"><span>{c.closed?'Answer judged':`${team?.name||'Assigned team'} has the floor`}</span><div className="judge-buttons"><Button disabled={g.paused||c.closed||!team} onClick={()=>void command('judge',{correct:false})}><X size={24}/>Incorrect / no answer</Button><Button variant="primary" disabled={g.paused||c.closed||!team} onClick={()=>void command('judge',{correct:true})}><Check size={24}/>Correct</Button></div></div>
-    </>}
-    <div className="host-answer"><div className="answer-heading"><span className="eyebrow">{c.phase==='wager'?'Host preview':'Answer · host only'}</span>{c.phase!=='wager'&&<Button disabled={!!c.revealAt} onClick={()=>void command('reveal')}>{c.revealed?'Revealed':'Reveal answer'}</Button>}</div>{c.phase==='wager'&&<><RichText text={q.prompt}/><AnswerChoices question={q}/><hr/></>}<RichText text={q.answer}/>{q.notes&&<div className="host-notes"><RichText text={q.notes}/></div>}</div>
-    <div className="question-next"><Button onClick={()=>void command('closeQuestion')}>Back to board<ArrowRight size={20}/></Button></div>
-  </div>;
+const validWager=(value:string)=>value.trim()!==''&&Number.isInteger(Number(value))&&Number(value)>=0&&Number(value)<=1e7;
+
+function TeamChoices({g,exclude,disabled,onChoose}:{g:GameView;exclude?:string;disabled:boolean;onChoose:(id:string)=>void}){
+  return <div className="dd-team-choices">{g.players.filter(p=>p.id!==exclude).map(p=><Button key={p.id} disabled={disabled} onClick={()=>onChoose(p.id)}><i className="player-marker" style={{background:p.color}}/>{p.name}<ArrowRight size={20}/></Button>)}</div>;
 }
 
-export function PlayerDailyDouble({g,command}:{g:GameView;command:Command}){
-  const c=g.current!,q=g.currentQuestion!,selected=c.answeringId===g.selfId;
-  const[wager,setWager]=useState('');
-  const valid=wager.trim()!==''&&Number.isInteger(Number(wager))&&Number(wager)>=0&&Number(wager)<=1e7;
-  return <section className="phone-daily-double"><DailyDoubleStatus g={g}/>
-    {c.phase==='wager'&&selected&&!g.yourFinal&&<form className="player-wager" onSubmit={e=>{e.preventDefault();void command('wager',{wager:Number(wager)});}}><Field label="Your chosen wager" hint="Enter one of the amounts the presenter offered verbally."><input type="number" min={0} max={1e7} step={1} value={wager} onChange={e=>setWager(e.target.value)}/></Field><Button variant="primary" disabled={!valid||g.paused}>Send choice to presenter<ArrowRight size={20}/></Button></form>}
-    {c.phase==='wager'&&selected&&g.yourFinal&&<p className="submitted">Choice sent. The presenter will confirm it and open the question.</p>}
-    {c.phase!=='wager'&&<>
-      {g.settings.showQuestionOnPhone&&<div className="phone-question"><RichText text={q.prompt}/><AnswerChoices question={q}/></div>}
-      {c.revealed?<div className="phone-answer"><span className="eyebrow">Answer</span><RichText text={q.answer}/></div>:<p>{selected?'Your team must answer aloud.':'The assigned team answers this question.'}</p>}
+export function HostDailyDouble({g,command}:{g:GameView;command:Command}){
+  const c=g.current!,q=g.currentQuestion!,step=dailyDoubleStep(c);
+  const from=g.players.find(p=>p.id===c.dailyDoubleFromId),team=g.players.find(p=>p.id===c.answeringId),entry=team?c.wagers[team.id]:undefined;
+  const[wager,setWager]=useState(''),[busy,setBusy]=useState(false);
+  useEffect(()=>setWager(entry?String(entry.wager):''),[c.answeringId,entry?.wager]);
+  const disabled=g.paused||busy;
+  const run=async(action:string,data?:Record<string,unknown>)=>{setBusy(true);try{return await command(action,data);}finally{setBusy(false);}};
+  const choose=(playerId:string)=>{void run('setDailyDoubleChooser',{playerId});};
+  return <div className="host-question daily-double">
+    <div className="question-meta"><span>{c.category}</span><span>Daily Double</span><IconButton title="Return to board" onClick={()=>void run('closeQuestion')} disabled={busy}><X/></IconButton></div>
+    <HostDailyDoubleStatus g={g}/>
+    {step==='chooser'&&<>{g.players.length<2?<p className="dd-notice">Add another team to play.</p>:<TeamChoices g={g} disabled={disabled} onChoose={choose}/>}</>}
+    {step==='opponent'&&from&&<TeamChoices g={g} exclude={from.id} disabled={disabled} onChoose={playerId=>void run('assignDailyDouble',{fromId:from.id,playerId})}/>}
+    {step==='wager'&&team&&<><p className="dd-notice">Offer the amounts aloud, then record {team.name}’s choice.</p><form className="dd-wager-form" onSubmit={async e=>{e.preventDefault();if(validWager(wager))await run('hostWager',{playerId:team.id,wager:Number(wager)});}}><Field label="Wager"><input autoFocus type="number" min={0} max={1e7} step={1} value={wager} onChange={e=>setWager(e.target.value)} disabled={disabled}/></Field><Button type="submit" variant="primary" disabled={disabled||!validWager(wager)}>Confirm wager<ArrowRight size={22}/></Button></form></>}
+    {step==='open'&&<Button className="dd-primary-action" variant="primary" disabled={disabled} onClick={()=>void run('finalBegin')}>Open question<ArrowRight size={22}/></Button>}
+    {(step==='answer'||step==='result')&&<>
+      <div className="host-clue"><RichText text={q.prompt}/><AnswerChoices question={q}/></div>
+      <div className="dd-answer"><h3>Answer</h3><RichText text={q.answer}/></div>
+      {step==='answer'?<div className="judge-buttons dd-judging"><Button disabled={disabled} onClick={()=>void run('judge',{correct:false})}><X size={24}/>Incorrect</Button><Button variant="primary" disabled={disabled} onClick={()=>void run('judge',{correct:true})}><Check size={24}/>Correct</Button></div>:<Button className="dd-primary-action" variant="primary" disabled={disabled} onClick={()=>void run('closeQuestion')}>Back to board<ArrowRight size={22}/></Button>}
     </>}
-  </section>;
+    {c.phase==='wager'&&<details className="dd-preview"><summary>Preview question & answer<ChevronDown size={20}/></summary><RichText text={q.prompt}/><AnswerChoices question={q}/><h3>Answer</h3><RichText text={q.answer}/>{q.notes&&<><h3>Notes</h3><RichText text={q.notes}/></>}</details>}
+    {q.notes&&c.phase!=='wager'&&<details className="dd-preview"><summary>Notes<ChevronDown size={20}/></summary><RichText text={q.notes}/></details>}
+    {c.phase==='wager'&&step!=='chooser'&&<details className="dd-corrections" key={`${c.dailyDoubleFromId}:${c.answeringId}`}><summary>Change<ChevronDown size={20}/></summary>
+      <h3>Choosing team</h3><TeamChoices g={g} disabled={disabled} onChoose={choose}/>
+      {from&&step!=='opponent'&&<><h3>Opponent</h3><TeamChoices g={g} exclude={from.id} disabled={disabled} onChoose={playerId=>void run('assignDailyDouble',{fromId:from.id,playerId})}/></>}
+      {team&&step==='open'&&<form className="dd-wager-form" onSubmit={async e=>{e.preventDefault();if(validWager(wager))await run('hostWager',{playerId:team.id,wager:Number(wager)});}}><Field label={`Wager for ${team.name}`}><input type="number" min={0} max={1e7} step={1} value={wager} onChange={e=>setWager(e.target.value)} disabled={disabled}/></Field><Button type="submit" disabled={disabled||!validWager(wager)}>Save wager<Check size={20}/></Button></form>}
+    </details>}
+  </div>;
 }

@@ -18,7 +18,7 @@ npm run play
 
 Use `npm run play` for game nights. Use `npm run dev` during development for hot reload.
 
-Open [localhost:43187](http://localhost:43187). Players open the LAN address printed in the terminal on the same Wi-Fi, choose their game from the list and tap **Join**. Invite links and QR codes open this game list; room codes are never shown. Open **Presenter** on your second screen.
+Open [localhost:43187](http://localhost:43187). Players open the LAN address printed in the terminal on the same Wi-Fi, choose their game from the list and tap **Join**. Invite links and QR codes open this game list; room codes are never shown. Open **Presenter** on your second screen. During play, phones show only scores and the circular buzzer. Teams speak their choices and answers to the presenter, who records them on the host screen.
 
 ## Local network security
 
@@ -66,19 +66,19 @@ Game JSON contains these references, not the media bytes. Moving a game to anoth
 
 ## Daily Double: give it to another team
 
-Enable **Daily Double** on a question during preparation. When the presenter opens that cell, record the team that selected it and a different team they give it to, then choose **Confirm teams**. The receiving team must answer; buzzers stay closed throughout.
+Enable **Daily Double** on a question during preparation. The presenter records each step on the host screen: which team chose the cell, which opponent that team names aloud, and the wager chosen aloud by the receiving team. Team and wager controls appear one step at a time. The room display shows a Daily Double card with the category, team matchup and confirmed wager; opening the question replaces the card with the clue and keeps those details visible. Phones keep the same score and buzzer screen throughout the game. Buzzers stay closed.
 
-The presenter offers wager amounts verbally. The assigned team chooses one and enters it on their phone; the presenter can also record or correct that choice. Options are not configured or stored as a list. The host checks the chosen amount matches an offered option, then selects **Lock wager & open question**. Only the assigned team is judged, using **Correct** or **Incorrect / no answer**. An incorrect answer loses its wager, including when normal wrong-answer deductions are disabled.
+The presenter offers wager amounts aloud. The receiving team states its choice and the presenter records it with **Confirm wager**, then selects **Open question**, then judges **Correct** or **Incorrect**. Only the receiving team's score changes; an incorrect answer loses the wager even when normal wrong-answer deductions are disabled. Wagers use whole point amounts from 0 to 10,000,000, independent of current score and the Final wager limit.
 
-Daily Double wagers are whole point amounts from 0 to 10,000,000, independent of current score and the Final wager limit. Reassigning before opening clears the previous team's wager. Assignment, stake and progress survive reload/restart; undo can correct judging. Legacy unfinished Daily Doubles return to the new assignment step when loaded. Final-round private wagers and answers keep their existing flow.
+On the host screen, **Change** lets the presenter correct earlier choices. Changing teams clears the previous wager. The question and answer are tucked under **Preview question & answer** until the clue opens. Assignment and wager progress survive reload/restart. For the final round, the presenter records spoken wagers with the existing score limit and judges answers given aloud.
 
 ## Hidden modifiers
 
 In **Edit → Questions**, open a cell and choose **Modifier** below the question. Enter its title and what it does, including any duration (for example, “Approximate answers allowed for the next 3 rounds”). The cell keeps its normal board value.
 
-When selected, the presenter and phones show a mystery modifier with buzzers open. The first player or team to buzz claims it, then its instructions are revealed. No points change automatically: edit scores from the host screen as needed. Claimed modifiers stay in the host’s reminders and on the winner’s phone until the host dismisses them.
+When selected, the presenter shows a mystery modifier and the phone buzzers open. The first player or team to buzz claims it, then its instructions are revealed. No points change automatically: edit scores from the host screen as needed. Claimed modifiers stay in the host’s reminders until the host dismisses them.
 
-The presenter selects every question from the host board. The chosen tile briefly highlights on both boards before opening, and phones show the selected category and value. Buzzers stay closed during this cue, including for hidden modifiers. A two-note selection chime plays from the host; its speaker button mutes it. The presenter display starts muted and can enable sound separately. Choices last for the browser tab. Motion preferences use a static highlight instead of a pulse. Questions, answers and the final have no countdowns or time limits; the presenter opens/closes buzzers and reveals answers when ready. Older timer settings are ignored. A team can join with one phone under its team name.
+The presenter selects every question from the host board. The chosen tile briefly highlights on both boards before opening, while phones keep the score and buzzer. Buzzers stay closed during this cue, including for hidden modifiers. A two-note selection chime plays from the host; its speaker button mutes it. The presenter display starts muted and can enable sound separately. Choices last for the browser tab. Motion preferences use a static highlight instead of a pulse. Questions, answers and the final have no countdowns or time limits; the presenter opens/closes buzzers and reveals answers when ready. Older timer settings are ignored. A team can join with one phone under its team name.
 
 Older game files still import their questions, settings and appearance; the former automated modifier rules are no longer used.
 
@@ -88,7 +88,7 @@ Each game lives in its own JSON file under **`data/games/`**. The server reads e
 
 You can put an exported game JSON directly into this directory and restart the server. It becomes a saved game in that same file. Open Dibs from any device on the local network and click **Host** to play a game added this way. No ownership claim is needed. Phones join from the game list as usual.
 
-To replay a board, open **More → Reset game** on the host page and confirm. It clears all players, scores, played questions, wagers, claimed modifiers and activity, then returns to the lobby. Questions, settings and appearance stay the same. Players join again from the local game list. Reset cannot be undone.
+To replay a board, click **Reset game** in the center of the host page header and confirm. It clears all players, scores, played questions, wagers, claimed modifiers and activity, then returns to the lobby. Questions, settings and appearance stay the same. Players join again from the local game list. Reset cannot be undone.
 
 To delete a game, open the home list and click the trash button beside **Edit**, then confirm the game name. This removes its JSON file and ends access for connected players and presenter screens. Anyone can delete a game when it is not being edited.
 

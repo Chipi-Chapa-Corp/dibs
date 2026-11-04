@@ -10,7 +10,7 @@ import {demoRounds} from '../shared/model.ts';
 import type {GameView} from '../shared/model.ts';
 const once=(s:Socket,event:string)=>new Promise<any>(resolve=>s.once(event,resolve));
 const emit=(s:Socket,event:string,data:unknown)=>new Promise<any>((resolve,reject)=>s.timeout(3000).emit(event,data,(err:Error,result:unknown)=>err?reject(err):resolve(result)));
-test('Daily Double host assignment, phone wager and mandatory answer synchronize across real clients',async()=>{
+test('Daily Double spoken choices are recorded by presenter and synchronized to read-only phones',async()=>{
  const dir=mkdtempSync(join(tmpdir(),'dibs-daily-network-')),server=await startServer({port:0,dataDir:dir,dev:false,quiet:true}),sockets:Socket[]=[];
  try{
   const base=`http://127.0.0.1:${(server.server.address()as{port:number}).port}`;
@@ -21,10 +21,17 @@ test('Daily Double host assignment, phone wager and mandatory answer synchronize
   const host=await connect('host'),selecting=await connect('player',a.token),answering=await connect('player',b.token),stage=await connect('stage');
   const command=(s:Socket,action:string,data?:unknown)=>emit(s,'command',{action,data});
   await command(host.s,'start');await command(host.s,'openQuestion',{questionId:rounds[0].categories[0].questions[0].id});
-  await command(host.s,'assignDailyDouble',{fromId:a.playerId,playerId:b.playerId});
+  assert.equal((await command(host.s,'setDailyDoubleChooser',{playerId:a.playerId})).ok,true);
+  await waitState(selecting,v=>v.current?.dailyDoubleFromId===a.playerId&&!v.current?.answeringId);
+  await waitState(stage,v=>v.current?.dailyDoubleFromId===a.playerId&&!v.current?.answeringId);
+  assert.equal((await command(answering.s,'chooseDailyDoubleOpponent',{playerId:a.playerId})).ok,false);
+  assert.equal((await command(selecting.s,'chooseDailyDoubleOpponent',{playerId:b.playerId})).ok,false);
+  assert.equal((await command(host.s,'assignDailyDouble',{fromId:a.playerId,playerId:b.playerId})).ok,true);
+  assert.equal((await command(selecting.s,'chooseDailyDoubleOpponent',{playerId:b.playerId})).ok,false);
   await waitState(answering,v=>v.current?.answeringId===b.playerId);assert.equal(answering.state().current?.dailyDoubleFromId,a.playerId);
   assert.equal((await command(selecting.s,'wager',{wager:750})).ok,false);
-  assert.equal((await command(answering.s,'wager',{wager:750})).ok,true);
+  assert.equal((await command(answering.s,'wager',{wager:750})).ok,false);
+  assert.equal((await command(host.s,'hostWager',{playerId:b.playerId,wager:750})).ok,true);
   await waitState(host,v=>v.current?.wagers[b.playerId]?.wager===750);await waitState(stage,v=>v.current?.wagers[b.playerId]?.wager===750);
   assert.equal(stage.state().currentQuestion?.prompt,'');assert.equal(answering.state().yourFinal?.wager,750);
   await command(host.s,'finalBegin');await waitState(stage,v=>v.current?.phase==='question');
@@ -92,10 +99,11 @@ test('editing locks serialize editors, protect uploads, and hand off automatical
   await waitState(second,v=>v.editLock==='mine');assert.equal(second.state().name,'First editor’s work');
   assert.equal((await fetch(`${base}/api/games/${created.id}/media`,{method:'POST',headers:{'X-Editor-Id':staleEditorId,'Content-Type':'application/json'},body:'{}'})).status,409);
   assert.equal((await emit(second.s,'command',{action:'save',data:{name:'Second editor’s work'}})).ok,true);
-  assert.equal((await emit(second.s,'subscribe',{gameId:created.id,role:'host',editing:false})).ok,true);
+  assert.equal((await emit(second.s,'subscribe',{gameId:created.id,role:'stage'})).ok,true);
   await waitState(host,v=>v.editLock===null);
   assert.equal((await emit(host.s,'command',{action:'start'})).ok,true);
-  assert.equal((await emit(second.s,'command',{action:'pause'})).ok,true);
+  assert.equal((await emit(second.s,'command',{action:'pause'})).ok,false);
+  assert.equal((await emit(host.s,'command',{action:'pause'})).ok,true);
   assert.equal(server.games.get(created.id)!.name,'Second editor’s work');
   assert.equal((await fetch(`${base}/api/games/${created.id}`,{method:'DELETE'})).status,200);
  }finally{sockets.forEach(s=>s.disconnect());await server.close();if(uploaded)rmSync(uploaded,{force:true});rmSync(dir,{recursive:true,force:true});}
@@ -115,13 +123,51 @@ test('editing locks are per game, release on resubscription, and do not survive 
   assert.equal((await fetch(`${base}/api/games/${b}`,{method:'DELETE'})).status,200);
  }finally{sockets.forEach(s=>s.disconnect());await server.close();rmSync(dir,{recursive:true,force:true});}
 });
+test('hosting locks admit one host, release on navigation or disconnect, and reset after restart',async()=>{
+ const dir=mkdtempSync(join(tmpdir(),'dibs-host-lock-'));let server=await startServer({port:0,dataDir:dir,dev:false,quiet:true});const sockets:Socket[]=[];
+ try{
+  let base=`http://127.0.0.1:${(server.server.address()as{port:number}).port}`;
+  const create=async(name:string)=>(await (await fetch(base+'/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,definition:{rounds:demoRounds()}})})).json()).id;
+  const a=await create('Game A'),b=await create('Game B');
+  const listed=async()=>(await fetch(base+'/api/games')).json();
+  const connect=async()=>{const s=io(base,{autoConnect:false,transports:['websocket']});sockets.push(s);s.connect();await once(s,'connect');return s;};
+  const first=await connect(),second=await connect();
+  const attempts=await Promise.all([first,second].map(s=>emit(s,'subscribe',{gameId:a,role:'host'})));
+  assert.equal(attempts.filter(result=>result.ok).length,1);
+  const host=attempts[0].ok?first:second,other=host===first?second:first;
+  assert.match(attempts.find(result=>!result.ok).error,/already hosting/);
+  assert.equal((await listed()).find((g:{id:string})=>g.id===a).hosting,true);
+  assert.equal((await emit(other,'command',{action:'start'})).ok,false);
+  assert.equal((await emit(host,'subscribe',{gameId:a,role:'host'})).ok,true);
+  // Editing and hosting have independent locks; editors cannot send gameplay commands.
+  assert.equal((await emit(other,'subscribe',{gameId:a,role:'host',editing:true})).ok,true);
+  assert.equal((await emit(other,'command',{action:'reset'})).ok,false);
+  assert.equal((await emit(other,'command',{action:'save',data:{name:'Edited while hosted'}})).ok,true);
+  assert.equal((await emit(other,'subscribe',{gameId:a,role:'stage'})).ok,true);
+  assert.equal((await listed()).find((g:{id:string})=>g.id===a).hosting,true);
+  // Moving to another game frees the old game immediately.
+  assert.equal((await emit(host,'subscribe',{gameId:b,role:'host'})).ok,true);
+  const moved=await listed();assert.equal(moved.find((g:{id:string})=>g.id===a).hosting,false);assert.equal(moved.find((g:{id:string})=>g.id===b).hosting,true);
+  assert.equal((await emit(other,'subscribe',{gameId:a,role:'host'})).ok,true);
+  // Moving from the host screen to the editor also frees hosting.
+  assert.equal((await emit(other,'subscribe',{gameId:a,role:'host',editing:true})).ok,true);
+  assert.equal((await listed()).find((g:{id:string})=>g.id===a).hosting,false);
+  assert.equal((await emit(other,'subscribe',{gameId:a,role:'host'})).ok,true);
+  const released=new Promise<void>(resolve=>host.on('games',list=>{if(list.some((g:{id:string;hosting:boolean})=>g.id===a&&!g.hosting))resolve();}));
+  other.disconnect();await released;
+  assert.equal((await emit(host,'subscribe',{gameId:a,role:'host'})).ok,true);
+  await server.close();server=await startServer({port:0,dataDir:dir,dev:false,quiet:true});base=`http://127.0.0.1:${(server.server.address()as{port:number}).port}`;
+  assert((await listed()).every((g:{hosting:boolean})=>!g.hosting));
+  const newHost=await connect();assert.equal((await emit(newHost,'subscribe',{gameId:a,role:'host'})).ok,true);
+ }finally{sockets.forEach(s=>s.disconnect());await server.close();rmSync(dir,{recursive:true,force:true});}
+});
 test('real clients: discovery, open hosting, concurrent buzzes, synchronized scores, redaction, reconnect and persistence',async()=>{
  const dir=mkdtempSync(join(tmpdir(),'jeopardy-test-'));const server=await startServer({port:0,dataDir:dir,dev:false,quiet:true});let sockets:Socket[]=[];let restarted:Awaited<ReturnType<typeof startServer>>|null=null;
  try{const port=(server.server.address()as{port:number}).port;const base=`http://127.0.0.1:${port}`;const request=async(path:string,data?:unknown)=>{const r=await fetch(base+path,{method:data?'POST':'GET',headers:{'Content-Type':'application/json'},body:data?JSON.stringify(data):undefined});return r.json();};
  const rounds=demoRounds(),mystery=rounds[0].categories[0].questions[1];mystery.prompt='';mystery.modifier={title:'Trading places',instructions:'Swap your score with another team.'};
- const created=await request('/api/games',{name:'Network test',definition:{rounds}});const listed=await request('/api/games');assert.equal(listed[0].id,created.id);assert(!('hostToken' in created));
+ const created=await request('/api/games',{name:'Network test',definition:{rounds,settings:{buzzMode:'first'}}});const listed=await request('/api/games');assert.equal(listed[0].id,created.id);assert(!('hostToken' in created));
  const pa=await request(`/api/games/${created.id}/join`,{name:'Ada'}),pb=await request(`/api/games/${created.id}/join`,{name:'Bea'});const connect=async(role:string,token?:string)=>{const s=io(base,{transports:['websocket'],autoConnect:false});sockets.push(s);s.connect();await once(s,'connect');let state:GameView; s.on('state',v=>state=v);const sub=await emit(s,'subscribe',{gameId:created.id,role,token});return{s,sub,state:()=>state!};};
- const host=await connect('host'),a=await connect('player',pa.token),b=await connect('player',pb.token),stage=await connect('stage');assert(host.sub.ok&&a.sub.ok&&b.sub.ok&&stage.sub.ok);const anotherHost=await connect('host');assert.equal(anotherHost.sub.ok,true);
+ const host=await connect('host'),a=await connect('player',pa.token),b=await connect('player',pb.token),stage=await connect('stage');assert(host.sub.ok&&a.sub.ok&&b.sub.ok&&stage.sub.ok);const anotherHost=await connect('host');assert.equal(anotherHost.sub.ok,false);assert.equal((await emit(anotherHost.s,'command',{action:'start'})).ok,false);
  assert.equal((await emit(a.s,'command',{action:'adjust',data:{playerId:pa.playerId,amount:99999}})).ok,false);
  const q=host.state().rounds[0].categories[0].questions[0];assert.equal(stage.state().rounds[0].categories[0].questions[0].answer,'');
  await emit(host.s,'command',{action:'start'});await emit(host.s,'command',{action:'selectQuestion',data:{questionId:q.id}});
@@ -285,8 +331,10 @@ test('library preparation saves before hosting; stale editors cannot change a ru
   assert.deepEqual(before.rounds[0].categories[0].questions[0].answerOptions,['First choice','Correct choice','Third choice']);assert.equal(before.rounds[0].categories[0].questions[0].answer,'Correct choice');assert.equal(before.rounds[0].categories[0].questions[0].correctAnswerIndex,1);
   const list=await (await fetch(base+'/api/games')).json();assert.equal(list.find((g:{id:string})=>g.id===created.id).questionTotal,41);
   const player=await post(`/api/games/${created.id}/join`,{name:'Ada'});
-  assert.equal((await emit(editor,'subscribe',{gameId:created.id,role:'host',editing:false})).ok,true);
+  assert.equal((await emit(editor,'subscribe',{gameId:created.id,role:'host',editing:false})).ok,false);
+  assert.equal((await emit(editor,'subscribe',{gameId:created.id,role:'stage'})).ok,true);
   await emit(host,'command',{action:'start'});await emit(host,'command',{action:'adjust',data:{playerId:player.playerId,amount:700}});
+  assert.equal((await emit(editor,'subscribe',{gameId:created.id,role:'host',editing:true})).ok,true);
   const rejected=await emit(editor,'command',{action:'save',data:{rounds:[],name:'Must not change',settings:{startingScore:999},theme:{title:'Must not change'}}});
   assert.equal(rejected.ok,false);assert.match(rejected.error,/Make a copy to edit/);
   assert.equal((await fetch(`${base}/api/games/${created.id}/media`,{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'})).status,400);

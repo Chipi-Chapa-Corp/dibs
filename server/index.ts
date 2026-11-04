@@ -26,6 +26,7 @@ export async function startServer(options:{port?:number;dataDir?:string;dev?:boo
   server.headersTimeout=15000;server.requestTimeout=120000;
   const connections=new Set<NetSocket>();
   const editLocks=new Map<string,string>();
+  const hostLocks=new Map<string,string>();
   server.on('connection',socket=>{connections.add(socket);socket.once('close',()=>connections.delete(socket));});
   const saveNow=()=>{for(const id of dirty){const game=games.get(id);if(game)storage.save(game);dirty.delete(id);}};
   const save=(game:Game)=>{dirty.add(game.id);if(stopping)return;if(saveHandle)clearTimeout(saveHandle);saveHandle=setTimeout(saveNow,150);};
@@ -35,7 +36,7 @@ export async function startServer(options:{port?:number;dataDir?:string;dev?:boo
     const next=[...io.sockets.sockets.values()].find(s=>s.connected&&s.id!==exclude&&s.data.gameId===g.id&&s.data.editing);
     if(next)editLocks.set(g.id,next.id);
   };
-  const summaries=():GameSummary[]=>[...games.values()].map(g=>({id:g.id,name:g.name,subtitle:g.subtitle,status:g.status,playerCount:g.players.length,questionTotal:g.rounds.reduce((total,r)=>total+r.categories.reduce((total,c)=>total+c.questions.filter(isQuestionFilled).length,0),0),rounds:g.rounds.length,accent:g.theme.accent,createdAt:g.createdAt,editing:editLocks.has(g.id)})).sort((a,b)=>b.createdAt-a.createdAt);
+  const summaries=():GameSummary[]=>[...games.values()].map(g=>({id:g.id,name:g.name,subtitle:g.subtitle,status:g.status,playerCount:g.players.length,questionTotal:g.rounds.reduce((total,r)=>total+r.categories.reduce((total,c)=>total+c.questions.filter(isQuestionFilled).length,0),0),rounds:g.rounds.length,accent:g.theme.accent,createdAt:g.createdAt,editing:editLocks.has(g.id),hosting:hostLocks.has(g.id)})).sort((a,b)=>b.createdAt-a.createdAt);
   const publish=(g:Game,removedMessage='You were removed from this game')=>{grantWaitingEditor(g);for(const s of io.sockets.sockets.values())if(s.data.gameId===g.id){if(s.data.role==='player'&&!g.players.some(p=>p.id===s.data.playerId)){s.emit('revoked',removedMessage);s.data={};continue;}s.emit('state',{...view(g,s.data.role,s.data.playerId),editLock:editLocks.has(g.id)?editLocks.get(g.id)===s.id?'mine':'other':null});}io.emit('games',summaries());save(g);};
   const game=(id:string)=>{const g=games.get(id.toUpperCase());if(!g)throw new Error('Game not found');return g;};
   app.disable('x-powered-by');
@@ -60,6 +61,7 @@ export async function startServer(options:{port?:number;dataDir?:string;dev?:boo
     editLocks.delete(gameId);
     const g=games.get(gameId);if(g)grantWaitingEditor(g,socketId);
   };
+  const releaseHost=(gameId:string,socketId:string)=>{if(hostLocks.get(gameId)===socketId)hostLocks.delete(gameId);};
   app.get('/api/health',(_req,res)=>res.json({ok:true,app:'dibs'}));
   app.get('/api/network',(_req,res)=>{const port=(server.address()as{port:number})?.port;res.json({port,addresses:network.lan?[`http://${network.lan.address}:${port}`]:[]});});
   app.get('/api/games',(_req,res)=>res.json(summaries()));
@@ -69,7 +71,7 @@ export async function startServer(options:{port?:number;dataDir?:string;dev?:boo
   app.delete('/api/games/:id',(req,res,next)=>{
     try{
       const g=game(String(req.params.id));requireUnlocked(g);
-      storage.remove(g.id);dirty.delete(g.id);editLocks.delete(g.id);
+      storage.remove(g.id);dirty.delete(g.id);editLocks.delete(g.id);hostLocks.delete(g.id);
       for(const socket of io.sockets.sockets.values())if(socket.data.gameId===g.id){
         socket.emit('deleted','This game was deleted by the host.');socket.data={};
       }
@@ -103,8 +105,12 @@ export async function startServer(options:{port?:number;dataDir?:string;dev?:boo
         if(!['host','player','stage'].includes(input.role))throw new Error('Unknown role');
         const p=input.role==='player'?g.players.find(p=>p.token===input.token):undefined;
         if(input.role==='player'&&!p)throw new Error('Join the game first');
+        const hosting=input.role==='host'&&input.editing!==true;
+        if(hosting&&hostLocks.has(g.id)&&hostLocks.get(g.id)!==s.id)throw new Error('Someone is already hosting this game.');
         const previousId=s.data.gameId;
         s.data={gameId:g.id,role:input.role,playerId:p?.id,editing:input.role==='host'&&input.editing===true};
+        if(previousId&&(previousId!==g.id||!hosting))releaseHost(previousId,s.id);
+        if(hosting)hostLocks.set(g.id,s.id);
         if(previousId&&(previousId!==g.id||!s.data.editing)){
           releaseEdit(previousId,s.id);
           const previous=games.get(previousId);if(previous&&previousId!==g.id)publish(previous);
@@ -119,6 +125,7 @@ export async function startServer(options:{port?:number;dataDir?:string;dev?:boo
         const g=game(s.data.gameId||'');
         if(!['host','player'].includes(s.data.role))throw new Error('Join as a host or player');
         if(input.action==='save')requireEditor(g,s.id);
+        else if(s.data.role==='host'&&hostLocks.get(g.id)!==s.id)throw new Error('Open the host screen to control this game.');
         if(input.action==='start')requireUnlocked(g);
         act(g,input.action,input.data||{},s.data.role,s.data.playerId||null);
         publish(g,input.action==='reset'?'The host reset this game. Join again to play.':undefined);ack?.({ok:true});
@@ -127,6 +134,7 @@ export async function startServer(options:{port?:number;dataDir?:string;dev?:boo
     s.on('disconnect',()=>{
       const g=games.get(s.data.gameId);if(!g)return;
       releaseEdit(g.id,s.id);
+      releaseHost(g.id,s.id);
       const p=g.players.find(p=>p.id===s.data.playerId);
       if(p&&![...io.sockets.sockets.values()].some(other=>other.data.gameId===g.id&&other.data.playerId===p.id))p.connected=false;
       publish(g);

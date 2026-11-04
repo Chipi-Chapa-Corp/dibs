@@ -25,7 +25,7 @@ export function normalizeSettings(data:Input,old=defaultSettings):Settings {
   const s={...defaultSettings};for(const key of Object.keys(defaultSettings)as(keyof Settings)[]){const value=key in data?data[key]:old[key];if(value===undefined)continue;const def=defaultSettings[key];if(typeof def==='boolean')(s as Input)[key]=!!value;else if(typeof def==='number')(s as Input)[key]=finite(value,Number(def));else (s as Input)[key]=text(value,32);}
   s.revealDelayMs=finite(s.revealDelayMs,900,0,10000);s.earlyPenaltyMs=finite(s.earlyPenaltyMs,750,0,10000);
   s.correctMultiplier=finite(s.correctMultiplier,1,0,100);s.wrongMultiplier=finite(s.wrongMultiplier,1,0,100);
-  if(!['first','queue'].includes(s.buzzMode))s.buzzMode='first';if(!['score','unlimited'].includes(s.finalMaxWager))s.finalMaxWager='score';return s;
+  if(!['first','queue'].includes(s.buzzMode))s.buzzMode=defaultSettings.buzzMode;if(!['score','unlimited'].includes(s.finalMaxWager))s.finalMaxWager='score';return s;
 }
 /** Discard retired settings and countdown fields in saved games and undo snapshots. */
 export function normalizeStoredGameplay(state:Pick<Game,'settings'|'rounds'|'current'>&Partial<Pick<Game,'selection'|'roundIndex'>>){
@@ -126,7 +126,7 @@ export function act(g:Game,action:string,data:Input={},role:'host'|'player'='hos
     c!.buzzes.push({playerId:playerId!,at:now,order:c!.buzzes.length+1});self!.stats.buzzes++;if(!c!.answeringId){c!.answeringId=playerId;if(g.settings.buzzMode==='first')c!.buzzOpen=false;}g.revision++;return;
   }
   if(action==='wager'){
-    assert(g.status==='playing'&&!g.paused,'Game is not running');const c=g.current,q=currentQuestion(g);assert(c&&c.phase==='wager'&&self,'Wagers are closed');if(q?.dailyDouble){assert(c!.dailyDoubleFromId&&c!.answeringId===playerId,'Only the assigned team can choose a wager');assert(Number.isInteger(data.wager)&&data.wager>=0&&data.wager<=1e7,'Enter a wager between 0 and 10000000');}assert(!c!.wagers[playerId!]?.submitted,'Wager is already submitted; ask the presenter to correct it');const max=q?.dailyDouble||g.settings.finalMaxWager==='unlimited'?1e7:Math.max(0,self!.score);const wager=Math.round(finite(data.wager,0,0,max));c!.wagers[playerId!]={wager,answer:'',submitted:true,judged:false};g.revision++;return;
+    assert(g.status==='playing'&&!g.paused,'Game is not running');const c=g.current,q=currentQuestion(g);assert(c&&c.phase==='wager'&&self,'Wagers are closed');assert(!q?.dailyDouble,'The presenter records Daily Double wagers');assert(!c!.wagers[playerId!]?.submitted,'Wager is already submitted; ask the presenter to correct it');const max=g.settings.finalMaxWager==='unlimited'?1e7:Math.max(0,self!.score);const wager=Math.round(finite(data.wager,0,0,max));c!.wagers[playerId!]={wager,answer:'',submitted:true,judged:false};g.revision++;return;
   }
   if(action==='finalAnswer'){
     assert(g.status==='playing'&&!g.paused,'Game is not running');const c=g.current;assert(c&&c.phase==='final'&&!c.revealAt&&!c.revealed&&!c.closed,'Answers are closed');const entry=c!.wagers[playerId!];assert(entry,'Submit your wager first');entry.answer=text(data.answer,5000);entry.submitted=true;g.revision++;return;
@@ -151,6 +151,13 @@ export function act(g:Game,action:string,data:Input={},role:'host'|'player'='hos
       case'closeBuzzers':assert(c,'No question');c!.buzzOpen=false;label='Buzzers closed';break;
       case'resetBuzzers':assert(!q?.dailyDouble,'Daily Double has one required answerer');assert(c&&c.phase==='question'&&!c.revealed&&!c.revealAt&&!c.closed,'Question is closed');c!.buzzes=[];c!.answeringId=null;c!.attempted=[];c!.buzzOpen=true;label='Buzzers reset';break;
       case'answerer':assert(!q?.dailyDouble,'Daily Double has one required answerer');assert(c&&c.phase==='question'&&!c.closed&&!c.revealAt,'No active question');assert(g.players.some(p=>p.id===data.playerId),'Choose a player');c!.answeringId=data.playerId;c!.buzzOpen=false;label='Answering player changed';break;
+      case'setDailyDoubleChooser':{
+        assert(g.status==='playing'&&!g.paused&&c?.phase==='wager'&&q?.dailyDouble,'No Daily Double awaiting assignment');
+        assert(g.players.length>=2,'Add at least two teams to play this Daily Double');
+        const from=g.players.find(p=>p.id===data.playerId);assert(from,'Choose the team that selected this question');
+        c!.dailyDoubleFromId=from!.id;c!.answeringId=null;c!.wagers={};c!.buzzOpen=false;c!.buzzes=[];
+        label=`${from!.name} is choosing a Daily Double opponent`;break;
+      }
       case'assignDailyDouble':{
         assert(g.status==='playing'&&!g.paused&&c?.phase==='wager'&&q?.dailyDouble,'No Daily Double awaiting assignment');
         const from=g.players.find(p=>p.id===data.fromId),to=g.players.find(p=>p.id===data.playerId);
@@ -163,7 +170,7 @@ export function act(g:Game,action:string,data:Input={},role:'host'|'player'='hos
         assert(c?.phase!=='modifier','Modifiers are applied manually');
         assert(g.status==='playing'&&!g.paused&&c&&q&&!c.closed,'No active question');assert(c!.phase!=='wager','Finish wagering first');const p=g.players.find(p=>p.id===(data.playerId||c!.answeringId));assert(p,'Choose a player');const isFinal=g.rounds[g.roundIndex].type==='final',entry=c!.wagers[p!.id];if(q!.dailyDouble&&!isFinal)assert(p!.id===c!.answeringId&&c!.dailyDoubleFromId&&entry?.submitted,'Only the assigned team can answer the Daily Double');if(isFinal)assert(entry&&!entry.judged,'This final answer has already been judged');else assert(!c!.attempted.includes(p!.id),'This player has already answered');
         const amount=isFinal||q!.dailyDouble?(entry?.wager||0):q!.value;const correct=!!data.correct;const delta=correct?amount*g.settings.correctMultiplier:g.settings.deductWrong||isFinal||q!.dailyDouble?-amount*g.settings.wrongMultiplier:0;
-        setScore(g,p!,p!.score+delta);p!.stats[correct?'correct':'incorrect']++;if(isFinal){entry.judged=true;entry.correct=correct;}else{c!.attempted.push(p!.id);if(correct||q!.dailyDouble){c!.closed=true;reveal(g,now);}else{c!.answeringId=null;if(g.settings.lockWrong)c!.buzzes=c!.buzzes.filter(b=>b.playerId!==p!.id&&!c!.attempted.includes(b.playerId));else{c!.attempted=c!.attempted.filter(id=>id!==p!.id);c!.buzzes=[];}const queued=g.settings.buzzMode==='queue'?c!.buzzes.find(b=>!c!.attempted.includes(b.playerId)):null;if(queued){c!.answeringId=queued.playerId;}c!.buzzOpen=g.settings.reopenWrong&&!queued;}}
+        setScore(g,p!,p!.score+delta);p!.stats[correct?'correct':'incorrect']++;if(isFinal||q!.dailyDouble){entry.judged=true;entry.correct=correct;}if(!isFinal){c!.attempted.push(p!.id);if(correct||q!.dailyDouble){c!.closed=true;reveal(g,now);}else{c!.answeringId=null;if(g.settings.lockWrong)c!.buzzes=c!.buzzes.filter(b=>b.playerId!==p!.id&&!c!.attempted.includes(b.playerId));else{c!.attempted=c!.attempted.filter(id=>id!==p!.id);c!.buzzes=[];}const queued=g.settings.buzzMode==='queue'?c!.buzzes.find(b=>!c!.attempted.includes(b.playerId)):null;if(queued){c!.answeringId=queued.playerId;}c!.buzzOpen=g.settings.reopenWrong&&!queued;}}
         label=`${p!.name} · ${correct?'correct':'incorrect'}`;break;
       }
       case'reveal':assert(!(q?.dailyDouble&&c?.phase==='wager'),'Assign a team and lock the wager first');assert(c?.phase!=='modifier'||c.answeringId,'Wait for someone to claim the modifier');reveal(g,now);label='Answer revealed';break;
