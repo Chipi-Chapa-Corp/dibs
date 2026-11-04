@@ -203,7 +203,26 @@ function ModifierReminders({g,command,onAdjust}:{g:GameView;command:Command;onAd
 
 function Stage({id}:{id:string}){const{g,error}=useGame(id,'stage');useEffect(()=>{document.title=g?`${g.name} · Presenter`:'Presenter';},[g?.name]);return g?<StageContent g={g}/>:<LoadError error={error}/>;}
 function PlayerEntry({id}:{id:string}){const[hasToken,setHasToken]=useState(!!playerKey(id));return hasToken?<PlayerGame id={id} rejoin={()=>{localStorage.removeItem(`jeopardy:player:${id}`);setHasToken(false);}}/>:<JoinGame id={id} joined={()=>setHasToken(true)}/>;}
-function JoinGame({id,joined}:{id:string;joined:()=>void}){const[g,set]=useState<GameView|null>(null),[name,setName]=useState(localStorage.getItem('jeopardy:name')||''),[busy,setBusy]=useState(false),[error,setError]=useState('');useEffect(()=>{api(`/api/games/${id}`).then(set).catch(e=>setError(e.message));},[id]);const toast=useToast();return <div className="join-page" style={g?themeStyle(g.theme):undefined}><header><Logo/><AppLink href="/play"><ArrowLeft size={20}/>Games</AppLink></header>{error?<Empty>{error}</Empty>:!g?<Empty>Connecting…</Empty>:<main><h1>{g.name}</h1><form onSubmit={async e=>{e.preventDefault();setBusy(true);try{const p=await api(`/api/games/${id}/join`,{name});localStorage.setItem(`jeopardy:player:${id}`,p.token);localStorage.setItem('jeopardy:name',name);joined();}catch(e){toast((e as Error).message);}finally{setBusy(false);}}}><Field label="Your name"><input autoFocus value={name} onChange={e=>setName(e.target.value)} maxLength={32} required autoComplete="nickname"/></Field><Button variant="primary" disabled={busy||!name.trim()}>{busy?'Joining…':'Take a seat'}<ArrowRight size={22}/></Button></form></main>}</div>}
+function JoinGame({id,joined}:{id:string;joined:()=>void}){
+  const{g,error}=useGame(id,'stage');
+  const[name,setName]=useState(localStorage.getItem('jeopardy:name')||''),[busy,setBusy]=useState(false);
+  const existing=g?.players.find(p=>p.name.toLowerCase()===name.trim().toLowerCase());
+  const toast=useToast();
+  return <div className="join-page" style={g?themeStyle(g.theme):undefined}>
+    <header><Logo/><AppLink href="/play"><ArrowLeft size={20}/>Games</AppLink></header>
+    {error?<Empty>{error}</Empty>:!g?<Empty>Connecting…</Empty>:<main><h1>{g.name}</h1><form onSubmit={async e=>{
+      e.preventDefault();setBusy(true);
+      try{
+        const p=await api(`/api/games/${id}/join`,{name});
+        localStorage.setItem(`jeopardy:player:${id}`,p.token);localStorage.setItem('jeopardy:name',name);joined();
+      }catch(e){toast((e as Error).message);}finally{setBusy(false);}
+    }}>
+      <Field label="Your name"><input autoFocus value={name} onChange={e=>setName(e.target.value)} maxLength={32} required autoComplete="nickname"/></Field>
+      <Field label="Or join an existing group"><select value={existing?.id||''} onChange={e=>setName(g.players.find(p=>p.id===e.target.value)?.name||'')}><option value="">New name</option>{g.players.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></Field>
+      <Button variant="primary" disabled={busy||!name.trim()}>{busy?'Joining…':'Take a seat'}<ArrowRight size={22}/></Button>
+    </form></main>}
+  </div>;
+}
 function PlayerGame({id,rejoin}:{id:string;rejoin:()=>void}){
   const{g,connected,error,deleted,command}=useGame(id,'player');
   const now=useNow(),self=g?.players.find(p=>p.id===g.selfId),c=g?.current;

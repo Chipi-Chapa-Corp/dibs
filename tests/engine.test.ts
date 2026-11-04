@@ -3,6 +3,14 @@ import assert from 'node:assert/strict';
 import {act,addPlayer,createGame,tick,updateDefinition,view} from '../server/engine.ts';
 import {demoRounds,emptyQuestion,emptyRound,nextBoardValue} from '../shared/model.ts';
 function fixture(){const g=createGame({name:'Test',definition:{rounds:demoRounds()}});const a=addPlayer(g,'Ada'),b=addPlayer(g,'Bea'),c=addPlayer(g,'Cam');act(g,'start');return{g,a,b,c,q:g.rounds[0].categories[0].questions[0]};}
+test('joining an existing name reuses the group without resetting its state',()=>{
+ const {g,a}=fixture();
+ a.score=500;a.ready=true;a.blockedUntil=12345;a.stats.incorrect=1;
+ const revision=g.revision;
+ assert.equal(addPlayer(g,'  ADA  '),a);assert.equal(g.players.length,3);assert.equal(g.revision,revision);
+ assert.equal(a.name,'Ada');assert.equal(a.score,500);assert(a.ready);assert.equal(a.blockedUntil,12345);assert.equal(a.stats.incorrect,1);
+ act(g,'finish');assert.throws(()=>addPlayer(g,'Ada'),/ended/);
+});
 test('new games default to queued buzzes while explicit first-buzz settings are preserved',()=>{
  const {g,a,b,q}=fixture();assert.equal(g.settings.buzzMode,'queue');
  act(g,'openQuestion',{questionId:q.id});act(g,'openBuzzers');

@@ -50,6 +50,59 @@ async function waitState(client:{s:Socket;state:()=>GameView},predicate:(v:GameV
   client.s.on('state',changed);
  });
 }
+for(const buzzMode of ['queue','first']as const)test(`group phones share one score and wrong-answer lockout in ${buzzMode} mode, including after restart`,async()=>{
+ const dir=mkdtempSync(join(tmpdir(),'dibs-groups-'));let server=await startServer({port:0,dataDir:dir,dev:false,quiet:true});const sockets:Socket[]=[];
+ try{
+  let base=`http://127.0.0.1:${(server.server.address()as{port:number}).port}`;
+  const post=async(path:string,data:unknown)=>{
+   const response=await fetch(base+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+   assert.equal(response.status,200);return response.json();
+  };
+  const created=await (await fetch(base+'/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({definition:{rounds:demoRounds(),settings:{buzzMode,earlyPenaltyMs:0}}})})).json();
+  const joinPath=`/api/games/${created.id}/join`;
+  const team=await post(joinPath,{name:'Team Ada'}),teammate=await post(joinPath,{name:' team ADA '}),opponent=await post(joinPath,{name:'Team Bea'});
+  assert.equal(teammate.playerId,team.playerId);assert.equal(teammate.token,team.token);
+  const connect=async(role:string,token?:string)=>{
+   const s=io(base,{autoConnect:false,transports:['websocket']});sockets.push(s);let latest:GameView;
+   s.on('state',v=>latest=v);s.connect();await once(s,'connect');
+   assert.equal((await emit(s,'subscribe',{gameId:created.id,role,token})).ok,true);return{s,state:()=>latest!};
+  };
+  const host=await connect('host'),stage=await connect('stage'),a=await connect('player',team.token),b=await connect('player',teammate.token),other=await connect('player',opponent.token);
+  const command=(s:Socket,action:string,data?:unknown)=>emit(s,'command',{action,data});
+  assert.equal(a.state().selfId,b.state().selfId);assert.equal(host.state().players.length,2);
+  const summaries=await (await fetch(base+'/api/games')).json();assert.equal(summaries[0].playerCount,2);
+  await command(a.s,'ready',{ready:true});await waitState(b,v=>v.players.find(p=>p.id===team.playerId)?.ready===true);
+  await command(host.s,'start');const question=host.state().rounds[0].categories[0].questions[0];
+  await command(host.s,'openQuestion',{questionId:question.id});await command(host.s,'openBuzzers');
+  const buzzes=await Promise.all([command(a.s,'buzz'),command(b.s,'buzz')]);assert.equal(buzzes.filter(r=>r.ok).length,1);
+  await waitState(host,v=>v.current?.answeringId===team.playerId);
+  assert.equal(host.state().current?.buzzes.length,1);assert.equal(host.state().players.find(p=>p.id===team.playerId)?.stats.buzzes,1);
+  await command(host.s,'judge',{correct:false});
+  for(const phone of [a,b]){
+   await waitState(phone,v=>v.players.find(p=>p.id===team.playerId)?.score===-100);
+   assert(phone.state().current?.attempted.includes(team.playerId));assert.equal((await command(phone.s,'buzz')).ok,false);
+  }
+  // Another phone joining after a miss cannot bypass the group's lockout.
+  const late=await post(joinPath,{name:'Team Ada'}),c=await connect('player',late.token);
+  assert.equal(late.playerId,team.playerId);assert.equal((await command(c.s,'buzz')).ok,false);
+  assert.equal((await command(other.s,'buzz')).ok,true);assert.equal((await command(host.s,'judge',{correct:true})).ok,true);
+  await waitState(stage,v=>v.players.find(p=>p.id===opponent.playerId)?.score===100);
+  assert.equal(stage.state().players.length,2);assert.equal(stage.state().players.find(p=>p.id===team.playerId)?.stats.incorrect,1);
+  for(const client of [host,stage,a,b,c])assert(!JSON.stringify(client.state()).includes(team.token));
+  a.s.disconnect();b.s.disconnect();
+  await command(c.s,'ready',{ready:false});assert(server.games.get(created.id)!.players.find(p=>p.id===team.playerId)?.connected);
+  c.s.disconnect();await waitState(host,v=>v.players.find(p=>p.id===team.playerId)?.connected===false);
+  // A new question restores eligibility for every phone in the group.
+  await command(host.s,'closeQuestion');await command(host.s,'openQuestion',{questionId:host.state().rounds[0].categories[0].questions[1].id});await command(host.s,'openBuzzers');
+  const reconnected=await connect('player',team.token);assert.equal((await command(reconnected.s,'buzz')).ok,true);
+  await command(host.s,'judge',{correct:true});await waitState(reconnected,v=>v.players.find(p=>p.id===team.playerId)?.score===100);
+  sockets.forEach(s=>s.disconnect());await server.close();
+  server=await startServer({port:0,dataDir:dir,dev:false,quiet:true});base=`http://127.0.0.1:${(server.server.address()as{port:number}).port}`;
+  const restored=await post(joinPath,{name:'TEAM ADA'});assert.equal(restored.playerId,team.playerId);assert.equal(restored.token,team.token);
+  const restoredA=await connect('player',team.token),restoredB=await connect('player',teammate.token);
+  for(const phone of [restoredA,restoredB]){assert.equal(phone.state().players.length,2);assert.equal(phone.state().players.find(p=>p.id===team.playerId)?.score,100);}
+ }finally{sockets.forEach(s=>s.disconnect());await server.close();rmSync(dir,{recursive:true,force:true});}
+});
 test('legacy room PINs and player limits are ignored when loading and importing games',async()=>{
  const dir=mkdtempSync(join(tmpdir(),'jeopardy-open-join-'));mkdirSync(join(dir,'games'));
  const game=createGame({name:'Legacy room'});

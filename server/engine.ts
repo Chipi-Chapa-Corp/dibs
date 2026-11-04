@@ -18,7 +18,9 @@ export function createGame(input:Input={}):Game {
 }
 export function addPlayer(g:Game,name:string):Player {
   assert(g.status!=='finished','This game has ended');
-  name=text(name.trim(),32);assert(name,'Enter your name');assert(!g.players.some(p=>p.name.toLowerCase()===name.toLowerCase()),'This name is already taken');
+  name=text(name.trim(),32);assert(name,'Enter your name');
+  // A name identifies one group; every buzzer in it shares gameplay and reconnects.
+  const existing=g.players.find(p=>p.name.toLowerCase()===name.toLowerCase());if(existing)return existing;
   const p:Player={id:uid(),token:token(),name,color:colors[g.players.length%colors.length],score:g.settings.startingScore,connected:false,ready:false,blockedUntil:0,stats:{correct:0,incorrect:0,buzzes:0},joinedAt:Date.now()};g.players.push(p);g.revision++;return p;
 }
 export function normalizeSettings(data:Input,old=defaultSettings):Settings {

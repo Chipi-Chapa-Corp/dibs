@@ -18,7 +18,7 @@ npm run play
 
 Use `npm run play` for game nights. Use `npm run dev` during development for hot reload.
 
-Open [localhost:43187](http://localhost:43187). Players open the LAN address printed in the terminal on the same Wi-Fi, choose their game from the list and tap **Join**. Invite links and QR codes open this game list; room codes are never shown. Open **Presenter** on your second screen. During play, phones show only scores and the circular buzzer. Teams speak their choices and answers to the presenter, who records them on the host screen.
+Open [localhost:43187](http://localhost:43187). Players open the LAN address printed in the terminal on the same Wi-Fi, choose their game from the list and tap **Join**. Enter a new name or select an existing name from the dropdown to join that group. Each group counts as one player, with shared scores, readiness, wagers and buzz lockouts across all its phones. Invite links and QR codes open this game list; room codes are never shown. Open **Presenter** on your second screen. During play, phones show only scores and the circular buzzer. Teams speak their choices and answers to the presenter, who records them on the host screen.
 
 ## Local network security
 
@@ -78,7 +78,7 @@ In **Edit → Questions**, open a cell and choose **Modifier** below the questio
 
 When selected, the presenter shows a mystery modifier and the phone buzzers open. The first player or team to buzz claims it, then its instructions are revealed. No points change automatically: edit scores from the host screen as needed. Claimed modifiers stay in the host’s reminders until the host dismisses them.
 
-The presenter selects every question from the host board. The chosen tile briefly highlights on both boards before opening, while phones keep the score and buzzer. Buzzers stay closed during this cue, including for hidden modifiers. A two-note selection chime plays from the host; its speaker button mutes it. The presenter display starts muted and can enable sound separately. Choices last for the browser tab. Motion preferences use a static highlight instead of a pulse. Questions, answers and the final have no countdowns or time limits; the presenter opens/closes buzzers and reveals answers when ready. Older timer settings are ignored. A team can join with one phone under its team name.
+The presenter selects every question from the host board. The chosen tile briefly highlights on both boards before opening, while phones keep the score and buzzer. Buzzers stay closed during this cue, including for hidden modifiers. A two-note selection chime plays from the host; its speaker button mutes it. The presenter display starts muted and can enable sound separately. Choices last for the browser tab. Motion preferences use a static highlight instead of a pulse. Questions, answers and the final have no countdowns or time limits; the presenter opens/closes buzzers and reveals answers when ready. Older timer settings are ignored. A team can join with multiple phones under the same team name.
 
 Older game files still import their questions, settings and appearance; the former automated modifier rules are no longer used.
 
