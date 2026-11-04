@@ -1,3 +1,4 @@
+import {startReadyGame} from './helpers.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {mkdtempSync,rmSync} from 'node:fs';
@@ -9,7 +10,7 @@ import {demoRounds} from '../shared/model.ts';
 
 function fixture(){
   const g=createGame({definition:{rounds:demoRounds()}}),a=addPlayer(g,'Selecting team'),b=addPlayer(g,'Opposing team'),other=addPlayer(g,'Other team');
-  const q=g.rounds[0].categories[0].questions[0];q.dailyDouble=true;act(g,'start');act(g,'openQuestion',{questionId:q.id});
+  const q=g.rounds[0].categories[0].questions[0];q.dailyDouble=true;startReadyGame(g);act(g,'openQuestion',{questionId:q.id});
   return{g,a,b,other,q};
 }
 
@@ -47,18 +48,18 @@ test('only the assigned team is judged; wrong answers lose the wager without a b
     for(const player of [a,b,other])assert.throws(()=>act(g,'buzz',{},'player',player.id),/assigned team/);
     assert.throws(()=>act(g,'judge',{playerId:other.id,correct}),/assigned team/);
     assert.throws(()=>act(g,'assignDailyDouble',{fromId:a.id,playerId:other.id}),/awaiting assignment/);
-    assert.throws(()=>act(g,'removePlayer',{playerId:b.id}),/Finish the Daily Double/);
+    assert.throws(()=>act(g,'removeTeam',{playerId:b.id}),/fixed/);
     act(g,'judge',{correct});assert.equal(g.players.find(p=>p.id===b.id)?.score,correct?750:-750);assert.equal(a.score,0);assert.equal(other.score,0);
     assert(g.current?.closed);assert(!g.current?.buzzOpen);assert.throws(()=>act(g,'judge',{correct}),/No active question/);
-    act(g,'undo');assert.equal(g.players.find(p=>p.id===b.id)?.score,0);assert(!g.current?.closed);assert.equal(g.current?.answeringId,b.id);assert.equal(g.current?.wagers[b.id].wager,750);
+    act(g,'undo');assert.equal(g.players.find(p=>p.id===b.id)?.score,0);assert.equal(g.current,null);
   }
 });
 
-test('reassignment clears the previous choice; undo and restart preserve the forced assignment and stake',()=>{
+test('reassignment clears the previous wager; question undo cancels selection and restart preserves a new assignment',()=>{
   const{g,a,b,other}=fixture();act(g,'assignDailyDouble',{fromId:a.id,playerId:b.id});act(g,'hostWager',{playerId:b.id,wager:500});
   act(g,'assignDailyDouble',{fromId:a.id,playerId:other.id});assert.deepEqual(g.current?.wagers,{});
   assert.throws(()=>act(g,'wager',{wager:500},'player',b.id),/presenter records/);
-  act(g,'undo');assert.equal(g.current?.answeringId,b.id);assert.equal(g.current?.wagers[b.id].wager,500);
+  act(g,'undo');assert.equal(g.current,null);act(g,'openQuestion',{questionId:g.rounds[0].categories[0].questions[0].id});act(g,'assignDailyDouble',{fromId:a.id,playerId:b.id});act(g,'hostWager',{playerId:b.id,wager:500});
   const dir=mkdtempSync(join(tmpdir(),'dibs-daily-double-'));
   try{
     const store=openGameStore(dir);store.games.set(g.id,g);store.save(g);
@@ -89,7 +90,7 @@ test('presenter records spoken Daily Double choices step by step; phones cannot 
   act(g,'finalBegin');assert.equal(view(g,'stage').currentQuestion?.prompt,q.prompt);assert.equal(g.current?.buzzOpen,false);
   act(g,'judge',{correct:false});assert.equal(g.players.find(p=>p.id===b.id)?.score,-500);assert.equal(g.players.find(p=>p.id===a.id)?.score,0);assert.equal(g.players.find(p=>p.id===other.id)?.score,0);
   assert.equal(g.current?.wagers[b.id].judged,true);assert.equal(g.current?.wagers[b.id].correct,false);
-  act(g,'undo');assert.equal(g.current?.wagers[b.id].judged,false);assert.equal(g.players.find(p=>p.id===b.id)?.score,0);
+  act(g,'undo');assert.equal(g.current,null);assert.equal(g.players.find(p=>p.id===b.id)?.score,0);
 });
 
 test('Daily Double handoffs persist between turns and host corrections clear the old choice',()=>{

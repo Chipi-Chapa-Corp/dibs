@@ -58,8 +58,12 @@ test('dev watcher reloads backend, shared code and config while CSS uses HMR and
  try{
   await until(async()=>!!(await request('/api/health')).ok,'Dev server did not start');
   const game=await request('/api/games',{name:'Reload persistence'});
-  const player=await request(`/api/games/${game.id}/join`,{name:'Ada'});
-  const host=connect('host',game.id),phone=connect('player',game.id,player.token);
+  const host=connect('host',game.id);
+  await until(()=>host.subscriptions()===1,'Host did not subscribe');
+  await command(host.socket,'addTeam',{name:'Ada team'});
+  const teamId=host.state()!.players[0].id;
+  const player=await request(`/api/games/${game.id}/join`,{name:'Ada',teamId});
+  const phone=connect('player',game.id,player.token);
   await until(()=>host.subscriptions()===1&&phone.subscriptions()===1,'Clients did not subscribe');
   await command(host.socket,'adjust',{playerId:player.playerId,mode:'set',amount:450});
   await until(()=>phone.state()?.players[0]?.score===450,'Score did not synchronize');
@@ -91,7 +95,10 @@ test('dev watcher reloads backend, shared code and config while CSS uses HMR and
   const sharedPath=join(fixture,'shared/model.ts'),beforeShared=host.subscriptions();
   writeFileSync(sharedPath,readFileSync(sharedPath,'utf8').replace('startingScore:0','startingScore:25'));
   await until(()=>host.subscriptions()>beforeShared,'Shared code edit did not restart the backend');
-  const changed=await request('/api/games',{});await request(`/api/games/${changed.id}/join`,{name:'Bea'});
+  const changed=await request('/api/games',{});
+  const changedHost=connect('host',changed.id);await until(()=>changedHost.subscriptions()===1,'New host did not subscribe');
+  await command(changedHost.socket,'addTeam',{name:'Bea team'});
+  await request(`/api/games/${changed.id}/join`,{name:'Bea',teamId:changedHost.state()!.players[0].id});
   assert.equal((await request(`/api/games/${changed.id}`)).players[0].score,25);
 
   const workingEngine=readFileSync(enginePath,'utf8'),beforeError=host.subscriptions();

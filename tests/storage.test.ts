@@ -1,3 +1,4 @@
+import {startReadyGame} from './helpers.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {mkdtempSync,mkdirSync,readFileSync,readdirSync,writeFileSync,rmSync,existsSync} from 'node:fs';
@@ -19,7 +20,7 @@ test('answer choices, selection, shuffle preference and the live shuffled order 
  try{
   const rounds=demoRounds();Object.assign(rounds[0].categories[0].questions[0],{answerOptions:['Mercury','Venus','Mars'],correctAnswerIndex:1,shuffleAnswers:true});
   const g=createGame({definition:{rounds}}),q=g.rounds[0].categories[0].questions[0];
-  act(g,'start');act(g,'openQuestion',{questionId:q.id});
+  addPlayer(g,'Test team');startReadyGame(g);act(g,'openQuestion',{questionId:q.id});
   const order=structuredClone(g.current?.answerOrder),visible=view(g,'stage').currentQuestion?.answerOptions;
   f.load().save(g);const restored=f.load().games.get(g.id)!,saved=restored.rounds[0].categories[0].questions[0];
   assert.deepEqual(saved.answerOptions,['Mercury','Venus','Mars']);assert.equal(saved.correctAnswerIndex,1);assert.equal(saved.answer,'Venus');assert.equal(saved.shuffleAnswers,true);
@@ -57,7 +58,7 @@ test('migration preserves IDs, player identities, scores and active progress and
  const f=fixture();
  try{
   const a=createGame({name:'Existing A',definition:{rounds:demoRounds()}}),b=createGame({name:'Existing B'}),player=addPlayer(a,'Ada');
-  player.score=800;act(a,'start');act(a,'openQuestion',{questionId:a.rounds[0].categories[0].questions[0].id});
+  player.score=800;startReadyGame(a);act(a,'openQuestion',{questionId:a.rounds[0].categories[0].questions[0].id});
   const active=structuredClone(a.current);write(join(f.dir,'games.json'),[a,b]);
   const store=f.load(),restored=store.games.get(a.id)!;
   assert.equal(store.games.size,2);assert.equal(restored.id,a.id);assert.equal(restored.players[0].token,player.token);assert.equal(restored.players[0].score,800);assert.deepEqual(restored.current,active);
@@ -123,14 +124,14 @@ test('loading and undoing older saves removes chooser settings and returns legac
  try{
   const game=createGame({definition:{rounds:demoRounds()}}),player=addPlayer(game,'Ada');player.score=500;
   const question=game.rounds[0].categories[0].questions[0];question.dailyDouble=true;
-  act(game,'start');act(game,'openQuestion',{questionId:question.id,playerId:player.id});act(game,'adjust',{playerId:player.id,amount:1});
+  startReadyGame(game);act(game,'openQuestion',{questionId:question.id,playerId:player.id});act(game,'adjust',{playerId:player.id,amount:1});
   const stored=JSON.parse(JSON.stringify(game));
   for(const snapshot of [stored,...stored.undo]){snapshot.settings.selection='winner';snapshot.chooserId=player.id;if(snapshot.current){snapshot.current.selectionPlayerId=player.id;snapshot.current.answeringId=player.id;snapshot.current.phase='question';snapshot.current.wagers={[player.id]:{wager:200,answer:'',submitted:true,judged:false}};}}
   write(join(f.directory,'old-selection.json'),stored);
   const restored=f.load().games.get(game.id)!;
   assert(!('selection' in restored.settings));assert(!('chooserId' in restored));assert(!('selectionPlayerId' in restored.current!));assert.equal(restored.current?.answeringId,null);assert.equal(restored.current?.phase,'wager');assert.deepEqual(restored.current?.wagers,{});
   act(restored,'undo');
-  assert(!('selection' in restored.settings));assert(!('chooserId' in restored));assert(!('selectionPlayerId' in restored.current!));assert.equal(restored.current?.answeringId,null);assert.equal(restored.current?.phase,'wager');assert.deepEqual(restored.current?.wagers,{});assert.equal(restored.players[0].score,500);
+  assert(!('selection' in restored.settings));assert(!('chooserId' in restored));assert.equal(restored.current,null);assert.equal(restored.players[0].score,500);
   assert.throws(()=>act(restored,'selectQuestion',{questionId:question.id},'player',player.id),/Host access/);
  }finally{f.remove();}
 });
@@ -168,7 +169,7 @@ test('legacy active countdowns are discarded on load and cannot return through u
  const f=fixture();
  try{
   const game=createGame({definition:{rounds:demoRounds()}}),player=addPlayer(game,'Ada');
-  act(game,'start');act(game,'openQuestion',{questionId:game.rounds[0].categories[0].questions[0].id});act(game,'openBuzzers');
+  startReadyGame(game);act(game,'openQuestion',{questionId:game.rounds[0].categories[0].questions[0].id});act(game,'openBuzzers');
   act(game,'adjust',{playerId:player.id,amount:100});
   const stored=JSON.parse(JSON.stringify(game));
   for(const snapshot of [stored,...stored.undo]){
@@ -181,7 +182,7 @@ test('legacy active countdowns are discarded on load and cannot return through u
   assert(restored);assert.equal(restored.current?.questionId,game.current?.questionId);assert(restored.current?.buzzOpen);
   assert(!JSON.stringify(restored).includes('timer'));assert(!('finalSeconds' in restored.settings));
   act(restored,'undo');assert.equal(restored.players[0].score,0);assert(!JSON.stringify(restored).includes('timer'));
-  act(restored,'buzz',{},'player',player.id,86400000);assert.equal(restored.current?.answeringId,player.id);
+  assert.equal(restored.current,null);act(restored,'openQuestion',{questionId:restored.rounds[0].categories[0].questions[0].id});act(restored,'openBuzzers');act(restored,'buzz',{},'player',player.id,86400000);assert.equal(view(restored,'host').current?.answeringId,player.id);
   store.save(restored);assert(!readFileSync(file,'utf8').includes('timer'));assert(!('timer' in f.load().games.get(game.id)!.current!));
  }finally{f.remove();}
 });
@@ -191,7 +192,7 @@ test('a pending selection survives restart and opens once, while older saves def
  const f=fixture();
  try{
   const game=createGame({definition:{rounds:demoRounds()}}),q=game.rounds[0].categories[0].questions[0];
-  act(game,'start');act(game,'selectQuestion',{questionId:q.id},'host',null,1000);
+  addPlayer(game,'Test team');startReadyGame(game);act(game,'selectQuestion',{questionId:q.id},'host',null,1000);
   const store=f.load();store.save(game);
   const restored=f.load().games.get(game.id)!;
   assert.deepEqual(restored.selection,game.selection);assert.equal(restored.current,null);assert(!tick(restored,1799));assert(tick(restored,1800));assert.equal(view(restored,'host').current?.questionId,q.id);assert.equal(restored.questionCount,1);assert.equal(restored.selection,null);assert(!tick(restored,2000));

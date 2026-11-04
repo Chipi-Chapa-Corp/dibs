@@ -8,7 +8,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import multer from 'multer';
 import {fileURLToPath} from 'node:url';
-import {act,addPlayer,createGame,view,tick,token} from './engine.ts';
+import {act,joinMember,removeMember,createGame,view,tick,token} from './engine.ts';
 import {openGameStore} from './storage.ts';
 import type {Game,GameSummary} from '../shared/model.ts';
 import {isQuestionFilled} from '../shared/model.ts';
@@ -37,7 +37,11 @@ export async function startServer(options:{port?:number;dataDir?:string;dev?:boo
     if(next)editLocks.set(g.id,next.id);
   };
   const summaries=():GameSummary[]=>[...games.values()].map(g=>({id:g.id,name:g.name,subtitle:g.subtitle,status:g.status,playerCount:g.players.length,questionTotal:g.rounds.reduce((total,r)=>total+r.categories.reduce((total,c)=>total+c.questions.filter(isQuestionFilled).length,0),0),rounds:g.rounds.length,accent:g.theme.accent,createdAt:g.createdAt,editing:editLocks.has(g.id),hosting:hostLocks.has(g.id)})).sort((a,b)=>b.createdAt-a.createdAt);
-  const publish=(g:Game,removedMessage='You were removed from this game')=>{grantWaitingEditor(g);for(const s of io.sockets.sockets.values())if(s.data.gameId===g.id){if(s.data.role==='player'&&!g.players.some(p=>p.id===s.data.playerId)){s.emit('revoked',removedMessage);s.data={};continue;}s.emit('state',{...view(g,s.data.role,s.data.playerId),editLock:editLocks.has(g.id)?editLocks.get(g.id)===s.id?'mine':'other':null});}io.emit('games',summaries());save(g);};
+  const presence=(g:Game)=>{
+    for(const member of g.members)member.connected=[...io.sockets.sockets.values()].some(s=>s.connected&&s.data.gameId===g.id&&s.data.memberId===member.id);
+    for(const team of g.players)team.connected=g.members.some(m=>m.teamId===team.id&&m.connected);
+  };
+  const publish=(g:Game,removedMessage='You were removed from this game')=>{presence(g);grantWaitingEditor(g);for(const s of io.sockets.sockets.values())if(s.data.gameId===g.id){if(s.data.role==='player'&&!g.members.some(m=>m.id===s.data.memberId)){s.emit('revoked',removedMessage);s.data={};continue;}s.emit('state',{...view(g,s.data.role,s.data.playerId,Date.now(),s.data.memberId),editLock:editLocks.has(g.id)?editLocks.get(g.id)===s.id?'mine':'other':null});}io.emit('games',summaries());save(g);};
   const game=(id:string)=>{const g=games.get(id.toUpperCase());if(!g)throw new Error('Game not found');return g;};
   app.disable('x-powered-by');
   app.use((req,res,next)=>{
@@ -67,7 +71,10 @@ export async function startServer(options:{port?:number;dataDir?:string;dev?:boo
   app.get('/api/games',(_req,res)=>res.json(summaries()));
   app.post('/api/games',(req,res,next)=>{try{if(games.size>=caps.maxGames){res.status(409).json({error:'Game storage limit reached. Delete an unused game first.'});return;}if(!rates.take('create:'+peerIP(req.socket.remoteAddress),20,3600000)){res.status(429).json({error:'Too many games created. Try again later.'});return;}const g=createGame(req.body);games.set(g.id,g);publish(g);res.status(201).json({id:g.id});}catch(e){next(e);}});
   app.get('/api/games/:id',(req,res,next)=>{try{res.json(view(game(String(req.params.id)),'stage'));}catch(e){next(e);}});
-  app.post('/api/games/:id/join',(req,res,next)=>{try{const g=game(String(req.params.id));if(req.body.token){const p=g.players.find(p=>p.token===req.body.token);if(p){res.json({playerId:p.id,token:p.token});return;}}const p=addPlayer(g,String(req.body.name||''));publish(g);res.json({playerId:p.id,token:p.token});}catch(e){next(e);}});
+  app.post('/api/games/:id/join',(req,res,next)=>{try{
+    const g=game(String(req.params.id)),member=joinMember(g,req.body);publish(g);
+    res.json({playerId:member.teamId,memberId:member.id,token:member.token});
+  }catch(e){next(e);}});
   app.delete('/api/games/:id',(req,res,next)=>{
     try{
       const g=game(String(req.params.id));requireUnlocked(g);
@@ -103,12 +110,13 @@ export async function startServer(options:{port?:number;dataDir?:string;dev?:boo
       try{
         const g=game(input.gameId);
         if(!['host','player','stage'].includes(input.role))throw new Error('Unknown role');
-        const p=input.role==='player'?g.players.find(p=>p.token===input.token):undefined;
+        const member=input.role==='player'?g.members.find(m=>m.token===input.token):undefined;
+        const p=member?g.players.find(t=>t.id===member.teamId):undefined;
         if(input.role==='player'&&!p)throw new Error('Join the game first');
         const hosting=input.role==='host'&&input.editing!==true;
         if(hosting&&hostLocks.has(g.id)&&hostLocks.get(g.id)!==s.id)throw new Error('Someone is already hosting this game.');
         const previousId=s.data.gameId;
-        s.data={gameId:g.id,role:input.role,playerId:p?.id,editing:input.role==='host'&&input.editing===true};
+        s.data={gameId:g.id,role:input.role,playerId:p?.id,memberId:member?.id,editing:input.role==='host'&&input.editing===true};
         if(previousId&&(previousId!==g.id||!hosting))releaseHost(previousId,s.id);
         if(hosting)hostLocks.set(g.id,s.id);
         if(previousId&&(previousId!==g.id||!s.data.editing)){
@@ -127,16 +135,18 @@ export async function startServer(options:{port?:number;dataDir?:string;dev?:boo
         if(input.action==='save')requireEditor(g,s.id);
         else if(s.data.role==='host'&&hostLocks.get(g.id)!==s.id)throw new Error('Open the host screen to control this game.');
         if(input.action==='start')requireUnlocked(g);
-        act(g,input.action,input.data||{},s.data.role,s.data.playerId||null);
-        publish(g,input.action==='reset'?'The host reset this game. Join again to play.':undefined);ack?.({ok:true});
+        if(s.data.role==='player'&&!g.members.some(m=>m.id===s.data.memberId))throw new Error('Join the game first');
+        if(input.action==='leaveGame'){
+          if(s.data.role!=='player')throw new Error('Only a player can leave');
+          removeMember(g,s.data.memberId);
+        }else act(g,input.action,input.data||{},s.data.role,s.data.playerId||null);
+        publish(g,input.action==='reset'?'The host reset this game. Join again to play.':input.action==='leaveGame'?'You left the game. Join a team to play again.':undefined);ack?.({ok:true});
       }catch(e){const g=games.get(s.data.gameId);if(g)publish(g);ack?.({ok:false,error:(e as Error).message});}
     });
     s.on('disconnect',()=>{
       const g=games.get(s.data.gameId);if(!g)return;
       releaseEdit(g.id,s.id);
       releaseHost(g.id,s.id);
-      const p=g.players.find(p=>p.id===s.data.playerId);
-      if(p&&![...io.sockets.sockets.values()].some(other=>other.data.gameId===g.id&&other.data.playerId===p.id))p.connected=false;
       publish(g);
     });
   });

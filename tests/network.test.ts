@@ -1,3 +1,4 @@
+import {markTeamsReady} from './helpers.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {mkdtempSync,mkdirSync,rmSync,writeFileSync,readFileSync,existsSync} from 'node:fs';
@@ -10,17 +11,29 @@ import {demoRounds} from '../shared/model.ts';
 import type {GameView} from '../shared/model.ts';
 const once=(s:Socket,event:string)=>new Promise<any>(resolve=>s.once(event,resolve));
 const emit=(s:Socket,event:string,data:unknown)=>new Promise<any>((resolve,reject)=>s.timeout(3000).emit(event,data,(err:Error,result:unknown)=>err?reject(err):resolve(result)));
+// Existing gameplay fixtures provision their teams as the host before joining phones.
+function fixtureRequest(server:Awaited<ReturnType<typeof startServer>>,base:string,path:string,data?:unknown){
+  let payload=data as Record<string,unknown>|undefined;
+  const match=path.match(/^\/api\/games\/([^/]+)\/join$/);
+  if(match&&payload&&!payload.token&&!payload.teamId){
+    const g=server.games.get(match[1])!;
+    const name=String(payload.name||'').trim();
+    const team=g.players.find(t=>t.name.toLowerCase()===name.toLowerCase())||addPlayer(g,name);
+    payload={...payload,teamId:team.id};
+  }
+  return fetch(base+path,{method:data===undefined?'GET':'POST',headers:{'Content-Type':'application/json'},body:payload===undefined?undefined:JSON.stringify(payload)});
+}
 test('Daily Double spoken choices are recorded by presenter and synchronized to read-only phones',async()=>{
  const dir=mkdtempSync(join(tmpdir(),'dibs-daily-network-')),server=await startServer({port:0,dataDir:dir,dev:false,quiet:true}),sockets:Socket[]=[];
  try{
   const base=`http://127.0.0.1:${(server.server.address()as{port:number}).port}`;
-  const post=async(path:string,data:unknown)=>(await fetch(base+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})).json();
+  const post=async(path:string,data:unknown)=>(await fixtureRequest(server,base,path,data)).json();
   const rounds=demoRounds();rounds[0].categories[0].questions[0].dailyDouble=true;
   const created=await post('/api/games',{name:'Daily Double network',definition:{rounds}}),a=await post(`/api/games/${created.id}/join`,{name:'Choosing team'}),b=await post(`/api/games/${created.id}/join`,{name:'Required team'});
   const connect=async(role:string,token?:string)=>{const s=io(base,{autoConnect:false,transports:['websocket']});sockets.push(s);let latest:GameView;s.on('state',v=>latest=v);s.connect();await once(s,'connect');assert((await emit(s,'subscribe',{gameId:created.id,role,token})).ok);return{s,state:()=>latest!};};
   const host=await connect('host'),selecting=await connect('player',a.token),answering=await connect('player',b.token),stage=await connect('stage');
   const command=(s:Socket,action:string,data?:unknown)=>emit(s,'command',{action,data});
-  await command(host.s,'start');await command(host.s,'openQuestion',{questionId:rounds[0].categories[0].questions[0].id});
+  markTeamsReady(server.games.get(created.id)!);await command(host.s,'start');await command(host.s,'openQuestion',{questionId:rounds[0].categories[0].questions[0].id});
   assert.equal((await command(host.s,'setDailyDoubleChooser',{playerId:a.playerId})).ok,true);
   await waitState(selecting,v=>v.current?.dailyDoubleFromId===a.playerId&&!v.current?.answeringId);
   await waitState(stage,v=>v.current?.dailyDoubleFromId===a.playerId&&!v.current?.answeringId);
@@ -55,13 +68,13 @@ for(const buzzMode of ['queue','first']as const)test(`group phones share one sco
  try{
   let base=`http://127.0.0.1:${(server.server.address()as{port:number}).port}`;
   const post=async(path:string,data:unknown)=>{
-   const response=await fetch(base+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+   const response=await fixtureRequest(server,base,path,data);
    assert.equal(response.status,200);return response.json();
   };
   const created=await (await fetch(base+'/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({definition:{rounds:demoRounds(),settings:{buzzMode,earlyPenaltyMs:0}}})})).json();
   const joinPath=`/api/games/${created.id}/join`;
   const team=await post(joinPath,{name:'Team Ada'}),teammate=await post(joinPath,{name:' team ADA '}),opponent=await post(joinPath,{name:'Team Bea'});
-  assert.equal(teammate.playerId,team.playerId);assert.equal(teammate.token,team.token);
+  assert.equal(teammate.playerId,team.playerId);assert.notEqual(teammate.token,team.token);assert.notEqual(teammate.memberId,team.memberId);
   const connect=async(role:string,token?:string)=>{
    const s=io(base,{autoConnect:false,transports:['websocket']});sockets.push(s);let latest:GameView;
    s.on('state',v=>latest=v);s.connect();await once(s,'connect');
@@ -72,7 +85,7 @@ for(const buzzMode of ['queue','first']as const)test(`group phones share one sco
   assert.equal(a.state().selfId,b.state().selfId);assert.equal(host.state().players.length,2);
   const summaries=await (await fetch(base+'/api/games')).json();assert.equal(summaries[0].playerCount,2);
   await command(a.s,'ready',{ready:true});await waitState(b,v=>v.players.find(p=>p.id===team.playerId)?.ready===true);
-  await command(host.s,'start');const question=host.state().rounds[0].categories[0].questions[0];
+  markTeamsReady(server.games.get(created.id)!);await command(host.s,'start');const question=host.state().rounds[0].categories[0].questions[0];
   await command(host.s,'openQuestion',{questionId:question.id});await command(host.s,'openBuzzers');
   const buzzes=await Promise.all([command(a.s,'buzz'),command(b.s,'buzz')]);assert.equal(buzzes.filter(r=>r.ok).length,1);
   await waitState(host,v=>v.current?.answeringId===team.playerId);
@@ -98,7 +111,7 @@ for(const buzzMode of ['queue','first']as const)test(`group phones share one sco
   await command(host.s,'judge',{correct:true});await waitState(reconnected,v=>v.players.find(p=>p.id===team.playerId)?.score===100);
   sockets.forEach(s=>s.disconnect());await server.close();
   server=await startServer({port:0,dataDir:dir,dev:false,quiet:true});base=`http://127.0.0.1:${(server.server.address()as{port:number}).port}`;
-  const restored=await post(joinPath,{name:'TEAM ADA'});assert.equal(restored.playerId,team.playerId);assert.equal(restored.token,team.token);
+  const restored=await post(joinPath,{token:team.token});assert.equal(restored.playerId,team.playerId);assert.equal(restored.token,team.token);
   const restoredA=await connect('player',team.token),restoredB=await connect('player',teammate.token);
   for(const phone of [restoredA,restoredB]){assert.equal(phone.state().players.length,2);assert.equal(phone.state().players.find(p=>p.id===team.playerId)?.score,100);}
  }finally{sockets.forEach(s=>s.disconnect());await server.close();rmSync(dir,{recursive:true,force:true});}
@@ -111,7 +124,7 @@ test('legacy room PINs and player limits are ignored when loading and importing 
  const server=await startServer({port:0,dataDir:dir,dev:false,quiet:true});
  try{
   const base=`http://127.0.0.1:${(server.server.address()as{port:number}).port}`;
-  const post=(path:string,data:unknown)=>fetch(base+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+  const post=(path:string,data:unknown)=>fixtureRequest(server,base,path,data);
   const restored=server.games.get(game.id)!;
   assert(!('joinPin' in restored.settings));assert(!('maxPlayers' in restored.settings));
   for(let i=0;i<101;i++){
@@ -136,6 +149,7 @@ test('editing locks serialize editors, protect uploads, and hand off automatical
    const s=io(base,{autoConnect:false,transports:['websocket']});sockets.push(s);let latest:GameView;s.on('state',v=>latest=v);s.connect();await once(s,'connect');
    assert.equal((await emit(s,'subscribe',{gameId:created.id,role:'host',editing})).ok,true);return{s,state:()=>latest!};
   };
+  addPlayer(server.games.get(created.id)!,'Test team');
   const first=await connect(true),second=await connect(true),host=await connect();
   assert.equal(first.state().editLock,'mine');assert.equal(second.state().editLock,'other');
   assert.equal((await emit(first.s,'command',{action:'save',data:{name:'First editor’s work'}})).ok,true);
@@ -154,7 +168,7 @@ test('editing locks serialize editors, protect uploads, and hand off automatical
   assert.equal((await emit(second.s,'command',{action:'save',data:{name:'Second editor’s work'}})).ok,true);
   assert.equal((await emit(second.s,'subscribe',{gameId:created.id,role:'stage'})).ok,true);
   await waitState(host,v=>v.editLock===null);
-  assert.equal((await emit(host.s,'command',{action:'start'})).ok,true);
+  markTeamsReady(server.games.get(created.id)!);assert.equal((await emit(host.s,'command',{action:'start'})).ok,true);
   assert.equal((await emit(second.s,'command',{action:'pause'})).ok,false);
   assert.equal((await emit(host.s,'command',{action:'pause'})).ok,true);
   assert.equal(server.games.get(created.id)!.name,'Second editor’s work');
@@ -216,14 +230,14 @@ test('hosting locks admit one host, release on navigation or disconnect, and res
 });
 test('real clients: discovery, open hosting, concurrent buzzes, synchronized scores, redaction, reconnect and persistence',async()=>{
  const dir=mkdtempSync(join(tmpdir(),'jeopardy-test-'));const server=await startServer({port:0,dataDir:dir,dev:false,quiet:true});let sockets:Socket[]=[];let restarted:Awaited<ReturnType<typeof startServer>>|null=null;
- try{const port=(server.server.address()as{port:number}).port;const base=`http://127.0.0.1:${port}`;const request=async(path:string,data?:unknown)=>{const r=await fetch(base+path,{method:data?'POST':'GET',headers:{'Content-Type':'application/json'},body:data?JSON.stringify(data):undefined});return r.json();};
+ try{const port=(server.server.address()as{port:number}).port;const base=`http://127.0.0.1:${port}`;const request=async(path:string,data?:unknown)=>{const r=await fixtureRequest(server,base,path,data);return r.json();};
  const rounds=demoRounds(),mystery=rounds[0].categories[0].questions[1];mystery.prompt='';mystery.modifier={title:'Trading places',instructions:'Swap your score with another team.'};
  const created=await request('/api/games',{name:'Network test',definition:{rounds,settings:{buzzMode:'first'}}});const listed=await request('/api/games');assert.equal(listed[0].id,created.id);assert(!('hostToken' in created));
  const pa=await request(`/api/games/${created.id}/join`,{name:'Ada'}),pb=await request(`/api/games/${created.id}/join`,{name:'Bea'});const connect=async(role:string,token?:string)=>{const s=io(base,{transports:['websocket'],autoConnect:false});sockets.push(s);s.connect();await once(s,'connect');let state:GameView; s.on('state',v=>state=v);const sub=await emit(s,'subscribe',{gameId:created.id,role,token});return{s,sub,state:()=>state!};};
  const host=await connect('host'),a=await connect('player',pa.token),b=await connect('player',pb.token),stage=await connect('stage');assert(host.sub.ok&&a.sub.ok&&b.sub.ok&&stage.sub.ok);const anotherHost=await connect('host');assert.equal(anotherHost.sub.ok,false);assert.equal((await emit(anotherHost.s,'command',{action:'start'})).ok,false);
  assert.equal((await emit(a.s,'command',{action:'adjust',data:{playerId:pa.playerId,amount:99999}})).ok,false);
  const q=host.state().rounds[0].categories[0].questions[0];assert.equal(stage.state().rounds[0].categories[0].questions[0].answer,'');
- await emit(host.s,'command',{action:'start'});await emit(host.s,'command',{action:'selectQuestion',data:{questionId:q.id}});
+ markTeamsReady(server.games.get(created.id)!);await emit(host.s,'command',{action:'start'});await emit(host.s,'command',{action:'selectQuestion',data:{questionId:q.id}});
  await waitState(stage,v=>v.selection?.questionId===q.id);await waitState(a,v=>v.selection?.questionId===q.id);
  assert.equal(stage.state().currentQuestion,null);assert.equal(a.state().current,null);assert.equal((await emit(a.s,'command',{action:'buzz'})).ok,false);
  await waitState(host,v=>v.current?.questionId===q.id&&!v.selection);
@@ -291,7 +305,7 @@ test('anyone can delete a game: removes the file, notifies every connected role,
   const base=`http://127.0.0.1:${(server.server.address()as{port:number}).port}`;
   const game=[...server.games.values()][0];
   const keep=await (await fetch(base+'/api/games',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:'Keep fixture'})})).json();
-  const player=await (await fetch(`${base}/api/games/${game.id}/join`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:'Ada'})})).json();
+  const player=await (await fixtureRequest(server,base,`/api/games/${game.id}/join`,{name:'Ada'})).json();
   const remove=()=>fetch(`${base}/api/games/${game.id}`,{method:'DELETE'});
   assert(server.games.has(game.id));assert(existsSync(file));
   const connect=async(role:string,token?:string)=>{
@@ -328,7 +342,7 @@ test('reset returns host and stage to the lobby, revokes players, preserves the 
  const dir=mkdtempSync(join(tmpdir(),'dibs-reset-'));let server=await startServer({port:0,dataDir:dir,dev:false,quiet:true});const sockets:Socket[]=[];
  try{
   let base=`http://127.0.0.1:${(server.server.address()as{port:number}).port}`;
-  const post=async(path:string,data:unknown)=>(await fetch(base+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})).json();
+  const post=async(path:string,data:unknown)=>(await fixtureRequest(server,base,path,data)).json();
   const created=await post('/api/games',{name:'Reset fixture',definition:{rounds:demoRounds(),settings:{allowLateJoin:false}}});
   const keep=await post('/api/games',{name:'Other game'});
   const pa=await post(`/api/games/${created.id}/join`,{name:'Ada'}),pb=await post(`/api/games/${created.id}/join`,{name:'Bea'});
@@ -338,7 +352,7 @@ test('reset returns host and stage to the lobby, revokes players, preserves the 
   };
   const host=await connect('host'),a=await connect('player',pa.token),b=await connect('player',pb.token),stage=await connect('stage');
   for(const client of [a,stage])assert.equal((await emit(client.s,'command',{action:'reset'})).ok,false);
-  await emit(host.s,'command',{action:'start'});
+  markTeamsReady(server.games.get(created.id)!);await emit(host.s,'command',{action:'start'});
   const q=host.state().rounds[0].categories[0].questions[0];
   await emit(host.s,'command',{action:'openQuestion',data:{questionId:q.id}});
   await emit(host.s,'command',{action:'adjust',data:{playerId:pa.playerId,amount:800}});
@@ -370,7 +384,7 @@ test('library preparation saves before hosting; stale editors cannot change a ru
  const dir=mkdtempSync(join(tmpdir(),'dibs-prepare-'));const server=await startServer({port:0,dataDir:dir,dev:false,quiet:true});const sockets:Socket[]=[];
  try{
   const base=`http://127.0.0.1:${(server.server.address()as{port:number}).port}`;
-  const post=async(path:string,data:unknown)=>(await fetch(base+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})).json();
+  const post=async(path:string,data:unknown)=>(await fixtureRequest(server,base,path,data)).json();
   const created=await post('/api/games',{name:'Prepared in advance'});
   const connect=async(editing=false,gameId=created.id)=>{
    const s=io(base,{autoConnect:false,transports:['websocket']});sockets.push(s);s.connect();await once(s,'connect');
@@ -386,7 +400,7 @@ test('library preparation saves before hosting; stale editors cannot change a ru
   const player=await post(`/api/games/${created.id}/join`,{name:'Ada'});
   assert.equal((await emit(editor,'subscribe',{gameId:created.id,role:'host',editing:false})).ok,false);
   assert.equal((await emit(editor,'subscribe',{gameId:created.id,role:'stage'})).ok,true);
-  await emit(host,'command',{action:'start'});await emit(host,'command',{action:'adjust',data:{playerId:player.playerId,amount:700}});
+  markTeamsReady(server.games.get(created.id)!);await emit(host,'command',{action:'start'});await emit(host,'command',{action:'adjust',data:{playerId:player.playerId,amount:700}});
   assert.equal((await emit(editor,'subscribe',{gameId:created.id,role:'host',editing:true})).ok,true);
   const rejected=await emit(editor,'command',{action:'save',data:{rounds:[],name:'Must not change',settings:{startingScore:999},theme:{title:'Must not change'}}});
   assert.equal(rejected.ok,false);assert.match(rejected.error,/Make a copy to edit/);

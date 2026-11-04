@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import {createGame,normalizeStoredGameplay,updateDefinition} from './engine.ts';
+import {createGame,normalizeStoredGameplay,normalizeQuestionUndo,normalizeBuzzerFlow,updateDefinition} from './engine.ts';
 import type {Game} from '../shared/model.ts';
 import {isQuestionFilled} from '../shared/model.ts';
 
@@ -15,17 +15,26 @@ function restore(value:unknown):Game{
   if(!['lobby','playing','finished'].includes(value.status))throw new Error('Invalid game status');
   if(!Number.isInteger(value.roundIndex)||!Array.isArray(value.rounds)||value.roundIndex<0||value.roundIndex>=value.rounds.length)throw new Error('Invalid current round');
   if(!Array.isArray(value.played)||!Array.isArray(value.history)||!Array.isArray(value.undo))throw new Error('Invalid game history');
-  for(const p of value.players)if(!object(p)||typeof p.id!=='string'||typeof p.token!=='string'||!Number.isFinite(p.score))throw new Error('Invalid saved player');
+  for(const p of value.players)if(!object(p)||typeof p.id!=='string'||typeof p.token!=='string'||!Number.isFinite(p.score))throw new Error('Invalid saved team');
   if(value.current!==null&&(!object(value.current)||!object(value.current.wagers)||!Array.isArray(value.current.buzzes)||!Array.isArray(value.current.attempted)||!['question','wager','final','modifier'].includes(value.current.phase)))throw new Error('Invalid active question');
   if(value.selection!=null&&(!object(value.selection)||typeof value.selection.questionId!=='string'||!Number.isFinite(value.selection.opensAt)||value.current!==null))throw new Error('Invalid question selection');
   if(value.modifierClaims!==undefined&&!Array.isArray(value.modifierClaims))throw new Error('Invalid modifier reminders');
   const {format:_format,hostToken:_legacyHostToken,hostClaimable:_legacyHostClaimable,modifiers:_legacyModifiers,uses:_legacyUses,chooserId:_legacyChooserId,...stored}=value;
   const game=stored as Game;
   if(game.current){const {selectionPlayerId:_legacySelectionPlayer,...current}=game.current as Game['current']&RecordValue;game.current=current;}
+  game.members??=[];
+  if(!Array.isArray(game.members))throw new Error('Invalid saved players');
+  for(const m of game.members){
+    if(!object(m)||typeof m.id!=='string'||typeof m.name!=='string'||typeof m.token!=='string'||!game.players.some(t=>t.id===m.teamId))throw new Error('Invalid saved player');
+    m.connected=false;
+  }
+  game.teamsLocked=game.teamsLocked===true||game.status!=='lobby'||game.history.some(h=>h.label==='Game started');
   game.modifierClaims??=[];
   normalizeStoredGameplay(game);
   for(const snapshot of game.undo)if(object(snapshot)&&object(snapshot.settings)&&Array.isArray(snapshot.rounds))normalizeStoredGameplay(snapshot as Game);
+  normalizeQuestionUndo(game);
   updateDefinition(game,{rounds:game.rounds});
+  normalizeBuzzerFlow(game);
   if(game.selection){const question=game.rounds[game.roundIndex].categories.flatMap(c=>c.questions).find(q=>q.id===game.selection!.questionId);if(!question||!isQuestionFilled(question)||game.played.includes(question.id)||game.status!=='playing')throw new Error('Invalid selected question');}
   game.players.forEach(p=>p.connected=false);
   return game;

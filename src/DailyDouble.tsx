@@ -1,6 +1,7 @@
 import {useEffect,useState} from 'react';
 import {ArrowRight,Check,ChevronDown,X} from 'lucide-react';
 import type {GameView} from '../shared/model';
+import {ContinueQuestion} from './ContinueQuestion';
 import {dailyDoubleStep} from '../shared/daily-double';
 import {AnswerChoices,Button,HostDailyDoubleStatus,Field,IconButton,RichText} from './components';
 
@@ -20,7 +21,7 @@ export function HostDailyDouble({g,command}:{g:GameView;command:Command}){
   const run=async(action:string,data?:Record<string,unknown>)=>{setBusy(true);try{return await command(action,data);}finally{setBusy(false);}};
   const choose=(playerId:string)=>{void run('setDailyDoubleChooser',{playerId});};
   return <div className="host-question daily-double">
-    <div className="question-meta"><span>{c.category}</span><span>Daily Double</span><IconButton title="Return to board" onClick={()=>void run('closeQuestion')} disabled={busy}><X/></IconButton></div>
+    <div className="question-meta"><span>{c.category}</span><span>Daily Double</span><IconButton title="Close question" onClick={()=>void run('closeQuestion')} disabled={busy}><X/></IconButton></div>
     <HostDailyDoubleStatus g={g}/>
     {step==='chooser'&&<>{g.players.length<2?<p className="dd-notice">Add another team to play.</p>:<TeamChoices g={g} disabled={disabled} onChoose={choose}/>}</>}
     {step==='opponent'&&from&&<TeamChoices g={g} exclude={from.id} disabled={disabled} onChoose={playerId=>void run('assignDailyDouble',{fromId:from.id,playerId})}/>}
@@ -29,7 +30,7 @@ export function HostDailyDouble({g,command}:{g:GameView;command:Command}){
     {(step==='answer'||step==='result')&&<>
       <div className="host-clue"><RichText text={q.prompt}/><AnswerChoices question={q}/></div>
       <div className="dd-answer"><h3>Answer</h3><RichText text={q.answer}/></div>
-      {step==='answer'?<div className="judge-buttons dd-judging"><Button disabled={disabled} onClick={()=>void run('judge',{correct:false})}><X size={24}/>Incorrect</Button><Button variant="primary" disabled={disabled} onClick={()=>void run('judge',{correct:true})}><Check size={24}/>Correct</Button></div>:<Button className="dd-primary-action" variant="primary" disabled={disabled} onClick={()=>void run('closeQuestion')}>Back to board<ArrowRight size={22}/></Button>}
+      <div className="team-result-buttons dd-judging" role="group" aria-label={`Result for ${team?.name}`}><Button className="result-correct" aria-pressed={entry?.judged&&entry.correct===true} disabled={disabled} onClick={()=>void run('gradeTeam',{questionId:c.questionId,playerId:team!.id,result:'correct'})}><Check size={20}/>Correct</Button><Button className="result-incorrect" aria-pressed={entry?.judged&&entry.correct===false} disabled={disabled} onClick={()=>void run('gradeTeam',{questionId:c.questionId,playerId:team!.id,result:'incorrect'})}><X size={20}/>Incorrect</Button></div>{step==='result'&&<ContinueQuestion g={g} command={run}/>}
     </>}
     {c.phase==='wager'&&<details className="dd-preview"><summary>Preview question & answer<ChevronDown size={20}/></summary><RichText text={q.prompt}/><AnswerChoices question={q}/><h3>Answer</h3><RichText text={q.answer}/>{q.notes&&<><h3>Notes</h3><RichText text={q.notes}/></>}</details>}
     {q.notes&&c.phase!=='wager'&&<details className="dd-preview"><summary>Notes<ChevronDown size={20}/></summary><RichText text={q.notes}/></details>}

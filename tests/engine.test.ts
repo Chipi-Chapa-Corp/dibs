@@ -1,31 +1,34 @@
+import {startReadyGame} from './helpers.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {act,addPlayer,createGame,normalizeStoredGameplay,tick,updateDefinition,view} from '../server/engine.ts';
+import {act,addPlayer,joinMember,createGame,normalizeStoredGameplay,tick,updateDefinition,view} from '../server/engine.ts';
 import {demoRounds,emptyQuestion,emptyRound,nextBoardValue,orderRounds} from '../shared/model.ts';
-function fixture(){const g=createGame({name:'Test',definition:{rounds:demoRounds()}});const a=addPlayer(g,'Ada'),b=addPlayer(g,'Bea'),c=addPlayer(g,'Cam');act(g,'start');return{g,a,b,c,q:g.rounds[0].categories[0].questions[0]};}
-test('joining an existing name reuses the group without resetting its state',()=>{
- const {g,a}=fixture();
+function fixture(){const g=createGame({name:'Test',definition:{rounds:demoRounds()}});const a=addPlayer(g,'Ada'),b=addPlayer(g,'Bea'),c=addPlayer(g,'Cam');startReadyGame(g);return{g,a,b,c,q:g.rounds[0].categories[0].questions[0]};}
+test('a duplicate team name before starting reuses its existing state',()=>{
+ const g=createGame(),a=addPlayer(g,'Ada');
  a.score=500;a.ready=true;a.blockedUntil=12345;a.stats.incorrect=1;
  const revision=g.revision;
- assert.equal(addPlayer(g,'  ADA  '),a);assert.equal(g.players.length,3);assert.equal(g.revision,revision);
+ assert.equal(addPlayer(g,'  ADA  '),a);assert.equal(g.players.length,1);assert.equal(g.revision,revision);
  assert.equal(a.name,'Ada');assert.equal(a.score,500);assert(a.ready);assert.equal(a.blockedUntil,12345);assert.equal(a.stats.incorrect,1);
- act(g,'finish');assert.throws(()=>addPlayer(g,'Ada'),/ended/);
+ act(g,'finish');assert.throws(()=>addPlayer(g,'Ada'),/fixed/);
 });
-test('new games default to queued buzzes while explicit first-buzz settings are preserved',()=>{
- const {g,a,b,q}=fixture();assert.equal(g.settings.buzzMode,'queue');
- act(g,'openQuestion',{questionId:q.id});act(g,'openBuzzers');
- act(g,'buzz',{},'player',a.id);act(g,'buzz',{},'player',b.id);
- assert.deepEqual(g.current?.buzzes.map(buzz=>buzz.playerId),[a.id,b.id]);
- assert.equal(createGame({definition:{settings:{buzzMode:'first'}}}).settings.buzzMode,'first');
- assert.equal(createGame({definition:{settings:{buzzMode:'invalid'}}}).settings.buzzMode,'queue');
+test('first buzz wins automatically, including imports with retired queue settings',()=>{
+ const {g,a,b,q}=fixture();assert.equal(g.settings.buzzMode,'first');
+ act(g,'openQuestion',{questionId:q.id});assert(g.current?.buzzOpen);
+ act(g,'buzz',{},'player',a.id);assert.throws(()=>act(g,'buzz',{},'player',b.id),/Another team/);
+ assert.deepEqual(g.current?.buzzes.map(buzz=>buzz.playerId),[a.id]);assert.equal(b.blockedUntil,0);
+ const imported=createGame({definition:{settings:{buzzMode:'queue',autoOpenBuzzers:false,lockWrong:false,reopenWrong:false}}});
+ assert.equal(imported.settings.buzzMode,'first');assert(imported.settings.autoOpenBuzzers&&imported.settings.lockWrong&&imported.settings.reopenWrong);
 });
 test('public snapshots never contain future answers, private notes or player tokens',()=>{const{g,a,q}=fixture();q.notes='secret-host-notes';act(g,'openQuestion',{questionId:q.id});for(const role of ['stage','player']as const){const v=view(g,role,a.id);const json=JSON.stringify(v);assert(!json.includes(q.answer));assert(!json.includes('secret-host-notes'));assert(!('hostToken' in v));assert(!json.includes(a.token));assert.equal(v.rounds[0].categories[1].questions[0].prompt,'');assert.equal(v.currentQuestion?.prompt,q.prompt);}assert.equal(view(g,'host').currentQuestion?.answer,q.answer);});
 test('players can always join running and paused games, including old definitions that disabled late joining',()=>{
  const g=createGame({definition:{rounds:demoRounds(),settings:{allowLateJoin:false}}});
  assert(!('allowLateJoin' in g.settings));
- act(g,'start');assert.equal(addPlayer(g,'Late player').name,'Late player');
- act(g,'pause');assert.equal(addPlayer(g,'Paused player').name,'Paused player');
- act(g,'finish');assert.throws(()=>addPlayer(g,'After the end'),/ended/);
+ const team=addPlayer(g,'Fixed team');
+ startReadyGame(g);assert.equal(joinMember(g,{teamId:team.id,name:'Late player'}).name,'Late player');
+ act(g,'pause');assert.equal(joinMember(g,{teamId:team.id,name:'Paused player'}).name,'Paused player');
+ assert.throws(()=>addPlayer(g,'Late team'),/fixed/);
+ act(g,'finish');assert.throws(()=>joinMember(g,{teamId:team.id,name:'After the end'}),/ended/);
 });
 test('answer reveal is withheld until the configured server-side deadline',()=>{const{g,q}=fixture();act(g,'openQuestion',{questionId:q.id},'host',null,1000);act(g,'reveal',{},'host',null,1100);assert.equal(view(g,'stage',undefined,1500).currentQuestion?.answer,'');tick(g,2001);assert.equal(view(g,'stage').currentQuestion?.answer,q.answer);});
 test('answer choices preserve the selected answer while public views hide correctness and future options',()=>{
@@ -33,7 +36,7 @@ test('answer choices preserve the selected answer while public views hide correc
  const g=createGame({definition:{rounds,settings:{revealDelayMs:0}}}),player=addPlayer(g,'Ada'),q=g.rounds[0].categories[0].questions[0];
  assert.equal(q.answer,'Venus');assert.equal(q.correctAnswerIndex,1);
  for(const role of ['stage','player']as const){const future=view(g,role).rounds[0].categories[0].questions[0];assert(!('answerOptions' in future));assert(!('correctAnswerIndex' in future));}
- act(g,'start');act(g,'openQuestion',{questionId:q.id});
+ startReadyGame(g);act(g,'openQuestion',{questionId:q.id});
  for(const role of ['stage','player']as const){const current=view(g,role,player.id).currentQuestion!;assert.deepEqual(current.answerOptions,['Mercury','Venus','Mars']);assert.equal(current.answer,'');assert(!('correctAnswerIndex' in current));}
  assert.equal(view(g,'host').currentQuestion?.answer,'Venus');assert.equal(view(g,'host').currentQuestion?.correctAnswerIndex,1);
  act(g,'reveal');assert.equal(view(g,'stage').currentQuestion?.answer,'Venus');assert(!('correctAnswerIndex' in view(g,'stage').currentQuestion!));
@@ -69,7 +72,7 @@ test('Free Response discards proposed choices and keeps the expected answer priv
  const rounds=demoRounds();Object.assign(rounds[0].categories[0].questions[0],{responseType:'free',answer:'Expected response',answerOptions:['Old choice','Other choice'],correctAnswerIndex:1,shuffleAnswers:true});
  const g=createGame({definition:{rounds,settings:{revealDelayMs:0}}}),q=g.rounds[0].categories[0].questions[0],a=addPlayer(g,'Ada');
  assert.equal(q.responseType,'free');assert.equal(q.answer,'Expected response');assert(!('answerOptions' in q));assert(!('correctAnswerIndex' in q));assert(!('shuffleAnswers' in q));
- act(g,'start');act(g,'openQuestion',{questionId:q.id});assert(!g.current?.answerOrder);
+ startReadyGame(g);act(g,'openQuestion',{questionId:q.id});assert(!g.current?.answerOrder);
  for(const role of ['stage','player']as const){const visible=view(g,role,a.id).currentQuestion!;assert.equal(visible.responseType,'free');assert.equal(visible.answer,'');assert(!visible.answerOptions);}
  assert.equal(view(g,'host').currentQuestion?.answer,'Expected response');act(g,'reveal');assert.equal(view(g,'stage').currentQuestion?.answer,'Expected response');
 });
@@ -82,7 +85,7 @@ test('Final Free Response accepts private submissions and never offers a modifie
  const rounds=demoRounds();Object.assign(rounds[2].categories[0].questions[0],{responseType:'free',answer:'The final answer',answerOptions:['Old','Choices'],modifier:{title:'Invalid',instructions:'Not allowed'},dailyDouble:true});
  const g=createGame({definition:{rounds}}),a=addPlayer(g,'Ada');a.score=500;
  const q=g.rounds[2].categories[0].questions[0];assert.equal(q.modifier,null);assert.equal(q.dailyDouble,false);assert.equal(q.answer,'The final answer');assert(!q.answerOptions);
- act(g,'start');act(g,'round',{index:2});act(g,'wager',{wager:200},'player',a.id);act(g,'finalBegin');
+ startReadyGame(g);act(g,'round',{index:2});act(g,'wager',{wager:200},'player',a.id);act(g,'finalBegin');
  assert.equal(g.current?.phase,'final');assert.equal(view(g,'player',a.id).currentQuestion?.responseType,'free');assert(!view(g,'player',a.id).currentQuestion?.answerOptions);
  act(g,'finalAnswer',{answer:'My final response'},'player',a.id);assert.equal(view(g,'host').current?.wagers[a.id].answer,'My final response');assert.equal(view(g,'stage').current?.wagers[a.id].answer,'');
 });
@@ -98,8 +101,12 @@ test('answer option imports retain single answers, infer and clamp selection, an
 });
 test('first buzz wins; a second player cannot steal the floor',()=>{const{g,a,b,q}=fixture();g.settings.buzzMode='first';act(g,'openQuestion',{questionId:q.id});act(g,'openBuzzers');act(g,'buzz',{},'player',a.id,1000);assert.throws(()=>act(g,'buzz',{},'player',b.id,1001));assert.equal(g.current?.answeringId,a.id);assert.equal(g.current?.buzzes.length,1);});
 test('a wrong answer reopens the floor but locks out the player who missed',()=>{const{g,a,b,q}=fixture();act(g,'openQuestion',{questionId:q.id});act(g,'openBuzzers');act(g,'buzz',{},'player',a.id);act(g,'judge',{correct:false});assert.equal(a.score,-100);assert(g.current?.buzzOpen);assert.throws(()=>act(g,'buzz',{},'player',a.id));act(g,'buzz',{},'player',b.id);act(g,'judge',{correct:true});assert.equal(g.players.find(p=>p.id===b.id)?.score,100);assert(g.current?.closed);assert.throws(()=>act(g,'judge',{correct:true,playerId:b.id}));});
-test('queue mode advances to the next buzz after a wrong answer',()=>{const{g,a,b,q}=fixture();g.settings.buzzMode='queue';act(g,'openQuestion',{questionId:q.id});act(g,'openBuzzers');act(g,'buzz',{},'player',a.id);act(g,'buzz',{},'player',b.id);act(g,'judge',{correct:false});assert.equal(g.current?.answeringId,b.id);});
-test('early buzzing applies a temporary penalty without adding a buzz',()=>{const{g,a,q}=fixture();act(g,'openQuestion',{questionId:q.id});assert.throws(()=>act(g,'buzz',{},'player',a.id,1000));assert.equal(a.blockedUntil,1750);act(g,'openBuzzers');assert.throws(()=>act(g,'buzz',{},'player',a.id,1500));act(g,'buzz',{},'player',a.id,1800);assert.equal(g.current?.answeringId,a.id);});
+test('teams buzz again after an incorrect answer rather than joining a queue',()=>{
+ const{g,a,b,q}=fixture();act(g,'openQuestion',{questionId:q.id});act(g,'buzz',{},'player',a.id);
+ assert.throws(()=>act(g,'buzz',{},'player',b.id));act(g,'judge',{correct:false});assert.equal(g.current?.answeringId,null);
+ act(g,'buzz',{},'player',b.id);assert.equal(g.current?.answeringId,b.id);
+});
+test('early buzzing applies a temporary penalty without adding a buzz',()=>{const{g,a,q}=fixture();act(g,'openQuestion',{questionId:q.id});act(g,'closeBuzzers');assert.throws(()=>act(g,'buzz',{},'player',a.id,1000));assert.equal(a.blockedUntil,1750);act(g,'openBuzzers');assert.throws(()=>act(g,'buzz',{},'player',a.id,1500));act(g,'buzz',{},'player',a.id,1800);assert.equal(g.current?.answeringId,a.id);});
 test('questions remain open without time limits and game pause still blocks play',()=>{
  const {g,a,q}=fixture();g.settings.autoOpenBuzzers=true;
  act(g,'openQuestion',{questionId:q.id},'host',null,1000);
@@ -117,7 +124,7 @@ test('old timer settings, question overrides and timer commands cannot enable co
  const g=createGame({definition:{rounds,settings}});
  act(g,'save',{settings});for(const key of Object.keys(settings))assert(!(key in g.settings));
  const q=g.rounds[0].categories[0].questions[0];assert(!('timer' in q));
- act(g,'start');act(g,'openQuestion',{questionId:q.id});
+ addPlayer(g,'Test team');startReadyGame(g);act(g,'openQuestion',{questionId:q.id});
  for(const action of ['timerStart','timerPause'])assert.throws(()=>act(g,action,{seconds:1}),/Unknown action/);
  assert(!('timer' in g.current!));assert(!tick(g,Date.now()+86400000));assert(!g.current?.revealed);
 });
@@ -143,7 +150,7 @@ test('round names follow their positions on import, reorder, deletion and legacy
  g.rounds.forEach(r=>r.name='Legacy name');normalizeStoredGameplay(g);
  assert.deepEqual(names(),['Round 1','Round 2']);
  assert.deepEqual(g.rounds.map(r=>r.categories),content);
- act(g,'start');act(g,'pause');
+ addPlayer(g,'Test team');startReadyGame(g);act(g,'openQuestion',{questionId:g.rounds[0].categories[0].questions[0].id});act(g,'pause');
  const previous=g.undo.at(-1) as typeof g;previous.rounds.forEach(r=>r.name='Old undo name');
  act(g,'undo');assert.deepEqual(names(),['Round 1','Round 2']);
 });
@@ -166,7 +173,7 @@ test('category values progress independently with round-specific defaults and un
  const imported=createGame({definition:JSON.parse(JSON.stringify({rounds:g.rounds}))});
  assert.deepEqual(imported.rounds,rounds);
  for(const role of ['host','stage','player']as const)assert.deepEqual(view(imported,role).rounds.map(r=>r.categories.map(c=>c.questions.length)),[[3,1,0],[4,1,0],[4,1,0]]);
- addPlayer(imported,'Ada');act(imported,'start');act(imported,'round',{index:2});
+ addPlayer(imported,'Ada');startReadyGame(imported);act(imported,'round',{index:2});
  const question=imported.rounds[2].categories[1].questions[0];
  act(imported,'openQuestion',{questionId:question.id});act(imported,'answerer',{playerId:imported.players[0].id});act(imported,'judge',{correct:true});
  assert.equal(imported.players[0].score,300);
@@ -175,7 +182,7 @@ test('blank and whitespace-only questions cannot be selected in a game',()=>{
  const {g,q}=fixture();q.prompt='   ';assert.throws(()=>act(g,'openQuestion',{questionId:q.id}),/empty/);assert.equal(g.current,null);
 });
 test('an empty final round can be edited and started without attempting to open a missing question',()=>{
- const g=createGame();g.rounds[0].type='final';assert.doesNotThrow(()=>act(g,'start'));assert.equal(g.current,null);
+ const g=createGame();addPlayer(g,'Test team');g.rounds[0].type='final';assert.doesNotThrow(()=>startReadyGame(g));assert.equal(g.current,null);
 });
 test('public boards distinguish playable questions from blanks without disclosing question text',()=>{
  const {g,q}=fixture();q.prompt='   ';const filled=g.rounds[0].categories[0].questions[1];
@@ -202,8 +209,8 @@ test('hidden modifiers look like normal cells and reveal their instructions only
 test('claiming a modifier can be undone and never consumes answer or score rules',()=>{
  const {g,a,b,q}=fixture();q.modifier={title:'Sign flip',instructions:'Multiply your points by -1.'};
  act(g,'openQuestion',{questionId:q.id});act(g,'buzz',{},'player',a.id);
- act(g,'undo');assert.equal(g.modifierClaims.length,0);assert.equal(g.current?.answeringId,null);assert.equal(g.current?.buzzOpen,true);
- act(g,'buzz',{},'player',b.id);assert.equal(g.modifierClaims[0].playerId,b.id);
+ act(g,'undo');assert.equal(g.modifierClaims.length,0);assert.equal(g.current,null);
+ act(g,'openQuestion',{questionId:q.id});act(g,'buzz',{},'player',b.id);assert.equal(g.modifierClaims[0].playerId,b.id);
 });
 test('modifier reminders survive the board and round changes until manually dismissed',()=>{
  const {g,a,q}=fixture();q.modifier={title:'Close enough',instructions:'Approximate answers allowed for 3 rounds.'};g.settings.revealDelayMs=0;
@@ -211,14 +218,14 @@ test('modifier reminders survive the board and round changes until manually dism
  assert.equal(view(g,'player',a.id).modifierClaims[0].instructions,q.modifier.instructions);
  assert.throws(()=>act(g,'dismissModifier',{id:g.modifierClaims[0].id},'player',a.id),/Host/);
  act(g,'dismissModifier',{id:g.modifierClaims[0].id});assert.equal(g.modifierClaims.length,0);
- act(g,'undo');assert.equal(g.modifierClaims.length,1);
+ assert.throws(()=>act(g,'undo'),/Nothing to undo/);assert.equal(g.modifierClaims.length,0);
 });
 test('hidden modifier definitions validate, export cleanly, and exclude daily doubles and finals',()=>{
  const rounds=demoRounds(),q=rounds[0].categories[0].questions[0];q.prompt='';q.dailyDouble=true;q.modifier={title:'Hidden',instructions:'Steal 100 points.'};
  rounds[2].categories[0].questions[0].modifier={title:'Invalid final',instructions:'Not supported.'};
  const g=createGame({definition:{rounds,modifiers:[{trigger:'roundStart',effects:[{type:'set',amount:999999}]}]}});
  assert.equal(g.rounds[0].categories[0].questions[0].dailyDouble,false);assert.equal(g.rounds[2].categories[0].questions[0].modifier,null);
- const p=addPlayer(g,'Ada');act(g,'start');assert.equal(p.score,0);assert.throws(()=>act(g,'modifier',{modifierId:'legacy'}),/Unknown action/);
+ const p=addPlayer(g,'Ada');startReadyGame(g);assert.equal(p.score,0);assert.throws(()=>act(g,'modifier',{modifierId:'legacy'}),/Unknown action/);
  const imported=createGame({definition:JSON.parse(JSON.stringify({rounds:g.rounds}))});assert.deepEqual(imported.rounds,g.rounds);
 });
 test('empty modifier instructions are unplayable even when the old question still has text',()=>{
@@ -229,7 +236,7 @@ test('only the presenter selects questions, including after correct answers and 
  const g=createGame({definition:{rounds:demoRounds(),settings:{selection:'winner'}}});
  const a=addPlayer(g,'Ada'),b=addPlayer(g,'Bea');
  const q=g.rounds[0].categories[0].questions[0];
- act(g,'save',{settings:{selection:'winner'}});assert(!('selection' in g.settings));act(g,'start');
+ act(g,'save',{settings:{selection:'winner'}});assert(!('selection' in g.settings));startReadyGame(g);
  for(const p of [a,b])for(const action of ['selectQuestion','openQuestion','chooser'])assert.throws(()=>act(g,action,{questionId:q.id,playerId:p.id},'player',p.id),/Host access/);
  assert.throws(()=>act(g,'chooser',{playerId:a.id}),/Unknown action/);
  act(g,'openQuestion',{questionId:q.id});act(g,'openBuzzers');act(g,'buzz',{},'player',a.id);act(g,'judge',{correct:true});act(g,'closeQuestion');
@@ -239,14 +246,12 @@ test('only the presenter selects questions, including after correct answers and 
  assert.throws(()=>act(g,'selectQuestion',{questionId:q.id},'player',b.id),/Host access/);
  assert(!('chooserId' in g));
 });
-test('queued answerers retain the floor until the presenter judges them',()=>{
- const {g,a,b,q}=fixture();g.settings.buzzMode='queue';
- act(g,'openQuestion',{questionId:q.id},'host',null,1000);act(g,'openBuzzers');
- act(g,'buzz',{},'player',a.id,2000);act(g,'buzz',{},'player',b.id,3000);
+test('the first answerer retains the floor until judged and other teams must buzz again',()=>{
+ const {g,a,b,q}=fixture();act(g,'openQuestion',{questionId:q.id},'host',null,1000);
+ act(g,'buzz',{},'player',a.id,2000);assert.throws(()=>act(g,'buzz',{},'player',b.id,3000));
  assert(!tick(g,86400000));assert.equal(g.current?.answeringId,a.id);
- act(g,'judge',{correct:false},'host',null,86400001);
- assert.equal(g.current?.answeringId,b.id);assert(!('timer' in g.current!));
- assert(!tick(g,172800000));assert.equal(g.current?.answeringId,b.id);
+ act(g,'judge',{correct:false},'host',null,86400001);assert.equal(g.current?.answeringId,null);
+ act(g,'buzz',{},'player',b.id,86400002);assert(!tick(g,172800000));assert.equal(g.current?.answeringId,b.id);
  act(g,'judge',{correct:true},'host',null,172800001);assert.equal(b.score,100);
 });
 test('final answers remain editable until the presenter reveals the answer',()=>{
@@ -296,7 +301,7 @@ test('host reset clears the session in every game state and preserves the comple
   assert(!JSON.stringify(g).includes(a.token));assert(!JSON.stringify(g).includes('Old answer'));
   assert.throws(()=>act(g,'undo'),/Nothing to undo/);
   const fresh=addPlayer(g,a.name);assert.notEqual(fresh.id,a.id);assert.notEqual(fresh.token,a.token);assert.equal(fresh.score,0);assert.equal(fresh.ready,false);assert.deepEqual(fresh.stats,{correct:0,incorrect:0,buzzes:0});
-  act(g,'start');act(g,'openQuestion',{questionId:q.id,playerId:fresh.id});const reopened=view(g,'host').current;assert.equal(reopened?.questionId,q.id);assert.equal(reopened?.phase,'wager');
+  startReadyGame(g);act(g,'openQuestion',{questionId:q.id,playerId:fresh.id});const reopened=view(g,'host').current;assert.equal(reopened?.questionId,q.id);assert.equal(reopened?.phase,'wager');
  }
 });
 test('players cannot reset the game or clear another player’s progress',()=>{
@@ -310,7 +315,7 @@ test('prepare before play: game definitions lock on start, stay locked when paus
  const rounds=structuredClone(g.rounds);rounds[0].categories[0].questions[0].prompt='Prepared clue';
  act(g,'save',{rounds,name:'Ready to host',settings:{startingScore:0},theme:{title:'Prepared appearance'}});
  assert.equal(g.name,'Ready to host');assert.equal(g.rounds[0].categories[0].questions[0].prompt,'Prepared clue');assert.equal(g.theme.title,'Prepared appearance');
- act(g,'start');
+ addPlayer(g,'Test team');startReadyGame(g);
  for(const state of ['playing','paused','finished']){
   if(state==='paused')act(g,'pause');
   if(state==='finished')act(g,'finish');

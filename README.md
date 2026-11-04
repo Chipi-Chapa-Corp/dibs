@@ -18,7 +18,7 @@ npm run play
 
 Use `npm run play` for game nights. Use `npm run dev` during development for hot reload.
 
-Open [localhost:43187](http://localhost:43187). Players open the LAN address printed in the terminal on the same Wi-Fi, choose their game from the list and tap **Join**. Enter a new name or select an existing name from the dropdown to join that group. Each group counts as one player, with shared scores, readiness, wagers and buzz lockouts across all its phones. Invite links and QR codes open this game list; room codes are never shown. Open **Presenter** on your second screen. During play, phones show only scores and the circular buzzer. Teams speak their choices and answers to the presenter, who records them on the host screen.
+Open [localhost:43187](http://localhost:43187). Players open the LAN address printed in the terminal on the same Wi-Fi, choose their game from the list and tap **Join**. The host creates teams before starting. Players enter their own name and select one of these teams; they cannot create teams. Each player can use their own phone as a buzzer; teammates share their score, readiness, wagers and buzz lockouts. Invite links and QR codes open this game list; room codes are never shown. Open **Presenter** on your second screen. During play, phones show only scores and the circular buzzer. Teams speak their choices and answers to the presenter, who records them on the host screen.
 
 ## Local network security
 
@@ -26,7 +26,7 @@ The server accepts HTTP and Socket.IO connections from loopback and the subnet o
 
 Host-header and browser-Origin checks reject unexpected addresses and cross-origin HTTP/WebSocket requests, including DNS rebinding attempts. Direct navigation to a shared game-list link still works.
 
-Games remain public within the selected LAN: anyone can create, host, edit, copy, export or delete games. There are no host keys or host-transfer links. One-editor-at-a-time locks prevent simultaneous edits. Player tokens identify participants and preserve reconnects. These network protections do not make untrusted LAN participants safe to invite.
+Games remain public within the selected LAN: anyone can create, host, edit, copy, export or delete games. There are no host keys or host-transfer links. One-editor-at-a-time locks prevent simultaneous edits. Individual player tokens preserve reconnects; teammates have different credentials. These network protections do not make untrusted LAN participants safe to invite.
 
 Limits per server: **100 games**, **1 GiB uploaded media** (including existing files), **100 MiB per file**, and one file per upload. Limits apply while streaming, including simultaneous/chunked uploads; failed or oversized uploads are removed. Existing files above the cap are preserved, and further uploads are rejected. Remove unused media while the server is stopped and restart to recalculate capacity.
 
@@ -38,7 +38,7 @@ Keep this app on a trusted LAN. HTTP traffic is still unencrypted. Do not config
 
 ## Development reloads
 
-Keep `npm run dev` running while editing. Changes in `server/`, `shared/`, `vite.config.ts`, `tsconfig.json`, or `package.json` restart the server automatically. A restart saves the current game first; host, presenter, and player screens reconnect automatically. Player tokens preserve each player’s identity. Vite refreshes the page after a server restart, so allow pending edits to finish saving.
+Keep `npm run dev` running while editing. Changes in `server/`, `shared/`, `vite.config.ts`, `tsconfig.json`, or `package.json` restart the server automatically. A restart saves the current game first; host, presenter, and player screens reconnect automatically. Individual player tokens preserve each player’s identity and team membership. Vite refreshes the page after a server restart, so allow pending edits to finish saving.
 
 React and CSS edits in `src/` update through Vite without restarting the game server. Both watchers poll every 200 ms, including when filesystem change notifications are unavailable. Saved games and uploaded media do not trigger restarts.
 
@@ -50,9 +50,9 @@ Open the home list and choose **Create game** or **Edit**. Anyone on the local n
 
 The library labels each game **Not started**, **Ongoing**, or **Finished** and updates as the host starts, finishes, resumes or resets it. Use the status filter to narrow the list; **All games** includes finished games.
 
-When your board is ready, choose **Host**, invite players and start. The host screen contains the board, buzzers, judging, scores and player status. It has no question, appearance or settings editor. **More** contains pause/resume, finish and reset. The host uses on-screen buttons for all game controls.
+When your board is ready, choose **Host**, use **+** beside **Teams** to create the teams, invite players and wait for every team to mark itself ready on a phone. **Start game** stays disabled until all teams are ready; this rule is always enforced. Teams cannot be added, renamed or removed once play starts, including while paused, after finishing or through undo. Reset clears teams for a new game. The host screen contains the board, buzzers, judging, scores and team status. It has no question, appearance or settings editor. **More** contains pause/resume, finish and reset. The host uses on-screen buttons for all game controls. **Undo question**, beside **Reset game**, cancels the last question selection and restores the board and scores from before that question. Correct/Incorrect/Pass clicks do not create separate undo steps. Undo preserves the fixed teams, player connections and pause state. Changing rounds, finishing or resetting clears question undo history.
 
-After a game starts, its definition is locked, including in editor tabs left open elsewhere. Choose **Copy & edit** in the library to prepare a fresh version while keeping the current game's players, scores and results. A reset returns the original to the lobby and allows preparation again.
+After a game starts, its definition is locked, including in editor tabs left open elsewhere. Choose **Copy & edit** in the library to prepare a fresh version while keeping the current game's teams, scores and results. A reset returns the original to the lobby and allows preparation again.
 
 Round names are automatic: **Round 1**, **Round 2**, **Round 3**, and so on. Moving, duplicating or removing rounds updates their numbers. Imported and saved games use the same numbering.
 
@@ -78,9 +78,13 @@ On the host screen, **Change** lets the presenter correct earlier choices. Chang
 
 In **Edit → Questions**, open a cell and choose **Modifier** below the question. Enter its title and what it does, including any duration (for example, “Approximate answers allowed for the next 3 rounds”). The cell keeps its normal board value.
 
-When selected, the presenter shows a mystery modifier and the phone buzzers open. The first player or team to buzz claims it, then its instructions are revealed. No points change automatically: edit scores from the host screen as needed. Claimed modifiers stay in the host’s reminders until the host dismisses them.
+When selected, the presenter shows a mystery modifier and the phone buzzers open. The first team to buzz claims it, then its instructions are revealed. No points change automatically: edit scores from the host screen as needed. Claimed modifiers stay in the host’s reminders until the host dismisses them.
 
-The presenter selects every question from the host board. The chosen tile briefly highlights on both boards before opening, while phones keep the score and buzzer. Buzzers stay closed during this cue, including for hidden modifiers. A two-note selection chime plays from the host; its speaker button mutes it. The presenter display starts muted and can enable sound separately. Choices last for the browser tab. Motion preferences use a static highlight instead of a pulse. Questions, answers and the final have no countdowns or time limits; the presenter opens/closes buzzers and reveals answers when ready. Older timer settings are ignored. A team can join with multiple phones under the same team name.
+For regular questions, the presenter chooses the tile after the team names its choice aloud. The clue opens and buzzers open automatically. The first buzz locks in one answering team and shows **Correct**, **Incorrect** and **Pass** controls on the host screen. Points follow the question value and scoring settings; click any team or **Manage teams** to open one panel with every team’s score and players. Edit multiple scores and apply them together with **Save scores**; players can be removed without leaving the panel. Correct scores that answer, closes buzzing and animates the answer reveal on the presenter screen. The answer remains visible until the host clicks **Continue**; Continue waits for the reveal to finish before returning to the board. Incorrect deducts the normal penalty and reopens buzzing for the remaining teams. Pass changes no points and also releases the buzzers; the passing team sits out the rest of that question. Clicking Incorrect immediately highlights that team in the host’s existing team list with a red border, an × and an Incorrect label. Teams stay in their creation order on the presenter screen as scores change. The presenter scoreboard immediately shows a steady red highlight and keeps the status visible for the whole question, including when scores are hidden. Passed teams have a neutral Passed label. These markers clear for the next question. No team queue is kept, and the picking team is not tracked. **End question** skips an unresolved question, including when no teams remain. Answers stay private on the host screen until a correct answer triggers the reveal.
+
+Final questions retain per-team wager judging. Daily Doubles retain their assigned opposing team and wager. Their results can be revised before Continue.
+
+The presenter selects every question from the host board. The chosen tile briefly highlights on both boards before opening, while phones keep the score and buzzer. Buzzers stay closed during this cue, including for hidden modifiers. A two-note selection chime plays from the host; its speaker button mutes it. The presenter display starts muted and can enable sound separately. Choices last for the browser tab. Motion preferences use a static highlight instead of a pulse. Questions, answers and the final have no countdowns or time limits; regular-question buzzers open automatically and the host judges the first team to buzz. Older timer settings are ignored. Each player joins a host-created team using their own name and phone.
 
 Older game files still import their questions, settings and appearance; the former automated modifier rules are no longer used.
 
@@ -90,11 +94,15 @@ Each game lives in its own JSON file under **`data/games/`**. The server reads e
 
 You can put an exported game JSON directly into this directory and restart the server. It becomes a saved game in that same file. Open Dibs from any device on the local network and click **Host** to play a game added this way. No ownership claim is needed. Phones join from the game list as usual.
 
-To replay a board, click **Reset game** in the center of the host page header and confirm. It clears all players, scores, played questions, wagers, claimed modifiers and activity, then returns to the lobby. Questions, settings and appearance stay the same. Players join again from the local game list. Reset cannot be undone.
+Players can click **Leave game** to remove their own buzzer and return to the join screen. Closing a tab or losing Wi-Fi keeps their membership; reopening the same game at the same address in the same browser reconnects automatically. After clearing browser data or moving to another device, enter your name and choose your team again. The host can select a team to see its named players and connection status, then **Remove player** to revoke only that player's login. A removed player can join again; removal is not a permanent ban. Team scores, wagers, answer attempts and claimed modifiers stay with the team even when nobody is connected.
+
+Older saved games retain their teams, scores and board progress. Existing phones must join once with an individual name because the old login identified the entire team. Player credentials and the fixed team roster persist across server restarts; undo cannot restore a removed player's credential.
+
+To replay a board, click **Reset game** in the center of the host page header and confirm. It clears all teams, players, scores, played questions, wagers, claimed modifiers and activity, then returns to the lobby. Questions, settings and appearance stay the same. Players join again from the local game list. Reset cannot be undone.
 
 To delete a game, open the home list and click the trash button beside **Edit**, then confirm the game name. This removes its JSON file and ends access for connected players and presenter screens. Anyone can delete a game when it is not being edited.
 
-Saved game files contain player tokens, scores and current progress. Player tokens identify buzzes and answers; they are not accounts or host permissions. To edit or remove a file manually, stop the server first; it loads the updated directory on the next start.
+Saved game files contain individual player tokens, team scores and current progress. Player tokens identify a member and their team; they are not accounts or host permissions. To edit or remove a file manually, stop the server first; it loads the updated directory on the next start.
 
 The old combined `data/games.json` is migrated automatically. Existing per-game files take precedence, and the original combined file is kept as `data/games.json.migrated` after a successful migration. Invalid game files are reported and skipped so other games can still load.
 

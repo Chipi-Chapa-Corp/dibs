@@ -6,6 +6,7 @@ import {join} from 'node:path';
 import {request as httpRequest,type IncomingMessage} from 'node:http';
 import {io} from 'socket.io-client';
 import {localNetwork,RateLimits} from '../server/security.ts';
+import {addPlayer} from '../server/engine.ts';
 import {startServer} from '../server/index.ts';
 
 const nic=(address:string,netmask='255.255.255.0')=>({address,netmask,family:'IPv4' as const,internal:false,mac:'00:00:00:00:00:00',cidr:null});
@@ -61,7 +62,8 @@ test('HTTP and WebSocket origin guards block unrelated websites while normal LAN
       assert.equal((await f.post('/api/games',{}, {},remote)).status,201);
       assert.equal((await f.post('/api/games',{}, {'X-Forwarded-For':'127.0.0.1'},remote)).status,201);
       assert.equal((await fetch(`${remote}/api/games/${created.id}/export`)).status,200);
-      assert.equal((await f.post(`/api/games/${created.id}/join`,{name:'Phone'}, {},remote)).status,200);
+      const team=addPlayer(f.instance.games.get(created.id)!,'LAN team');
+      assert.equal((await f.post(`/api/games/${created.id}/join`,{name:'Phone',teamId:team.id}, {},remote)).status,200);
     }
     assert.equal((await fetch(f.base+'/api/games')).headers.get('x-frame-options'),'DENY');
   }finally{await f.close();}

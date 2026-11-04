@@ -1,12 +1,16 @@
 import {useEffect,useRef,useState} from 'react';
 import {AppLink,usePathname} from './navigation';
-import {ArrowUpRight,ArrowRight,Plus,Users,Monitor,Settings2,Palette,Grid2X2,Layers,CircleHelp,Play,Pause,Flag,Hand,Check,X,Lock,Unlock,Copy,Download,Upload,ChevronDown,ArrowLeft,MoreHorizontal,Zap,QrCode,Pencil,RotateCcw,Trash2,Volume2,VolumeX} from 'lucide-react';
+import {ArrowUpRight,ArrowRight,Plus,Users,Monitor,Settings2,Palette,Grid2X2,Layers,CircleHelp,Play,Pause,Flag,Hand,Check,X,Lock,Unlock,Copy,Download,Upload,ChevronDown,ArrowLeft,MoreHorizontal,Zap,QrCode,Pencil,RotateCcw,Undo2,Trash2,LogOut,Volume2,VolumeX} from 'lucide-react';
 import type {GameSummary,GameView,Theme} from '../shared/model';
 import {themes,defaultTheme,defaultSettings,emptyRound,roundName} from '../shared/model';
 import {api,download,go,number,playerKey,sortedPlayers,themeStyle,useGame,useGames,useNow,useToast} from './lib';
 import {flushAutosaves} from './autosave';
 import {useSoundCues} from './useSoundCues';
 import {HostDailyDouble} from './DailyDouble';
+import {TeamJudging} from './TeamJudging';
+import {ContinueQuestion} from './ContinueQuestion';
+import {AnswerDecision} from './AnswerDecision';
+import {TeamsPanel} from './TeamsPanel';
 import {AnswerChoices,Board,Button,Connection,Empty,Field,IconButton,Invite,Logo,Modal,RichText,Scores,StageContent} from './components';
 import {QuestionsEditor,AppearanceEditor,SettingsEditor} from './editors';
 type Command=(action:string,data?:Record<string,unknown>)=>Promise<boolean>;
@@ -43,7 +47,7 @@ function Lobby({joinOnly}:{joinOnly:boolean}){
             <span className="game-meta-count" aria-label={`${g.rounds} ${g.rounds===1?'round':'rounds'}`}><Layers className="game-meta-icon" size={18} aria-hidden="true"/>{g.rounds}<span className="game-meta-label">{g.rounds===1?'round':'rounds'}</span></span>
             <span aria-hidden="true">·</span>
             <span className="game-meta-count" aria-label={`${g.questionTotal} ${g.questionTotal===1?'question':'questions'}`}><CircleHelp className="game-meta-icon" size={18} aria-hidden="true"/>{g.questionTotal}<span className="game-meta-label">{g.questionTotal===1?'question':'questions'}</span></span>
-            {g.playerCount>0&&<><span aria-hidden="true">·</span><span className="game-meta-count" aria-label={`${g.playerCount} ${g.playerCount===1?'player':'players'}`}><Users size={18} aria-hidden="true"/>{g.playerCount}</span></>}
+            {g.playerCount>0&&<><span aria-hidden="true">·</span><span className="game-meta-count" aria-label={`${g.playerCount} ${g.playerCount===1?'team':'teams'}`}><Users size={18} aria-hidden="true"/>{g.playerCount}</span></>}
             <span className="game-mobile-status"><span aria-hidden="true">·</span><span className={`game-status status-${g.status}`}>{gameStatuses[g.status]}</span></span>
           </span></td>
           <td className="game-status-cell"><span className={`game-status status-${g.status}`}><i aria-hidden="true"/>{gameStatuses[g.status]}</span></td>
@@ -70,7 +74,7 @@ function DeleteGameDialog({game,onClose}:{game:GameSummary;onClose:()=>void}){
     }catch(error){setError((error as Error).message);setBusy(false);}
   };
   return <Modal title="Delete game?" onClose={()=>{if(!busy)onClose();}}>
-    <p>Permanently delete <strong>{game.name}</strong>, including its players, scores and saved progress? Players and presenter screens will show that the game was deleted.</p>
+    <p>Permanently delete <strong>{game.name}</strong>, including its teams, scores and saved progress? Team buzzers and presenter screens will show that the game was deleted.</p>
     <p className="delete-game-warning">This cannot be undone.</p>
     {error&&<p className="delete-game-error" role="alert">{error}</p>}
     <div className="modal-actions"><Button disabled={busy} onClick={onClose}>Cancel</Button><Button className="delete-game-confirm" disabled={busy} onClick={()=>void remove()}><Trash2 size={18}/>{busy?'Deleting…':'Delete game'}</Button></div>
@@ -82,13 +86,13 @@ function LoadError({error,connected}:{error:string;connected?:boolean}){return <
 function GameEditor({id}:{id:string}){
   const{g,connected,error,command,editorId}=useGame(id,'host',true);
   const[tab,setTab]=useState<'questions'|'appearance'|'settings'>('questions'),[busy,setBusy]=useState(false);
-  const[loadingGame]=useState<GameView>(()=>({id,name:'',subtitle:'',createdAt:0,status:'lobby',paused:false,roundIndex:0,rounds:[emptyRound()],settings:structuredClone(defaultSettings),theme:structuredClone(defaultTheme),players:[],played:[],current:null,history:[],questionCount:0,selection:null,announcement:null,revision:0,modifierClaims:[],filledQuestionIds:[],role:'host',serverTime:0,currentQuestion:null,yourFinal:null}));
+  const[loadingGame]=useState<GameView>(()=>({id,name:'',subtitle:'',createdAt:0,status:'lobby',paused:false,roundIndex:0,rounds:[emptyRound()],settings:structuredClone(defaultSettings),theme:structuredClone(defaultTheme),teamsLocked:false,members:[],players:[],played:[],current:null,history:[],questionCount:0,selection:null,announcement:null,revision:0,modifierClaims:[],filledQuestionIds:[],role:'host',canUndo:false,serverTime:0,currentQuestion:null,yourFinal:null}));
   const toast=useToast();
   const leave=async(url:string)=>{setBusy(true);try{if(await flushAutosaves())go(url);}finally{setBusy(false);}};
   if(!g&&error)return <LoadError error={error}/>;
   if(g&&g.status!=='lobby')return <div className="preparation-locked" style={themeStyle(g.theme)}>
     <Logo/><h1>This game has already started.</h1>
-    <p>Make a copy to edit a new version with the same questions. The current game keeps its players and scores.</p>
+    <p>Make a copy to edit a new version with the same questions. The current game keeps its teams and scores.</p>
     <div className="toolbar-actions"><AppLink className="button" href="/">Game library</AppLink><AppLink className="button" href={`/host/${id}`}>Back to host</AppLink><Button variant="primary" disabled={busy||!connected} onClick={async()=>{setBusy(true);try{await copyGameForEditing(id);}catch(e){toast((e as Error).message);setBusy(false);}}}><Copy size={20}/>Make a copy</Button></div>
   </div>;
   const tabs=[['questions',Grid2X2,'Questions'],['appearance',Palette,'Appearance'],['settings',Settings2,'Settings']]as const;
@@ -105,32 +109,33 @@ function GameEditor({id}:{id:string}){
 
 function Host({id}:{id:string}){
   const{g,connected,error,command}=useGame(id,'host');
+  const[undoing,setUndoing]=useState(false);
   const[invite,setInvite]=useState(false),[adjust,setAdjust]=useState<string|null>(null),[confirm,setConfirm]=useState<'finish'|'round'|null>(null),[reset,setReset]=useState(false),[more,setMore]=useState(false);
   const{muted,toggleSound}=useSoundCues(g,'host');
   const toast=useToast();
   if(!g&&error==='Someone is already hosting this game.')return <main className="loading-page"><Logo/><h2>{error}</h2><AppLink className="button primary" href={`/play/${id}`}>Join<ArrowRight size={20}/></AppLink><AppLink className="button" href="/">Back to games<ArrowLeft size={20}/></AppLink></main>;
   if(!g)return <LoadError error={error} connected={connected}/>;
   const questionTotal=g.filledQuestionIds.length;
-  const waitingForReady=g.settings.requireReady&&g.players.some(p=>!p.ready);
+  const waitingForReady=g.players.some(p=>!p.ready);
   return <div className="host-app hosting-app" style={themeStyle(g.theme)}>
-    <header className="host-header"><div className="host-header-identity"><AppLink className="button library-link" href="/"><ArrowLeft size={20}/><span>Library</span></AppLink><span className="host-game-name">{g.name}</span></div><div className="host-header-controls"><IconButton title={muted?'Enable selection sound':'Mute selection sound'} aria-pressed={!muted} onClick={toggleSound}>{muted?<VolumeX/>:<Volume2/>}</IconButton><Button disabled={!connected} onClick={()=>setReset(true)}><RotateCcw size={20}/>Reset game</Button></div><div className="header-actions"><Connection connected={connected}/><Button onClick={()=>setInvite(true)}><Users size={20}/><span>Invite players</span></Button><AppLink className="button" href={`/stage/${id}`} target="_blank" rel="noreferrer"><Monitor size={20}/>Presenter<ArrowUpRight size={18}/></AppLink></div></header>
+    <header className="host-header"><div className="host-header-identity"><AppLink className="button library-link" href="/"><ArrowLeft size={20}/><span>Library</span></AppLink><span className="host-game-name">{g.name}</span></div><div className="host-header-controls"><IconButton title={muted?'Enable selection sound':'Mute selection sound'} aria-pressed={!muted} onClick={toggleSound}>{muted?<VolumeX/>:<Volume2/>}</IconButton><Button disabled={!connected||!g.canUndo||undoing} title={g.canUndo?'Undo the last question selection':'No question selection to undo'} onClick={async()=>{setUndoing(true);try{if(await command('undo')){setAdjust(null);setConfirm(null);}}finally{setUndoing(false);}}}><Undo2 size={20}/>{undoing?'Undoing…':'Undo question'}</Button><Button disabled={!connected} onClick={()=>setReset(true)}><RotateCcw size={20}/>Reset game</Button></div><div className="header-actions"><Connection connected={connected}/><Button onClick={()=>setInvite(true)}><Users size={20}/><span>Invite teams</span></Button><AppLink className="button" href={`/stage/${id}`} target="_blank" rel="noreferrer"><Monitor size={20}/>Presenter<ArrowUpRight size={18}/></AppLink></div></header>
     <main className="host-main hosting-main">
       {g.status!=='lobby'&&<div className="live-toolbar"><div className="round-select"><span className="eyebrow">Round</span><select aria-label="Current round" disabled={g.status==='finished'} value={g.roundIndex} onChange={e=>void command('round',{index:Number(e.target.value)})}>{g.rounds.map((r,i)=><option key={r.id} value={i}>{roundName(i)}{r.type==='final'?' · Final':''}</option>)}</select>{g.paused&&<span className="tag">Paused</span>}</div><div className="toolbar-actions"><Button onClick={()=>setMore(true)}><MoreHorizontal size={20}/>More</Button></div></div>}
       <div className="live-layout"><section className="live-table">
-        {g.status==='lobby'?<div className="host-waiting"><span className="eyebrow">Ready to host</span><h1>Gather your players.</h1><p>{g.rounds.length} {g.rounds.length===1?'round':'rounds'} · {questionTotal} {questionTotal===1?'question':'questions'}</p><Button variant="primary" disabled={!connected||!questionTotal||waitingForReady||!!g.editLock} onClick={()=>void command('start')}><Play size={20}/>Start game</Button>{g.editLock&&<p className="field-hint">Someone is editing this game. You can start when they’re done.</p>}{waitingForReady&&<p className="field-hint">Waiting for everyone to mark themselves ready.</p>}{!questionTotal&&<p className="field-hint">This game needs questions first. Prepare it from the <AppLink href="/">game library</AppLink>.</p>}</div>
+        {g.status==='lobby'?<div className="host-waiting"><span className="eyebrow">Ready to host</span><h1>Gather your teams.</h1><p>{g.rounds.length} {g.rounds.length===1?'round':'rounds'} · {questionTotal} {questionTotal===1?'question':'questions'}</p><Button variant="primary" disabled={!connected||!questionTotal||!g.players.length||waitingForReady||!!g.editLock} onClick={()=>void command('start')}><Play size={20}/>Start game</Button>{!g.players.length&&<p className="field-hint">Create your teams using the + button before starting.</p>}{g.editLock&&<p className="field-hint">Someone is editing this game. You can start when they’re done.</p>}{waitingForReady&&<p className="field-hint">Waiting for all teams to mark themselves ready.</p>}{!questionTotal&&<p className="field-hint">This game needs questions first. Prepare it from the <AppLink href="/">game library</AppLink>.</p>}</div>
         :g.status==='finished'?<div className="host-results"><span className="eyebrow">Final standings</span><h1>{sortedPlayers(g.players).filter(p=>p.score===Math.max(...g.players.map(x=>x.score))).map(p=>p.name).join(' & ')||'Good game.'}</h1><Scores g={g}/><div className="results-actions"><Button variant="primary" disabled={!connected} onClick={()=>setReset(true)}><RotateCcw size={20}/>Play again</Button><AppLink className="button" href="/">Choose another game<ArrowRight size={20}/></AppLink></div></div>
-        :g.current?<HostQuestion key={g.current.questionId} g={g} command={command} onAdjust={setAdjust}/>
+        :g.current?<HostQuestion key={g.current.questionId} g={g} command={command}/>
         :<><Board g={g} onSelect={!g.paused&&!g.selection?q=>void command('selectQuestion',{questionId:q.id}):undefined}/><div className="board-bottom">{g.roundIndex<g.rounds.length-1?<Button onClick={()=>setConfirm('round')}>Next round<ArrowRight size={20}/></Button>:<Button onClick={()=>setConfirm('finish')}>Finish game<Flag size={20}/></Button>}</div></>}
-      </section><aside className="live-side"><PlayerList g={g} command={command} onAdjust={setAdjust}/><ModifierReminders g={g} command={command} onAdjust={setAdjust}/></aside></div>
+      </section><aside className="live-side"><PlayerList g={g} command={command} onAdjust={setAdjust}/><ModifierReminders g={g} command={command}/></aside></div>
     </main>
     {invite&&<Invite onClose={()=>setInvite(false)}/>}
-    {adjust&&g.players.some(p=>p.id===adjust)&&<AdjustScore g={g} playerId={adjust} command={command} onSelectPlayer={setAdjust} onClose={()=>setAdjust(null)}/>}
+    {adjust&&<TeamsPanel g={g} command={command} onClose={()=>setAdjust(null)}/>}
     {more&&<Modal title="Game controls" onClose={()=>setMore(false)}><div className="host-more-actions">
       {g.status==='playing'&&<Button disabled={!connected} onClick={async()=>{if(await command('pause'))setMore(false);}}>{g.paused?<Play size={20}/>:<Pause size={20}/>} {g.paused?'Resume game':'Pause game'}</Button>}
       {g.status==='finished'&&<Button disabled={!connected} onClick={async()=>{if(await command('resume'))setMore(false);}}><Play size={20}/>Resume game</Button>}
       {g.status==='playing'&&<Button onClick={()=>{setMore(false);setConfirm('finish');}}><Flag size={20}/>Finish game</Button>}
     </div></Modal>}
-    {reset&&<ResetGameDialog name={g.name} command={command} onClose={()=>setReset(false)} onReset={()=>{setReset(false);setAdjust(null);setConfirm(null);toast('Game reset · players can join again');}}/>}
+    {reset&&<ResetGameDialog name={g.name} command={command} onClose={()=>setReset(false)} onReset={()=>{setReset(false);setAdjust(null);setConfirm(null);toast('Game reset · teams can join again');}}/>}
     {confirm&&<Modal title={confirm==='finish'?'Finish this game?':'Move to the next round?'} onClose={()=>setConfirm(null)}><div className="modal-actions"><Button onClick={()=>setConfirm(null)}>Cancel</Button><Button variant="primary" disabled={!connected} onClick={async()=>{if(await command(confirm==='finish'?'finish':'round',{index:g.roundIndex+1}))setConfirm(null);}}>{confirm==='finish'?'Show results':'Next round'}<ArrowRight size={20}/></Button></div></Modal>}
   </div>;
 }
@@ -144,87 +149,78 @@ function ResetGameDialog({name,command,onClose,onReset}:{name:string;command:Com
     }finally{setBusy(false);}
   };
   return <Modal title="Reset game?" onClose={()=>{if(!busy)onClose();}}>
-    <p>Reset <strong>{name}</strong> to the lobby? This removes all players and scores, clears game progress and claimed modifiers, and makes every question available again.</p>
-    <p className="reset-game-note">Your questions, settings, appearance and room code stay the same. Players will need to join again.</p>
+    <p>Reset <strong>{name}</strong> to the lobby? This removes all teams and scores, clears game progress and claimed modifiers, and makes every question available again.</p>
+    <p className="reset-game-note">Your questions, settings, appearance and room code stay the same. Teams will need to join again.</p>
     <p className="reset-game-note">This cannot be undone.</p>
     {error&&<p className="reset-game-error" role="alert">{error}</p>}
     <div className="modal-actions"><Button disabled={busy} onClick={onClose}>Cancel</Button><Button variant="primary" disabled={busy} onClick={()=>void reset()}><RotateCcw size={18}/>{busy?'Resetting…':'Reset game'}</Button></div>
   </Modal>;
 }
 
-function HostQuestion({g,command,onAdjust}:{g:GameView;command:Command;onAdjust:(id:string)=>void}){const c=g.current!,q=g.currentQuestion!;const[wager,setWager]=useState(0),[wagerPlayer,setWagerPlayer]=useState(g.players[0]?.id||'');const final=g.rounds[g.roundIndex].type==='final';if(q.dailyDouble&&!final)return <HostDailyDouble g={g} command={command}/>;if(c.phase==='modifier')return <HostModifier g={g} command={command} onAdjust={onAdjust}/>;return <div className="host-question"><div className="question-meta"><span>{c.category}</span><span>{q.dailyDouble?'Daily double':number(q.value)}</span><IconButton title="Return to board" onClick={()=>void command('closeQuestion')}><X/></IconButton></div>{c.phase==='wager'?<><div className="wager-console"><h2>{q.dailyDouble?'Daily double':'Final wagers'}</h2><div className="inline-form"><select aria-label="Wagering player" value={wagerPlayer} onChange={e=>setWagerPlayer(e.target.value)}><option value="">Player</option>{g.players.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select><input aria-label="Wager amount" type="number" value={wager} min={0} onChange={e=>setWager(Number(e.target.value))}/><Button onClick={()=>void command('hostWager',{playerId:wagerPlayer,wager})}>Set wager</Button></div>{g.players.map(p=><div className="wager-person" key={p.id}><span>{p.name}</span><strong>{c.wagers[p.id]?number(c.wagers[p.id].wager):'Waiting'}</strong></div>)}<Button variant="primary" onClick={()=>void command('finalBegin')}>Lock wagers & open question<ArrowRight size={20}/></Button></div><div className="host-answer"><span className="eyebrow">Host preview</span><RichText text={q.prompt}/><hr/><RichText text={q.answer}/></div></>:<><div className="host-clue"><RichText text={q.prompt}/><AnswerChoices question={q}/></div><div className="host-answer"><div className="answer-heading"><span className="eyebrow">Answer · host only</span><Button onClick={()=>void command('reveal')} disabled={!!c.revealAt}>{c.revealed?'Revealed':c.revealAt?'Revealing…':'Reveal answer'}<ArrowUpRight size={18}/></Button></div><RichText text={q.answer}/>{q.notes&&<div className="host-notes"><RichText text={q.notes}/></div>}</div>{final?<div className="final-judging">{g.players.map(p=>{const entry=c.wagers[p.id];return <div className="final-player" key={p.id}><div><strong>{p.name}</strong><span>{number(entry?.wager||0)} wager</span>{entry?.answer&&<p>{entry.answer}</p>}</div><Button disabled={entry?.judged} onClick={()=>void command('judge',{playerId:p.id,correct:false})}><X size={20}/></Button><Button variant="primary" disabled={entry?.judged} onClick={()=>void command('judge',{playerId:p.id,correct:true})}><Check size={20}/></Button></div>;})}</div>:<div className="judging-console"><select aria-label="Answering player" value={c.answeringId||''} onChange={e=>{if(e.target.value)void command('answerer',{playerId:e.target.value});}}><option value="">Select answerer</option>{g.players.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select><div className="judge-buttons"><Button disabled={!c.answeringId||c.closed} onClick={()=>void command('judge',{correct:false})}><X size={24}/>Incorrect</Button><Button variant="primary" disabled={!c.answeringId||c.closed} onClick={()=>void command('judge',{correct:true})}><Check size={24}/>Correct</Button></div></div>}<div className="buzzer-toolbar"><Button variant={c.buzzOpen?'primary':''} disabled={c.closed||!!c.revealAt} onClick={()=>void command(c.buzzOpen?'closeBuzzers':'openBuzzers')}>{c.buzzOpen?<Unlock size={20}/>:<Lock size={20}/>}Buzzers {c.buzzOpen?'open':'closed'}</Button><IconButton title="Clear queue and reopen" disabled={c.closed||!!c.revealAt} onClick={()=>void command('resetBuzzers')}><RotateCcw/></IconButton>{c.buzzes.length>0&&<span className="buzz-queue">{c.buzzes.map((b,i)=><span key={b.playerId}>{i+1}. {g.players.find(p=>p.id===b.playerId)?.name}</span>)}</span>}</div></>}<div className="question-next"><Button onClick={()=>void command('closeQuestion')}>Back to board<ArrowRight size={20}/></Button></div></div>}
+function HostQuestion({g,command}:{g:GameView;command:Command}){const c=g.current!,q=g.currentQuestion!;const[wager,setWager]=useState(0),[wagerPlayer,setWagerPlayer]=useState(g.players[0]?.id||'');const final=g.rounds[g.roundIndex].type==='final';if(q.dailyDouble&&!final)return <HostDailyDouble g={g} command={command}/>;if(c.phase==='modifier')return <HostModifier g={g} command={command}/>;return <div className="host-question"><div className="question-meta"><span>{c.category}</span><span>{q.dailyDouble?'Daily double':number(q.value)}</span><IconButton title="Close question" onClick={()=>void command('closeQuestion')}><X/></IconButton></div>{c.phase==='wager'?<><div className="wager-console"><h2>{q.dailyDouble?'Daily double':'Final wagers'}</h2><div className="inline-form"><select aria-label="Wagering team" value={wagerPlayer} onChange={e=>setWagerPlayer(e.target.value)}><option value="">Team</option>{g.players.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select><input aria-label="Wager amount" type="number" value={wager} min={0} onChange={e=>setWager(Number(e.target.value))}/><Button onClick={()=>void command('hostWager',{playerId:wagerPlayer,wager})}>Set wager</Button></div>{g.players.map(p=><div className="wager-person" key={p.id}><span>{p.name}</span><strong>{c.wagers[p.id]?number(c.wagers[p.id].wager):'Waiting'}</strong></div>)}<Button variant="primary" onClick={()=>void command('finalBegin')}>Lock wagers & open question<ArrowRight size={20}/></Button></div><div className="host-answer"><span className="eyebrow">Host preview</span><RichText text={q.prompt}/><hr/><RichText text={q.answer}/></div></>:<><div className="host-clue"><RichText text={q.prompt}/><AnswerChoices question={q}/></div><div className="host-answer"><div className="answer-heading"><span className="eyebrow">Answer · host only</span>{final&&<Button onClick={()=>void command('reveal')} disabled={!!c.revealAt}>{c.revealed?'Revealed':c.revealAt?'Revealing…':'Reveal answer'}<ArrowUpRight size={18}/></Button>}</div><RichText text={q.answer}/>{q.notes&&<div className="host-notes"><RichText text={q.notes}/></div>}</div>{final?<TeamJudging g={g} command={command}/>:<AnswerDecision key={`${c.questionId}:${c.answerToken||'waiting'}`} g={g} command={command}/>}</>}{final&&c.phase!=='wager'&&<ContinueQuestion g={g} command={command}/>}</div>}
 function PlayerList({g,command,onAdjust}:{g:GameView;command:Command;onAdjust:(id:string)=>void}){
   const[adding,setAdding]=useState(false),[name,setName]=useState('');
-  const lobby=g.status==='lobby';
+  const lobby=g.status==='lobby',canEditTeams=lobby&&!g.teamsLocked;
   const ready=g.players.filter(p=>p.ready).length;
-  return <section className="player-list" aria-label="Players">
-    <div className="side-heading"><h2>Players<span>{g.players.length}</span></h2><IconButton title="Add player manually" onClick={()=>setAdding(!adding)}><Plus/></IconButton></div>
-    {lobby&&<div className="player-lobby-summary"><p role="status">{ready} / {g.players.length} ready</p></div>}
-    {adding&&<form className="inline-form" onSubmit={async e=>{e.preventDefault();if(await command('addPlayer',{name})){setName('');setAdding(false);}}}><input aria-label="Player name" autoFocus placeholder="Name" value={name} onChange={e=>setName(e.target.value)} maxLength={32}/><IconButton title="Add player" disabled={!name.trim()}><ArrowRight/></IconButton></form>}
+  return <section className="player-list" aria-label="Teams">
+    <div className="side-heading"><h2>Teams<span>{g.players.length}</span></h2>{g.players.length>0&&<IconButton title="Manage teams" onClick={()=>onAdjust(g.players[0].id)}><Pencil size={20}/></IconButton>}{canEditTeams&&<IconButton title="Add team" onClick={()=>setAdding(!adding)}><Plus/></IconButton>}</div>
+    {lobby&&<div className="player-lobby-summary"><p role="status">{ready} / {g.players.length} teams ready</p></div>}
+    {canEditTeams&&adding&&<form className="inline-form" onSubmit={async e=>{e.preventDefault();if(await command('addTeam',{name})){setName('');setAdding(false);}}}><input aria-label="Team name" autoFocus placeholder="Team name" value={name} onChange={e=>setName(e.target.value)} maxLength={32}/><IconButton title="Add team" disabled={!name.trim()}><ArrowRight/></IconButton></form>}
     {g.players.length?<div>{sortedPlayers(g.players).map(p=>{
-      const player=g.players.find(x=>x.id===p.id)!;
-      return <button className="player-row" key={p.id} onClick={()=>onAdjust(p.id)}>
+      const player=g.players.find(x=>x.id===p.id)!,members=g.members.filter(m=>m.teamId===p.id);
+      const incorrect=g.current?.incorrectTeamIds?.includes(p.id),passed=g.current?.passedTeamIds?.includes(p.id);
+      return <button className={`player-row${incorrect?' incorrect':passed?' passed':''}`} key={p.id} onClick={()=>onAdjust(p.id)}>
         <i aria-hidden="true" className="player-marker" style={{background:p.color}}/>
-        <span className="player-row-identity"><span className="player-row-name">{p.name}</span>{lobby&&<span className="player-row-status"><span className={player.ready?'player-ready':''}>{player.ready&&<Check size={16}/>} {player.ready?'Ready':'Not ready'}</span></span>}</span>
+        <span className="player-row-identity"><span className="player-row-name">{p.name}</span>{lobby&&<span className="player-row-status"><span className={player.ready?'player-ready':''}>{player.ready&&<Check size={16}/>} {player.ready?'Ready':'Not ready'}</span></span>}{(incorrect||passed)&&<span className="player-answer-status" role="status">{incorrect?<X size={18} aria-hidden="true"/>:null}{incorrect?'Incorrect':'Passed'}</span>}<span className="player-row-status">{members.filter(m=>m.connected).length} / {members.length} players connected</span></span>
         <strong>{number(p.score)}</strong><MoreHorizontal size={18}/>
       </button>;
-    })}</div>:<Empty>Waiting for players</Empty>}
+    })}</div>:<Empty>Create teams before starting</Empty>}
   </section>;
 }
 
-function AdjustScore({g,playerId,command,onSelectPlayer,onClose}:{g:GameView;playerId:string;command:Command;onSelectPlayer:(id:string)=>void;onClose:()=>void}){
-  const p=g.players.find(p=>p.id===playerId)!;
-  const[amount,setAmount]=useState(p.score),[remove,setRemove]=useState(false);
-  return <Modal title="Edit score" onClose={onClose}><form onSubmit={async e=>{e.preventDefault();if(await command('adjust',{playerId,amount,mode:'set'}))onClose();}}>
-    <Field label="Player"><select value={playerId} onChange={e=>{const player=g.players.find(p=>p.id===e.target.value)!;setAmount(player.score);setRemove(false);onSelectPlayer(player.id);}}>{g.players.map(player=><option key={player.id} value={player.id}>{player.name}</option>)}</select></Field>
-    <Field label="Score"><input autoFocus type="number" value={amount} onChange={e=>setAmount(Number(e.target.value))}/></Field>
-    <div className="score-steps">{[-500,-100,100,500].map(n=><Button key={n} type="button" onClick={()=>setAmount(a=>a+n)}>{n>0?'+':''}{n}</Button>)}</div>
-    <div className="modal-actions">{remove?<Button type="button" variant="danger" onClick={async()=>{await command('removePlayer',{playerId});onClose();}}>Confirm removal</Button>:<Button type="button" onClick={()=>setRemove(true)}>Remove player</Button>}<Button type="submit" variant="primary"><Check size={20}/>Save</Button></div>
-  </form></Modal>;
-}
-function HostModifier({g,command,onAdjust}:{g:GameView;command:Command;onAdjust:(id:string)=>void}){
+function HostModifier({g,command}:{g:GameView;command:Command}){
   const c=g.current!,modifier=g.currentQuestion!.modifier!;
   const winner=g.players.find(p=>p.id===c.answeringId);
   return <div className="host-question host-mystery">
     <div className="question-meta"><span>{c.category}</span><span>Mystery modifier</span></div>
     <span className="display-star">✳</span>
     <h1>{winner?`${winner.name} claimed it`:'First to buzz claims it'}</h1>
-    <p>{winner?'Apply the instructions manually, then return to the board.':'Buzzers are open. The modifier stays hidden until someone claims it.'}</p>
-    <div className="host-answer"><span className="eyebrow">{winner?'Modifier instructions':'Host preview · hidden from players'}</span><h2>{modifier.title}</h2><RichText text={modifier.instructions}/></div>
+    {!winner&&<p>Buzzers are open. The modifier stays hidden until someone claims it.</p>}
+    <div className="host-answer"><span className="eyebrow">{winner?'Modifier instructions':'Host preview · hidden from teams'}</span><h2>{modifier.title}</h2><RichText text={modifier.instructions}/></div>
     {g.currentQuestion!.notes&&<div className="host-notes"><RichText text={g.currentQuestion!.notes}/></div>}
-    {winner&&<div className="manual-score-actions"><span>Edit scores if needed</span>{g.players.map(p=><Button key={p.id} onClick={()=>onAdjust(p.id)}>{p.name} · {number(p.score)}</Button>)}</div>}
-    <div className="question-next"><Button onClick={()=>void command('closeQuestion')}>Back to board<ArrowRight size={20}/></Button></div>
+    <div className="question-next"><Button onClick={()=>void command('closeQuestion')}>Continue<ArrowRight size={20}/></Button></div>
   </div>;
 }
-function ModifierReminders({g,command,onAdjust}:{g:GameView;command:Command;onAdjust:(id:string)=>void}){
+function ModifierReminders({g,command}:{g:GameView;command:Command}){
   if(!g.modifierClaims?.length)return null;
-  return <section className="modifier-reminders"><div className="side-heading"><h2>Claimed modifiers</h2><Zap size={20}/></div>{g.modifierClaims.map(m=><div className="modifier-reminder" key={m.id}><div><strong>{m.title}</strong><IconButton title={`Dismiss ${m.title} reminder`} onClick={()=>void command('dismissModifier',{id:m.id})}><X size={18}/></IconButton></div><span className="field-hint">{g.players.find(p=>p.id===m.playerId)?.name||'Removed player'} · round {m.roundIndex+1}</span><RichText text={m.instructions}/>{g.players.some(p=>p.id===m.playerId)&&<Button onClick={()=>onAdjust(m.playerId)}>Edit score</Button>}</div>)}</section>;
+  return <section className="modifier-reminders"><div className="side-heading"><h2>Claimed modifiers</h2><Zap size={20}/></div>{g.modifierClaims.map(m=><div className="modifier-reminder" key={m.id}><div><strong>{m.title}</strong><IconButton title={`Dismiss ${m.title} reminder`} onClick={()=>void command('dismissModifier',{id:m.id})}><X size={18}/></IconButton></div><span className="field-hint">{g.players.find(p=>p.id===m.playerId)?.name||'Removed team'} · round {m.roundIndex+1}</span><RichText text={m.instructions}/></div>)}</section>;
 }
 
 function Stage({id}:{id:string}){const{g,error}=useGame(id,'stage');useEffect(()=>{document.title=g?`${g.name} · Presenter`:'Presenter';},[g?.name]);return g?<StageContent g={g}/>:<LoadError error={error}/>;}
 function PlayerEntry({id}:{id:string}){const[hasToken,setHasToken]=useState(!!playerKey(id));return hasToken?<PlayerGame id={id} rejoin={()=>{localStorage.removeItem(`jeopardy:player:${id}`);setHasToken(false);}}/>:<JoinGame id={id} joined={()=>setHasToken(true)}/>;}
 function JoinGame({id,joined}:{id:string;joined:()=>void}){
   const{g,error}=useGame(id,'stage');
-  const[name,setName]=useState(localStorage.getItem('jeopardy:name')||''),[busy,setBusy]=useState(false);
-  const existing=g?.players.find(p=>p.name.toLowerCase()===name.trim().toLowerCase());
+  const[name,setName]=useState(localStorage.getItem('jeopardy:member:name')||''),[teamId,setTeam]=useState(''),[busy,setBusy]=useState(false);
   const toast=useToast();
   return <div className="join-page" style={g?themeStyle(g.theme):undefined}>
     <header><Logo/><AppLink href="/play"><ArrowLeft size={20}/>Games</AppLink></header>
-    {error?<Empty>{error}</Empty>:!g?<Empty>Connecting…</Empty>:<main><h1>{g.name}</h1><form onSubmit={async e=>{
+    {error?<Empty>{error}</Empty>:!g?<Empty>Connecting…</Empty>:<main><h1>{g.name}</h1>{g.status==='finished'?<Empty>This game has ended.</Empty>:!g.players.length?<Empty>Waiting for the host to create teams.</Empty>:<form onSubmit={async e=>{
       e.preventDefault();setBusy(true);
       try{
-        const p=await api(`/api/games/${id}/join`,{name});
-        localStorage.setItem(`jeopardy:player:${id}`,p.token);localStorage.setItem('jeopardy:name',name);joined();
+        const p=await api(`/api/games/${id}/join`,{name,teamId});
+        localStorage.setItem(`jeopardy:player:${id}`,p.token);localStorage.setItem('jeopardy:member:name',name);joined();
       }catch(e){toast((e as Error).message);}finally{setBusy(false);}
     }}>
       <Field label="Your name"><input autoFocus value={name} onChange={e=>setName(e.target.value)} maxLength={32} required autoComplete="nickname"/></Field>
-      <Field label="Or join an existing group"><select value={existing?.id||''} onChange={e=>setName(g.players.find(p=>p.id===e.target.value)?.name||'')}><option value="">New name</option>{g.players.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></Field>
-      <Button variant="primary" disabled={busy||!name.trim()}>{busy?'Joining…':'Take a seat'}<ArrowRight size={22}/></Button>
-    </form></main>}
+      <Field label="Team"><select required value={teamId} onChange={e=>setTeam(e.target.value)}><option value="" disabled>Choose your team</option>{g.players.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></Field>
+      <p className="field-hint">Each player has their own buzzer. Reopen this game in the same browser to reconnect automatically.</p>
+      <Button variant="primary" disabled={busy||!name.trim()||!g.players.some(t=>t.id===teamId)}>{busy?'Joining…':'Join team'}<ArrowRight size={22}/></Button>
+    </form>}</main>}
   </div>;
 }
 function PlayerGame({id,rejoin}:{id:string;rejoin:()=>void}){
   const{g,connected,error,deleted,command}=useGame(id,'player');
+  const[leaving,setLeaving]=useState(false);
   const now=useNow(),self=g?.players.find(p=>p.id===g.selfId),c=g?.current;
   const lobby=g?.status==='lobby',selected=!!self&&c?.phase==='question'&&!g?.currentQuestion?.dailyDouble&&!c.closed&&!c.revealAt&&c.answeringId===self.id;
   const blocked=!!self&&self.blockedUntil>now,attempted=!!self&&c?.attempted.includes(self.id),already=!!self&&c?.buzzes.some(b=>b.playerId===self.id);
@@ -241,13 +237,15 @@ function PlayerGame({id,rejoin}:{id:string;rejoin:()=>void}){
   if(deleted)return <LoadError error={error}/>;
   if(error)return <div className="join-page"><Logo/><Empty>{error}</Empty><Button onClick={rejoin}>Join again</Button></div>;
   if(!g)return <LoadError error=""/>;
-  if(!self)return <LoadError error="Player not found"/>;
-  const label=lobby?(self.ready?'Ready':'I’m ready'):g.status==='finished'?'Finished':g.paused?'Paused':c?.closed||c?.revealAt?'Stand by':selected?'Your turn':blocked?`${Math.ceil((self.blockedUntil-now)/1000)}s`:attempted?'Wait':already?'Queued':canBuzz?'Buzz':'Stand by';
+  if(!self)return <LoadError error="Team not found"/>;
+  const member=g.members.find(m=>m.id===g.selfMemberId);
+  const label=lobby?(self.ready?'Team ready':'Our team is ready'):g.status==='finished'?'Finished':g.paused?'Paused':c?.closed||c?.revealAt?'Stand by':selected?'Your turn':blocked?`${Math.ceil((self.blockedUntil-now)/1000)}s`:attempted?'Wait':already?'Queued':canBuzz?'Buzz':'Stand by';
   return <div className="player-app" style={themeStyle(g.theme)}>
-    <header className="player-header"><AppLink href="/play" aria-label="Back to games"><ArrowLeft/></AppLink><span>{g.name}</span><Connection connected={connected}/></header>
+    <header className="player-header"><AppLink href="/play" aria-label="Back to games"><ArrowLeft/></AppLink><span>{g.name}</span><Connection connected={connected}/><Button disabled={!connected||leaving} onClick={async()=>{setLeaving(true);if(await command('leaveGame'))rejoin();else setLeaving(false);}}><LogOut size={18}/>{leaving?'Leaving…':'Leave game'}</Button></header>
     <main className="player-main">
+      <p className="player-team-identity">{member?.name} · <strong>{self.name}</strong></p>
       {g.status==='finished'?<Scores g={g}/>:<div className="my-score"><strong>{number(self.score)}</strong><span>points</span></div>}
-      <div className="buzz-area"><button aria-label={lobby?(self.ready?'Mark not ready':'Mark ready'):'Buzz in'} aria-pressed={lobby?self.ready:undefined} className={`buzz-button ${selected||lobby&&self.ready?'has-floor':''}`} disabled={!connected||!lobby&&!canBuzz} onPointerDown={e=>{if(connected&&(lobby||canBuzz)){e.preventDefault();press();}}} onClick={e=>{if(e.detail===0)press();}}><Hand strokeWidth={1.2}/><span>{label}</span></button></div>
+      <div className="buzz-area"><button aria-label={lobby?(self.ready?'Mark team not ready':'Mark team ready'):'Buzz in'} aria-pressed={lobby?self.ready:undefined} className={`buzz-button ${selected||lobby&&self.ready?'has-floor':''}`} disabled={!connected||!lobby&&!canBuzz} onPointerDown={e=>{if(connected&&(lobby||canBuzz)){e.preventDefault();press();}}} onClick={e=>{if(e.detail===0)press();}}><Hand strokeWidth={1.2}/><span>{label}</span></button></div>
     </main>
   </div>;
 }
