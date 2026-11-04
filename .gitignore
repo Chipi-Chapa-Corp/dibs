@@ -5,3 +5,6 @@ public/media/*
 !public/media/.gitkeep
 test-results/
 .env
+
+# Private game research and preparation notes (spoilers)
+/research/
