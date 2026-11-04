@@ -54,6 +54,8 @@ When your board is ready, choose **Host**, invite players and start. The host sc
 
 After a game starts, its definition is locked, including in editor tabs left open elsewhere. Choose **Copy & edit** in the library to prepare a fresh version while keeping the current game's players, scores and results. A reset returns the original to the lobby and allows preparation again.
 
+Round names are automatic: **Round 1**, **Round 2**, **Round 3**, and so on. Moving, duplicating or removing rounds updates their numbers. Imported and saved games use the same numbering.
+
 Each category has its own **+ Question** button and can contain a different number of questions. New categories start empty. Default values increase by 100 in round one, 200 in round two, 300 in round three, and so on, continuing after the highest value in that category. Existing values remain editable. **Delete question** in the question popup removes only that question.
 
 In the question popup, **Daily double** uses the same checkbox control as **Show ended**. Enter the question, then choose **Answer**, **Modifier** or **Free Response**. Free Response keeps an expected answer for the host and offers no answer choices to players. Final allows Answer or Free Response. Answers start with two rows; **Add answer** adds more choices, with a radio button marking the correct one. Deleting the correct answer selects the next remaining choice. **Shuffle answers** is on by default and randomizes the shared order when a question opens; turn it off to keep the written order. The Answer / Modifier toolbar also offers media insertion and preview. Choices appear with the question during play, and the correct answer is revealed by the host. Host notes are always visible in the popup.

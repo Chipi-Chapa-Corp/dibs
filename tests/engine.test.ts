@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {act,addPlayer,createGame,tick,updateDefinition,view} from '../server/engine.ts';
-import {demoRounds,emptyQuestion,emptyRound,nextBoardValue} from '../shared/model.ts';
+import {act,addPlayer,createGame,normalizeStoredGameplay,tick,updateDefinition,view} from '../server/engine.ts';
+import {demoRounds,emptyQuestion,emptyRound,nextBoardValue,orderRounds} from '../shared/model.ts';
 function fixture(){const g=createGame({name:'Test',definition:{rounds:demoRounds()}});const a=addPlayer(g,'Ada'),b=addPlayer(g,'Bea'),c=addPlayer(g,'Cam');act(g,'start');return{g,a,b,c,q:g.rounds[0].categories[0].questions[0]};}
 test('joining an existing name reuses the group without resetting its state',()=>{
  const {g,a}=fixture();
@@ -127,6 +127,25 @@ test('new games have no precreated categories or questions; empty drafts can be 
  const rounds=structuredClone(g.rounds);rounds[0].categories=[{id:'empty-category',name:'First',questions:[]}];
  act(g,'save',{rounds});assert.equal(g.rounds[0].categories[0].questions.length,0);
  act(g,'save',{rounds:[{...g.rounds[0],categories:[]}]});assert.equal(g.rounds[0].categories.length,0);
+});
+test('round names follow their positions on import, reorder, deletion and legacy restoration',()=>{
+ const g=createGame({definition:{rounds:demoRounds()}});
+ const names=()=>g.rounds.map(r=>r.name);
+ assert.deepEqual(names(),['Round 1','Round 2','Round 3']);
+ const reversed=structuredClone(g.rounds).reverse();reversed.forEach(r=>r.name='Custom name');
+ act(g,'save',{rounds:reversed});
+ assert.deepEqual(names(),['Round 1','Round 2','Round 3']);
+ assert.deepEqual(g.rounds.map(r=>r.id),orderRounds(reversed).map(r=>r.id));
+ assert.equal(g.rounds.at(-1)?.type,'final');
+ act(g,'save',{rounds:g.rounds.slice(1)});
+ assert.deepEqual(names(),['Round 1','Round 2']);
+ const content=structuredClone(g.rounds.map(r=>r.categories));
+ g.rounds.forEach(r=>r.name='Legacy name');normalizeStoredGameplay(g);
+ assert.deepEqual(names(),['Round 1','Round 2']);
+ assert.deepEqual(g.rounds.map(r=>r.categories),content);
+ act(g,'start');act(g,'pause');
+ const previous=g.undo.at(-1) as typeof g;previous.rounds.forEach(r=>r.name='Old undo name');
+ act(g,'undo');assert.deepEqual(names(),['Round 1','Round 2']);
 });
 test('category values progress independently with round-specific defaults and uneven boards survive export/import',()=>{
  const rounds=[0,1,2].map(roundIndex=>{

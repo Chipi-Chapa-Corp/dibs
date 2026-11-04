@@ -1,5 +1,5 @@
 import {randomBytes} from 'node:crypto';
-import {defaultSettings,defaultTheme,emptyRound,uid,themes,isQuestionFilled,QUESTION_SELECTION_MS,orderRounds} from '../shared/model.ts';
+import {defaultSettings,defaultTheme,emptyRound,uid,themes,isQuestionFilled,QUESTION_SELECTION_MS,orderRounds,numberRounds} from '../shared/model.ts';
 import type {Game,GameView,Player,Question,Settings,Theme,Round} from '../shared/model.ts';
 
 type Input=Record<string,any>;
@@ -34,7 +34,7 @@ export function normalizeStoredGameplay(state:Pick<Game,'settings'|'rounds'|'cur
   for(const field of ['hostToken','hostClaimable','hostTransfer'])delete(state as unknown as Input)[field];
   state.settings=normalizeSettings(state.settings);state.selection??=null;
   const activeRoundId=state.roundIndex===undefined?undefined:state.rounds[state.roundIndex]?.id;
-  state.rounds=orderRounds(state.rounds);
+  state.rounds=numberRounds(orderRounds(state.rounds));
   if(activeRoundId)state.roundIndex=state.rounds.findIndex(r=>r.id===activeRoundId);
   for(const round of state.rounds)for(const category of round.categories)for(const question of category.questions)delete(question as unknown as Input).timer;
   if(state.current){
@@ -67,7 +67,7 @@ function normalizeRounds(data:unknown):Round[]{
     if(q.responseType!=='free'&&(q.answerOptions!==undefined||q.shuffleAnswers!==undefined))question.shuffleAnswers=q.shuffleAnswers!==false;
     return question;
   })};})};});
-  return orderRounds(rounds);
+  return numberRounds(orderRounds(rounds));
 }
 export function updateDefinition(g:Game,data:Input){
   // Normalize everything first: malformed imports must not partially mutate a game.
