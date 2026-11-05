@@ -58,6 +58,10 @@ Round names are automatic: **Round 1**, **Round 2**, **Round 3**, and so on. Mov
 
 Each category has its own **+ Question** button and can contain a different number of questions. New categories start empty. Default values increase by 100 in round one, 200 in round two, 300 in round three, and so on, continuing after the highest value in that category. Existing values remain editable. **Delete question** in the question popup removes only that question.
 
+Use the up and down arrows on each question card to reorder questions within its category. Changes save automatically and appear in the same order on the host and presenter boards. Moving a question keeps its point value, answer, media and settings together.
+
+Enable **Slow image reveal · 5 seconds** in a question to uncover its images from top to bottom on the presenter screen. The image keeps its full size while it is revealed; text and answer choices appear normally. Buzzers stay available during the reveal. A team's buzz freezes the image until the presenter judges its answer; the reveal then continues from the same point. Pausing the game also pauses the reveal. The host sees the complete image for judging. The setting and paused progress survive saving and reloading the presenter.
+
 In the question popup, **Daily double** uses the same checkbox control as **Show ended**. Enter the question, then choose **Answer**, **Modifier** or **Free Response**. Free Response keeps an expected answer for the host and offers no answer choices to players. Final allows Answer or Free Response. Answers start with two rows; **Add answer** adds more choices, with a radio button marking the correct one. Deleting the correct answer selects the next remaining choice. **Shuffle answers** is on by default and randomizes the shared order when a question opens; turn it off to keep the written order. The Answer / Modifier toolbar also offers media insertion and preview. Choices appear with the question during play, and the correct answer is revealed by the host. Host notes are always visible in the popup.
 
 ## Media references

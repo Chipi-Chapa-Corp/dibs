@@ -93,6 +93,7 @@ function normalizeRounds(data:unknown):Round[]{
   const rounds:Round[]=(data as Input[]).map((r,i)=>{assert(Array.isArray(r.categories)&&r.categories.length<=10,'Use up to 10 categories');return{id:id(r.id),name:text(r.name,60)||`Round ${i+1}`,type:r.type==='final'?'final':'board',categories:r.categories.map((c:Input)=>{assert(Array.isArray(c.questions)&&c.questions.length<=12,'Use up to 12 questions per category');return{id:id(c.id),name:text(c.name,60)||'Category',questions:c.questions.map((q:Input)=>{
     const question:Question={id:id(q.id),value:Math.round(finite(q.value,100,0,1e7)),prompt:text(q.prompt,100000),answer:text(q.answer,100000),notes:text(q.notes,20000),dailyDouble:!!q.dailyDouble&&!q.modifier&&r.type!=='final',modifier:r.type==='final'||!q.modifier?null:{title:text(q.modifier.title,80)||'Mystery modifier',instructions:text(q.modifier.instructions,20000)}};
     if(q.responseType!==undefined)question.responseType=q.responseType==='free'?'free':'answer';
+    if(q.slowReveal!==undefined)question.slowReveal=q.slowReveal===true;
     if(q.responseType!=='free'&&q.answerOptions!==undefined){
       assert(Array.isArray(q.answerOptions),'Answer options must be a list');
       const answerOptions:string[]=q.answerOptions.length?q.answerOptions.map((option:unknown)=>text(option,100000)):[question.answer];
@@ -172,11 +173,22 @@ function selectableQuestion(g:Game,qid:string){
 }
 function open(g:Game,qid:string,now:number){
   const {r,c,q}=selectableQuestion(g,qid);
-  g.questionCount++;g.current={answerToken:null,dailyDoubleFromId:null,questionId:qid,category:c!.name,buzzOpen:!!q!.modifier||r.type==='board'&&!q!.dailyDouble,buzzes:[],answeringId:null,attempted:[],revealAt:null,revealed:false,phase:q!.modifier?'modifier':r.type==='final'||q!.dailyDouble?'wager':'question',wagers:{},closed:false};
+  g.questionCount++;g.current={openedAt:now,answerToken:null,dailyDoubleFromId:null,questionId:qid,category:c!.name,buzzOpen:!!q!.modifier||r.type==='board'&&!q!.dailyDouble,buzzes:[],answeringId:null,attempted:[],revealAt:null,revealed:false,phase:q!.modifier?'modifier':r.type==='final'||q!.dailyDouble?'wager':'question',wagers:{},closed:false};
   if(!q.modifier&&q.responseType!=='free'&&q.shuffleAnswers!==false&&q.answerOptions&&q.answerOptions.length>1){
     const order=q.answerOptions.map((_,i)=>i);
     for(let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[order[i],order[j]]=[order[j],order[i]];}
     g.current.answerOrder=order;
+  }
+}
+function syncImageReveal(g:Game,now:number){
+  const c=g.current,q=currentQuestion(g);
+  if(!c||!q?.slowReveal||c.openedAt===undefined)return;
+  const answering=c.phase==='question'&&!q.dailyDouble&&!!c.answeringId&&!c.closed&&!c.revealed&&c.revealAt===null;
+  const paused=g.status==='playing'&&(g.paused||answering);
+  if(paused)c.imageRevealPausedAt??=now;
+  else if(c.imageRevealPausedAt!==undefined){
+    c.imageRevealPausedMs=(c.imageRevealPausedMs||0)+Math.max(0,now-c.imageRevealPausedAt);
+    delete c.imageRevealPausedAt;
   }
 }
 function reveal(g:Game,now:number){assert(g.current,'Open a question first');g.current!.buzzOpen=false;g.current!.revealAt=now+g.settings.revealDelayMs;g.current!.revealed=g.settings.revealDelayMs===0;}
@@ -220,7 +232,7 @@ export function act(g:Game,action:string,data:Input={},role:'host'|'player'='hos
     assert(g.status==='playing'&&!g.paused,'Game is not running');const c=g.current;assert(c&&c.phase==='question'&&!c.revealed&&!c.revealAt&&!c.closed,'No active question');assert(!currentQuestion(g)?.dailyDouble,'Only the assigned team answers this Daily Double');assert(self&&self.blockedUntil<=now,'Your button is temporarily blocked');
     if(!c!.buzzOpen){assert(!c!.answeringId,'Another team is answering');if(g.settings.earlyPenaltyMs>0){self!.blockedUntil=now+g.settings.earlyPenaltyMs;g.revision++;}throw new Error('Buzzers are closed');}
     assert(!c!.attempted.includes(playerId!),'Your team already attempted this question');assert(!c!.buzzes.some(b=>b.playerId===playerId),'Your team already buzzed');assert(!c!.answeringId,'Another team is answering');
-    c!.buzzes.push({playerId:playerId!,at:now,order:c!.buzzes.length+1});self!.stats.buzzes++;if(!c!.answeringId){c!.answeringId=playerId;c!.answerToken=uid();c!.buzzOpen=false;}g.revision++;return;
+    c!.buzzes.push({playerId:playerId!,at:now,order:c!.buzzes.length+1});self!.stats.buzzes++;if(!c!.answeringId){c!.answeringId=playerId;c!.answerToken=uid();c!.buzzOpen=false;}syncImageReveal(g,now);g.revision++;return;
   }
   if(action==='wager'||action==='finalAnswer'){
     assert(g.status==='playing'&&!g.paused,'Game is not running');
@@ -417,6 +429,7 @@ export function act(g:Game,action:string,data:Input={},role:'host'|'player'='hos
           assert(g.players.length&&g.players.every(p=>c!.wagers[p.id]?.submitted),'Record a wager for every team before locking');
           c!.phase='final';c!.answersLocked=false;
         }
+        c!.openedAt=now;
         label='Wagers locked';break;
       }
       case'lockFinalAnswers':{
@@ -476,6 +489,7 @@ export function act(g:Game,action:string,data:Input={},role:'host'|'player'='hos
       }
       default:throw new Error('Unknown action');
     }
+    syncImageReveal(g,now);
     syncFinalPresentation(g);
     log(g,label,before);
   }catch(error){Object.assign(g,backup);throw error;}

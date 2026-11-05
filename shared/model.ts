@@ -1,6 +1,6 @@
 export interface HiddenModifier { title: string; instructions: string }
 export interface ModifierClaim extends HiddenModifier { id: string; questionId: string; playerId: string; roundIndex: number }
-export interface Question { modifier?: HiddenModifier|null; id: string; value: number; prompt: string; answer: string; responseType?: 'answer'|'free'; answerOptions?: string[]; correctAnswerIndex?: number; shuffleAnswers?: boolean; notes: string; dailyDouble: boolean }
+export interface Question { modifier?: HiddenModifier|null; id: string; value: number; prompt: string; answer: string; responseType?: 'answer'|'free'; answerOptions?: string[]; correctAnswerIndex?: number; shuffleAnswers?: boolean; slowReveal?: boolean; notes: string; dailyDouble: boolean }
 export interface Category { id: string; name: string; questions: Question[] }
 export interface Round { id: string; name: string; type: 'board'|'final'; categories: Category[] }
 export const orderRounds=(rounds:Round[]):Round[]=>[...rounds.filter(r=>r.type!=='final'),...rounds.filter(r=>r.type==='final')];
@@ -14,7 +14,7 @@ export interface Buzz { playerId: string; at: number; order: number }
 export interface FinalEntry { wager: number; answer: string; submitted: boolean; judged: boolean; answerSubmitted?: boolean; wagerVersion?:number; answerVersion?:number; correct?: boolean }
 export type TeamResult = 'correct'|'incorrect'|'pass';
 export interface TeamJudgment { result:TeamResult; delta:number|null }
-export interface Current { answersLocked?:boolean; incorrectTeamIds?:string[]; passedTeamIds?:string[]; answerToken?:string|null; judgments?:Record<string,TeamJudgment>; dailyDoubleFromId?:string|null; questionId: string; category: string; answerOrder?: number[]; buzzOpen: boolean; buzzes: Buzz[]; answeringId: string|null; attempted: string[]; revealAt: number|null; revealed: boolean; phase: 'question'|'wager'|'final'|'modifier'; wagers: Record<string, FinalEntry>; closed: boolean }
+export interface Current { openedAt?:number; imageRevealPausedAt?:number; imageRevealPausedMs?:number; answersLocked?:boolean; incorrectTeamIds?:string[]; passedTeamIds?:string[]; answerToken?:string|null; judgments?:Record<string,TeamJudgment>; dailyDoubleFromId?:string|null; questionId: string; category: string; answerOrder?: number[]; buzzOpen: boolean; buzzes: Buzz[]; answeringId: string|null; attempted: string[]; revealAt: number|null; revealed: boolean; phase: 'question'|'wager'|'final'|'modifier'; wagers: Record<string, FinalEntry>; closed: boolean }
 export function hasCorrectResult(current:Current):boolean{
   if(current.phase!=='question'&&current.phase!=='final')return false;
   return Object.values(current.judgments||{}).some(j=>j.result==='correct')
