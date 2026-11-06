@@ -2,7 +2,7 @@ import {createContext,useContext,useEffect,useRef,useState} from 'react';
 import {io,Socket} from 'socket.io-client';
 import type {CSSProperties,ReactNode} from 'react';
 import type {GameView,Theme,GameSummary,Player} from '../shared/model';
-export const number=(n:number)=>new Intl.NumberFormat('en-US').format(n);
+export const number=(n:number)=>new Intl.NumberFormat('en-US',{useGrouping:false}).format(n);
 export const playerKey=(id:string)=>localStorage.getItem(`jeopardy:player:${id}`)||'';
 export async function api<T=any>(url:string,data?:unknown,method:'GET'|'POST'|'DELETE'=data===undefined?'GET':'POST'):Promise<T>{const res=await fetch(url,{method,headers:{...(data===undefined?{}:{'Content-Type':'application/json'})},body:data===undefined?undefined:JSON.stringify(data)});const result=await res.json();if(!res.ok)throw new Error(result.error||'Something went wrong');return result;}
 export const ToastContext=createContext<(message:string)=>void>(()=>{});
