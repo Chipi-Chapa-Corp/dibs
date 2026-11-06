@@ -133,3 +133,7 @@ PORT=43189 npm run dev                # Use another port
 ```
 
 Games live in `data/games/`, uploads in `public/media/`. Back up both. JSON imports and exports game definitions; uploaded media stays separate.
+
+### Final category elimination
+
+Prepare up to 20 final categories, each with one free-response question. During the final, teams announce the categories they reject and the host crosses them out. Rejected categories remain visible on the presenter screen and can be restored before wagering starts. Once one category remains, **Collect wagers** opens the existing private phone wager and answer flow. The clue stays hidden until wagers are locked; scores and judgments remain private until the final reveal. Elimination progress survives reconnection and server restarts. A final with one category goes straight to wagers.

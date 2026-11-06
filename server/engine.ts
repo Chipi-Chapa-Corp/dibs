@@ -48,12 +48,17 @@ export function normalizeSettings(data:Input,old=defaultSettings):Settings {
   s.buzzMode='first';s.autoOpenBuzzers=true;s.lockWrong=true;s.reopenWrong=true;if(!['score','unlimited'].includes(s.finalMaxWager))s.finalMaxWager='score';return s;
 }
 /** Discard retired settings and countdown fields in saved games and undo snapshots. */
-export function normalizeStoredGameplay(state:Pick<Game,'settings'|'rounds'|'current'>&Partial<Pick<Game,'selection'|'roundIndex'>>){
+export function normalizeStoredGameplay(state:Pick<Game,'settings'|'rounds'|'current'>&Partial<Pick<Game,'selection'|'roundIndex'|'finalCategorySelection'>>){
   for(const field of ['hostToken','hostClaimable','hostTransfer'])delete(state as unknown as Input)[field];
   state.settings=normalizeSettings(state.settings);state.selection??=null;
   const activeRoundId=state.roundIndex===undefined?undefined:state.rounds[state.roundIndex]?.id;
   state.rounds=numberRounds(orderRounds(state.rounds));
   if(activeRoundId)state.roundIndex=state.rounds.findIndex(r=>r.id===activeRoundId);
+  if(state.finalCategorySelection){
+    const selection=state.finalCategorySelection,round=state.rounds.find(r=>r.id===selection.roundId&&r.type==='final');
+    if(!round)delete state.finalCategorySelection;
+    else selection.rejectedCategoryIds=[...new Set(Array.isArray(selection.rejectedCategoryIds)?selection.rejectedCategoryIds:[])].filter(id=>round.categories.some(c=>c.id===id)).slice(0,Math.max(0,round.categories.length-1));
+  }
   for(const round of state.rounds)for(const category of round.categories)for(const question of category.questions)delete(question as unknown as Input).timer;
   if(state.current){
     delete(state.current as unknown as Input).timer;
@@ -90,18 +95,19 @@ function normalizeTheme(data:Input,old=defaultTheme):Theme {
 function normalizeRounds(data:unknown):Round[]{
   assert(Array.isArray(data)&&data.length>0&&data.length<=20,'Use 1–20 rounds');const ids=new Set<string>();
   const id=(s:unknown)=>{let n=text(s,60)||uid();if(ids.has(n))n=uid();ids.add(n);return n;};
-  const rounds:Round[]=(data as Input[]).map((r,i)=>{assert(Array.isArray(r.categories)&&r.categories.length<=10,'Use up to 10 categories');return{id:id(r.id),name:text(r.name,60)||`Round ${i+1}`,type:r.type==='final'?'final':'board',categories:r.categories.map((c:Input)=>{assert(Array.isArray(c.questions)&&c.questions.length<=12,'Use up to 12 questions per category');return{id:id(c.id),name:text(c.name,60)||'Category',questions:c.questions.map((q:Input)=>{
+  const rounds:Round[]=(data as Input[]).map((r,i)=>{assert(Array.isArray(r.categories)&&r.categories.length<=(r.type==='final'?20:10),r.type==='final'?'Use up to 20 final categories':'Use up to 10 categories');return{id:id(r.id),name:text(r.name,60)||`Round ${i+1}`,type:r.type==='final'?'final':'board',categories:r.categories.map((c:Input)=>{assert(Array.isArray(c.questions)&&c.questions.length<=(r.type==='final'?1:12),r.type==='final'?'Each final category must contain one question':'Use up to 12 questions per category');return{id:id(c.id),name:text(c.name,60)||'Category',questions:c.questions.map((q:Input)=>{
     const question:Question={id:id(q.id),value:Math.round(finite(q.value,100,0,1e7)),prompt:text(q.prompt,100000),answer:text(q.answer,100000),notes:text(q.notes,20000),dailyDouble:!!q.dailyDouble&&!q.modifier&&r.type!=='final',modifier:r.type==='final'||!q.modifier?null:{title:text(q.modifier.title,80)||'Mystery modifier',instructions:text(q.modifier.instructions,20000)}};
-    if(q.responseType!==undefined)question.responseType=q.responseType==='free'?'free':'answer';
+    if(r.type==='final')question.responseType='free';
+    else if(q.responseType!==undefined)question.responseType=q.responseType==='free'?'free':'answer';
     if(q.slowReveal!==undefined)question.slowReveal=q.slowReveal===true;
-    if(q.responseType!=='free'&&q.answerOptions!==undefined){
+    if(r.type!=='final'&&q.responseType!=='free'&&q.answerOptions!==undefined){
       assert(Array.isArray(q.answerOptions),'Answer options must be a list');
       const answerOptions:string[]=q.answerOptions.length?q.answerOptions.map((option:unknown)=>text(option,100000)):[question.answer];
       while(answerOptions.length<2)answerOptions.push('');
       question.correctAnswerIndex=Math.round(finite(q.correctAnswerIndex,Math.max(0,answerOptions.indexOf(question.answer)),0,answerOptions.length-1));
       question.answerOptions=answerOptions;question.answer=answerOptions[question.correctAnswerIndex];
     }
-    if(q.responseType!=='free'&&(q.answerOptions!==undefined||q.shuffleAnswers!==undefined))question.shuffleAnswers=q.shuffleAnswers!==false;
+    if(r.type!=='final'&&q.responseType!=='free'&&(q.answerOptions!==undefined||q.shuffleAnswers!==undefined))question.shuffleAnswers=q.shuffleAnswers!==false;
     return question;
   })};})};});
   return numberRounds(orderRounds(rounds));
@@ -169,6 +175,11 @@ function syncFinalPresentation(g:Game){
 }
 function selectableQuestion(g:Game,qid:string){
   const r=g.rounds[g.roundIndex];const c=r.categories.find(c=>c.questions.some(q=>q.id===qid));const q=c?.questions.find(q=>q.id===qid);assert(q&&c,'Question not found');assert(!g.played.includes(qid),'This question has already been played');assert(isQuestionFilled(q!),'This question is empty');
+  if(r.type==='final'&&r.categories.length>1){
+    const selection=g.finalCategorySelection;
+    const remaining=r.categories.filter(category=>!selection?.rejectedCategoryIds.includes(category.id));
+    assert(selection?.roundId===r.id&&remaining.length===1&&remaining[0].id===c!.id,'Cross out final categories until only one remains');
+  }
   return {r,c:c!,q:q!};
 }
 function open(g:Game,qid:string,now:number){
@@ -194,7 +205,7 @@ function syncImageReveal(g:Game,now:number){
 function reveal(g:Game,now:number){assert(g.current,'Open a question first');g.current!.buzzOpen=false;g.current!.revealAt=now+g.settings.revealDelayMs;g.current!.revealed=g.settings.revealDelayMs===0;}
 function finish(g:Game,now:number){
   assert(g.status!=='finished','This game has already ended');
-  if(g.current&&g.rounds[g.roundIndex].type==='final')assert(g.current.phase==='final'&&g.current.answersLocked&&g.players.length&&g.players.every(t=>g.current!.wagers[t.id]?.judged),'Lock answers and mark every team Correct or Incorrect before finishing');
+  if(g.rounds[g.roundIndex].type==='final')assert(g.current?.phase==='final'&&g.current.answersLocked&&g.players.length&&g.players.every(t=>g.current!.wagers[t.id]?.judged),'Lock answers and mark every team Correct or Incorrect before finishing');
   g.undo=[];g.status='finished';g.paused=false;g.selection=null;
   if(g.current){
     g.current.buzzOpen=false;
@@ -204,14 +215,14 @@ function finish(g:Game,now:number){
     }
   }
 }
-function nextRound(g:Game,index:number,now:number){assert(g.players.length,'Create at least one team before starting');if(g.status==='lobby')assert(g.players.every(p=>p.ready),'Wait until all teams are ready');assert(index>=0&&index<g.rounds.length,'No such round');g.roundIndex=index;g.current=null;g.selection=null;g.paused=false;g.status='playing';g.teamsLocked=true;g.undo=[];syncFinalPresentation(g);if(g.rounds[index].type==='final'){const q=g.rounds[index].categories.flatMap(c=>c.questions).find(q=>q.prompt.trim());if(q)open(g,q.id,now);}}
+function nextRound(g:Game,index:number,now:number){assert(g.players.length,'Create at least one team before starting');if(g.status==='lobby')assert(g.players.every(p=>p.ready),'Wait until all teams are ready');assert(index>=0&&index<g.rounds.length,'No such round');g.roundIndex=index;g.current=null;g.selection=null;g.paused=false;g.status='playing';g.teamsLocked=true;g.undo=[];syncFinalPresentation(g);if(g.rounds[index].type==='final'){const round=g.rounds[index];if(g.finalCategorySelection?.roundId!==round.id)g.finalCategorySelection={roundId:round.id,rejectedCategoryIds:[]};if(round.categories.length===1){const q=round.categories[0].questions[0];if(q&&isQuestionFilled(q))open(g,q.id,now);}}else delete g.finalCategorySelection;}
 
 /** All gameplay mutations run synchronously on the server. No client supplies a score or a buzz timestamp. */
 export function act(g:Game,action:string,data:Input={},role:'host'|'player'='host',playerId:string|null=null,now=Date.now()){
   assert(role==='host'||['buzz','ready','wager','finalAnswer'].includes(action),'Host access required');
   const self=g.players.find(p=>p.id===playerId);if(role==='player')assert(self,'Join the game first');
   if(action==='reset'){
-    delete g.finalPresentation;
+    delete g.finalPresentation;delete g.finalCategorySelection;
     Object.assign(g,{status:'lobby',paused:false,roundIndex:0,teamsLocked:false,members:[],players:[],played:[],current:null,modifierClaims:[],history:[],undo:[],questionCount:0,selection:null,announcement:null,revision:g.revision+1});
     return;
   }
@@ -290,6 +301,30 @@ export function act(g:Game,action:string,data:Input={},role:'host'|'player'='hos
     switch(action){
       case'save':assert(g.status==='lobby','This game has started. Make a copy to edit it.');updateDefinition(g,data);label='Game settings updated';break;
       case'start':assert(g.status==='lobby','Game has already started');assert(g.players.length,'Create at least one team before starting');assert(g.players.every(p=>p.ready),'Wait until all teams are ready');nextRound(g,0,now);label='Game started';break;
+      case'setFinalCategoryRejected':{
+        const round=g.rounds[g.roundIndex];
+        assert(g.status==='playing'&&!g.paused&&round.type==='final'&&!c&&!g.selection,'Final category selection is closed');
+        assert(data.roundId===round.id,'This final round is no longer active');
+        assert(round.categories.some(category=>category.id===data.categoryId),'Category not found');
+        assert(typeof data.rejected==='boolean','Choose whether to cross out this category');
+        const selection=g.finalCategorySelection??={roundId:round.id,rejectedCategoryIds:[]};
+        assert(selection.roundId===round.id,'This final round is no longer active');
+        const rejected=new Set(selection.rejectedCategoryIds);
+        if(data.rejected){
+          assert(rejected.has(data.categoryId)||round.categories.length-rejected.size>1,'Keep one final category');
+          rejected.add(data.categoryId);
+        }else rejected.delete(data.categoryId);
+        selection.rejectedCategoryIds=[...rejected];label='Final categories updated';break;
+      }
+      case'chooseFinalCategory':{
+        const round=g.rounds[g.roundIndex];
+        assert(g.status==='playing'&&!g.paused&&round.type==='final'&&!c&&!g.selection,'Final category selection is closed');
+        assert(data.roundId===round.id,'This final round is no longer active');
+        const remaining=round.categories.filter(category=>!g.finalCategorySelection?.rejectedCategoryIds.includes(category.id));
+        assert(remaining.length===1,'Cross out final categories until only one remains');
+        const question=remaining[0].questions[0];assert(question&&isQuestionFilled(question),'Add a question to the remaining category before playing');
+        open(g,question.id,now);label=`Final category · ${remaining[0].name}`;break;
+      }
       case'selectQuestion':{
         assert(g.status==='playing'&&!g.paused,'Start or resume the game first');assert(!c&&!g.selection,'A question is already selected');
         const {q}=selectableQuestion(g,text(data.questionId));
