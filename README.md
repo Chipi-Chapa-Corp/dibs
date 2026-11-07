@@ -122,6 +122,10 @@ The old combined `data/games.json` is migrated automatically. Existing per-game 
 
 On the first startup with the default data directory, the bundled sample is copied to `data/games/test-game.json` and loads with the other games. Removing that file later does not recreate it. It has two small boards and a final, with pictures, hidden modifiers and Daily Doubles. A portable definition remains in [examples/test-game.json](examples/test-game.json) for creating another copy through **Create game → Import JSON**. The photos are bundled in `public/test-board/`, so the sample works offline. See the [host guide](examples/test-game.md) for the answer map and a suggested playthrough.
 
+## Played game: Это моя игра
+
+The completed Russian-language game is available as [examples/eto-moya-igra.json](examples/eto-moya-igra.json), with its images and audio bundled in `public/played-games/eto-moya-igra/`. Import it through **Create game → Import JSON** to play a fresh copy. See the [game guide](examples/eto-moya-igra.md) for details. Local saved sessions and preparation research remain excluded from Git.
+
 ## Commands
 
 ```sh
