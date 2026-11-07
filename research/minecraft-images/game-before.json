@@ -1,0 +1,137 @@
+{
+  "format": "jeopardy/1",
+  "name": "Это моя игра",
+  "subtitle": "",
+  "rounds": [
+    {
+      "id": "eyk9sz9y",
+      "name": "Round 1",
+      "type": "board",
+      "categories": [
+        {
+          "id": "3036pxdv",
+          "name": "Шлакоблокунь",
+          "questions": [
+            {
+              "id": "ac9382d1bf34",
+              "value": 100,
+              "prompt": "![Ребус](/media/d62a335636bc37691f8d0c7cfc965cd3b4e7f845dd54931a.png)",
+              "answer": "жабаунти",
+              "notes": "",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "0a45454f09d0",
+              "value": 200,
+              "prompt": "![Ребус](/media/24e5d4e26c0774d6f8b17b977f352611b2ebeb3e1d281d95.png)",
+              "answer": "крабрикос",
+              "notes": "",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "6ec7e95fbe4e",
+              "value": 300,
+              "prompt": "![Ребус](/media/ab4e958f5c6c6312773fd6ec76aa1d3c67eb738854c6c600.png)",
+              "answer": "крысало",
+              "notes": "",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "21239e0a8947",
+              "value": 400,
+              "prompt": "![Ребус](/media/b3190600cab471f48f88b91e7d5bd83fb5b698c2eaef013a.png)",
+              "answer": "макакао",
+              "notes": "",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "2ff1cdfbc4b3",
+              "value": 500,
+              "prompt": "![Ребус](/media/059845f48c4007fd0a4b4eb291b57c534f67023561ea140d.png)",
+              "answer": "комаркер",
+              "notes": "",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "08faeecc15cf",
+              "value": 600,
+              "prompt": "![Ребус](/media/f184f457bba47860510b44220f673225b5c4d3ab6982397e.png)",
+              "answer": "пудельфин",
+              "notes": "",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "e78b9c03de5c",
+              "value": 700,
+              "prompt": "![Ребус](/media/32446e985f9a1aac0738a10eeb807521579a878c6f02a5f0.png)",
+              "answer": "джинитки",
+              "notes": "",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "b4eb6dc11fdc",
+              "value": 800,
+              "prompt": "![Ребус](/media/e9154cb3d3ec0268d9b7c1f4df863df33282508381a40dfa.png)",
+              "answer": "жемчугорь",
+              "notes": "",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "settings": {
+    "buzzMode": "first",
+    "autoOpenBuzzers": true,
+    "earlyPenaltyMs": 750,
+    "deductWrong": true,
+    "wrongMultiplier": 1,
+    "correctMultiplier": 1,
+    "allowNegative": true,
+    "reopenWrong": true,
+    "lockWrong": true,
+    "revealDelayMs": 900,
+    "showLeaderboardOnStage": true,
+    "startingScore": 0,
+    "finalMaxWager": "score"
+  },
+  "theme": {
+    "preset": "paper",
+    "accent": "#b7482d",
+    "paper": "#ece9e0",
+    "ink": "#252620",
+    "surface": "#f6f3eb",
+    "muted": "#6e7166",
+    "line": "#c9c9be",
+    "displayFont": "serif",
+    "background": "",
+    "motion": true,
+    "sound": false,
+    "title": ""
+  }
+}

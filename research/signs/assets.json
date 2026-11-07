@@ -1,0 +1,82 @@
+[
+  {
+    "value": 300,
+    "answer": "Кофе с булочкой",
+    "original": "/var/folders/t3/wh0_r9jx0jz4kqxrwpsvv5rh0000gn/T/codex-clipboard-def7757b-c8c1-4dbb-bea6-1ecb51c7115d.png",
+    "file": "research/signs/question-01.png",
+    "width": 466,
+    "height": 884,
+    "sha256": "0e30ffd90d09e497d3466bc633466337084a8f80df605ef07d93dc560a0436b6",
+    "mediaUrl": "/media/a5e068c8e19a9c9c612f584d6d0ab4f10e781643a3543f86.png"
+  },
+  {
+    "value": 600,
+    "answer": "Приятного аппетита!",
+    "original": "/var/folders/t3/wh0_r9jx0jz4kqxrwpsvv5rh0000gn/T/codex-clipboard-6f634f70-ea58-4817-a35d-57eff8906752.png",
+    "file": "research/signs/question-02.png",
+    "width": 494,
+    "height": 882,
+    "sha256": "e8f8daa64c0b4e1d47f522b1b99c00cf143f34c0954fc23edc60a35e5c141efb",
+    "mediaUrl": "/media/53a9cbd11d4a523ef3064d1b3ea2a56a352ebe2951fc7121.png"
+  },
+  {
+    "value": 900,
+    "answer": "Для бытового мусора",
+    "original": "/var/folders/t3/wh0_r9jx0jz4kqxrwpsvv5rh0000gn/T/codex-clipboard-79158a53-2c2d-43db-a743-1d0ee0808ba1.png",
+    "file": "research/signs/question-03.png",
+    "width": 1230,
+    "height": 856,
+    "sha256": "5341be8e51c44d2e0240dbec48e393bb61e6fb89c9876744a4e95b34bdb8bf5c",
+    "mediaUrl": "/media/49a1c334c6ad07bc933db629cde50fea0f6d52210d4fbd2a.png"
+  },
+  {
+    "value": 1200,
+    "answer": "Глобальное падение цен!",
+    "original": "/var/folders/t3/wh0_r9jx0jz4kqxrwpsvv5rh0000gn/T/codex-clipboard-80206611-0479-47dc-bbd4-a17c3b201703.png",
+    "file": "research/signs/question-04.png",
+    "width": 492,
+    "height": 848,
+    "sha256": "3762a596ce15a6810c42aeec35670e0b90435338f8d61ccedf4cb6c22f737bfa",
+    "mediaUrl": "/media/0187c8c4d1e33050140c7c51e3f9551a4a881c6472fa3b82.png"
+  },
+  {
+    "value": 1500,
+    "answer": "«Горизонт». Мы ищем вожатых!",
+    "original": "/var/folders/t3/wh0_r9jx0jz4kqxrwpsvv5rh0000gn/T/codex-clipboard-a6e1dbea-95ab-43d4-826b-b1576a324a13.png",
+    "file": "research/signs/question-05.png",
+    "width": 628,
+    "height": 846,
+    "sha256": "7f6e5343978b6dc4c4d79a1a003f6559f034be35bb123d22b332a30a27e69801",
+    "mediaUrl": "/media/496316ca1ff4852c5a7dd0c599bcc43f636a179c8c7b5048.png"
+  },
+  {
+    "value": 1800,
+    "answer": "Растормаживание речи",
+    "original": "/var/folders/t3/wh0_r9jx0jz4kqxrwpsvv5rh0000gn/T/codex-clipboard-73df6f17-2de6-4f36-8789-2538d7ff35d0.png",
+    "file": "research/signs/question-06.png",
+    "width": 876,
+    "height": 1138,
+    "sha256": "ef7db0f1c8d868610f9b9af85f0e014ee90edb239d39c9bb19fa793dfc5dfd10",
+    "mediaUrl": "/media/b9c88479fb8e254c580dac61b1eca55d213e76bbb8cfa69a.png"
+  },
+  {
+    "value": 2100,
+    "answer": "Распродажа платьев",
+    "original": "/var/folders/t3/wh0_r9jx0jz4kqxrwpsvv5rh0000gn/T/codex-clipboard-f6564d0a-f135-45e6-a5ef-c57cc5b92570.png",
+    "file": "research/signs/question-07.png",
+    "width": 858,
+    "height": 886,
+    "sha256": "bd146aabe343d94c46b41b128b76e7039e2eb6e7173e83e1fe1c02de89320748",
+    "mediaUrl": "/media/6f3ee6f4467d5c4bd136917c7acdb3b310168b8d6504216f.png"
+  },
+  {
+    "value": 2400,
+    "answer": "Ликвидация одежды",
+    "original": "/var/folders/t3/wh0_r9jx0jz4kqxrwpsvv5rh0000gn/T/codex-clipboard-0be33361-33b2-4291-af85-8b2ae644e33c.png",
+    "file": "research/signs/question-08.png",
+    "width": 784,
+    "height": 1138,
+    "sha256": "d5bc6eb29977f0da6d758c2df8fb80a529a7a271e9fe0a9298a4e46f4ea87728",
+    "mediaUrl": "/media/fa780c9d25044b6b6b5d0013c9ae2b45b6153abe8af2dd45.png"
+  }
+]

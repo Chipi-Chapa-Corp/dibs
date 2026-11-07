@@ -1,0 +1,68 @@
+[
+  {
+    "key": "mercury",
+    "answer": "Фредди Меркьюри",
+    "accepted": "Меркьюри; Фредди Меркьюри; Фредди Меркури; Freddie Mercury",
+    "value": 200,
+    "file": "/Users/mychkvad/Projects/dibs/research/tattoos/mercury.png",
+    "sourceFile": "/var/folders/t3/wh0_r9jx0jz4kqxrwpsvv5rh0000gn/T/codex-clipboard-5a8e4991-2c12-44cc-ba9c-d7918ce62d65.png",
+    "timestamp": 1695,
+    "sha256": "cd15ef762248d882192b5eac5c75d7f2bacd52b8ae8d0e1e0b36e94f6c2ea6d2",
+    "mediaUrl": "/media/ea708fa0314d9ec10d560ac03a58a709634444f72fc50575.png"
+  },
+  {
+    "key": "monroe",
+    "answer": "Мэрилин Монро",
+    "accepted": "Монро; Мэрилин Монро; Мерлин Монро; Marilyn Monroe",
+    "value": 400,
+    "file": "/Users/mychkvad/Projects/dibs/research/tattoos/monroe.png",
+    "sourceFile": "/var/folders/t3/wh0_r9jx0jz4kqxrwpsvv5rh0000gn/T/codex-clipboard-dccbdf96-935e-45ac-ab6c-48e414c4d169.png",
+    "timestamp": 1712,
+    "sha256": "5d4d746ae8ac27bd3c7d1b4dfa23c414b77434c1c1dcf8ddea84c297e318cc6c",
+    "mediaUrl": "/media/9994938aaf38865b7f4d79fc963e8736abd177439bd68e58.png"
+  },
+  {
+    "key": "presley",
+    "answer": "Элвис Пресли",
+    "accepted": "Элвис; Пресли; Элвис Пресли; Elvis Presley",
+    "value": 600,
+    "file": "/Users/mychkvad/Projects/dibs/research/tattoos/presley.png",
+    "sourceFile": "/var/folders/t3/wh0_r9jx0jz4kqxrwpsvv5rh0000gn/T/codex-clipboard-b5c8a739-c570-499c-ba8f-9d033b259c84.png",
+    "timestamp": 1730,
+    "sha256": "17cf4a956befcd59d80aae02ebd6a0dc3db41b6882718a70b0fe325ad63a8e7a",
+    "mediaUrl": "/media/63ffdf4905052c66ac0f38497b819bda973c72cea82668e3.png"
+  },
+  {
+    "key": "stalin",
+    "answer": "Иосиф Сталин",
+    "accepted": "Сталин; Иосиф Сталин; Joseph Stalin",
+    "value": 800,
+    "file": "/Users/mychkvad/Projects/dibs/research/tattoos/stalin.png",
+    "sourceFile": "/var/folders/t3/wh0_r9jx0jz4kqxrwpsvv5rh0000gn/T/codex-clipboard-a6f9c886-9d33-4f0b-88a4-24eeba3cf3af.png",
+    "timestamp": 1766,
+    "sha256": "2892ec8a6acb572afe1ed933c01d4174eb2da314c15fcfd39118abdeea6cb752",
+    "mediaUrl": "/media/c87ba780dc5ca2951ea3e72f0b96772de34425026bb6727c.png"
+  },
+  {
+    "key": "obama",
+    "answer": "Барак Обама",
+    "accepted": "Обама; Барак Обама; Barack Obama",
+    "value": 1000,
+    "file": "/Users/mychkvad/Projects/dibs/research/tattoos/obama.png",
+    "sourceFile": "/var/folders/t3/wh0_r9jx0jz4kqxrwpsvv5rh0000gn/T/codex-clipboard-c283ab89-8e8f-451f-8f42-dd273b746aa5.png",
+    "timestamp": null,
+    "sha256": "5f7132beee4ea0ad8f6e88de59ee1b062274565fb7cd3820927277c0214f7be5",
+    "mediaUrl": "/media/fc5f9665fe2933cde61ac18fa55bed57fe57ec3edcf5dca1.png"
+  },
+  {
+    "key": "trump",
+    "answer": "Дональд Трамп",
+    "accepted": "Трамп; Дональд Трамп; Donald Trump",
+    "value": 1200,
+    "file": "/Users/mychkvad/Projects/dibs/research/tattoos/trump.png",
+    "sourceFile": "/var/folders/t3/wh0_r9jx0jz4kqxrwpsvv5rh0000gn/T/codex-clipboard-4c91de10-714b-43bb-906d-172f400f9871.png",
+    "timestamp": null,
+    "sha256": "1459909d8ddd7c5d7fde04f41eb1148d9c1f4f48d6536dc5cc6c7cd195525e1b",
+    "mediaUrl": "/media/d305787e6068095d7b73516afaf54dcaa338bf1d14b8612c.png"
+  }
+]

@@ -1,0 +1,51 @@
+{
+  "gameId": "95AF7D",
+  "insertions": [
+    {
+      "category": "Кинопейнт",
+      "value": 300,
+      "title": "Поменяйся баллами",
+      "id": "cd2b71eb19d9"
+    },
+    {
+      "category": "Джим",
+      "value": 500,
+      "title": "Умножь баллы на 0,5",
+      "id": "c632510b02df"
+    }
+  ],
+  "moves": [
+    {
+      "id": "dc8fc1598b5d",
+      "category": "Кинопейнт",
+      "from": 300,
+      "to": 400
+    },
+    {
+      "id": "9f61b7711d69",
+      "category": "Кинопейнт",
+      "from": 400,
+      "to": 500
+    },
+    {
+      "id": "c5adf812198d",
+      "category": "Кинопейнт",
+      "from": 500,
+      "to": 600
+    },
+    {
+      "id": "576eb33815bb",
+      "category": "Джим",
+      "from": 500,
+      "to": 600
+    },
+    {
+      "id": "cd98a2188d7d",
+      "category": "Джим",
+      "from": 600,
+      "to": 700
+    }
+  ],
+  "originalQuestionsPreserved": 33,
+  "totalQuestions": 35
+}

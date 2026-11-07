@@ -1,0 +1,46 @@
+import fs from 'node:fs/promises';
+import assert from 'node:assert/strict';
+import {randomInt} from 'node:crypto';
+import {io} from 'socket.io-client';
+
+const base='http://localhost:43187',gameId='95AF7D';
+const socket=io(base,{transports:['websocket'],reconnection:false,timeout:10000});
+let state;
+socket.on('state',value=>{state=value;});
+const emit=(event,input)=>new Promise((resolve,reject)=>socket.timeout(10000).emit(event,input,(error,result)=>error?reject(error):result?.ok?resolve(result):reject(new Error(result?.error||'Command failed'))));
+const exported=async()=>{const response=await fetch(`${base}/api/games/${gameId}/export`);assert(response.ok);return response.json();};
+try {
+  await new Promise((resolve,reject)=>{socket.once('connect',resolve);socket.once('connect_error',reject);});
+  await emit('subscribe',{gameId,role:'host',editing:true});
+  assert.equal(state?.editLock,'mine','Another editor is open; no game changes made.');
+  assert.equal(state.status,'lobby','Game must still be in preparation.');
+  const before=await exported(),rounds=structuredClone(before.rounds);
+  const categories=rounds[0].categories;
+  const casino=categories.find(c=>c.name==='Казино');
+  const minecraft=categories.find(c=>c.name==='Майнкрафтляндия');
+  assert(casino&&minecraft,'Expected categories missing.');
+  const old=casino.questions.filter(q=>q.dailyDouble);
+  assert.equal(old.length,1,'Expected one Casino Daily Double.');
+  assert(!minecraft.questions.some(q=>q.modifier||q.dailyDouble),'Minecraft already contains a special tile.');
+  const eligible=minecraft.questions.filter(q=>q.prompt?.trim());
+  assert(eligible.length);
+  const chosen=eligible[randomInt(eligible.length)];
+  old[0].dailyDouble=false;
+  chosen.dailyDouble=true;
+  const expected={...before,rounds},restored=structuredClone(expected);
+  const all=restored.rounds[0].categories.flatMap(c=>c.questions);
+  all.find(q=>q.id===old[0].id).dailyDouble=true;
+  all.find(q=>q.id===chosen.id).dailyDouble=false;
+  assert.deepEqual(restored,before,'Only two Daily Double flags may change.');
+  const directory=`research/move-daily-double-${gameId}-${new Date().toISOString().replaceAll(':','-')}`;
+  await fs.mkdir(directory,{recursive:true});
+  await fs.writeFile(`${directory}/game-before.json`,JSON.stringify(before,null,2)+'\n',{mode:0o600});
+  assert.deepEqual(await exported(),before,'Game changed while preparing; no save performed.');
+  await emit('command',{action:'save',data:{rounds}});
+  const after=await exported();
+  assert.deepEqual(after,expected);
+  await new Promise(resolve=>setTimeout(resolve,500));
+  assert.deepEqual(JSON.parse(await fs.readFile(`data/games/${gameId}.json`,'utf8')).rounds,rounds);
+  await fs.writeFile(`${directory}/game-after.json`,JSON.stringify(after,null,2)+'\n',{mode:0o600});
+  console.log(JSON.stringify({removed:{category:casino.name,value:old[0].value},dailyDoubles:after.rounds[0].categories.flatMap(c=>c.questions.filter(q=>q.dailyDouble).map(q=>({category:c.name,value:q.value}))),preservedAllQuestions:true,persisted:true},null,2));
+} finally {socket.disconnect();}

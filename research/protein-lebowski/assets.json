@@ -1,0 +1,101 @@
+[
+  {
+    "key": "skyr",
+    "path": "research/protein-lebowski/skyr.jpg",
+    "type": "image/jpeg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/11/Icelandic_Skyr.jpg/500px-Icelandic_Skyr.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "source": "https://commons.wikimedia.org/wiki/File:Icelandic_Skyr.jpg",
+    "credit": "<a href=\"//commons.wikimedia.org/w/index.php?title=User:IcelandicProvisions&amp;action=edit&amp;redlink=1\" class=\"new\" title=\"User:IcelandicProvisions (page does not exist)\">IcelandicProvisions</a>",
+    "license": "CC BY-SA 4.0"
+  },
+  {
+    "key": "peanut-butter",
+    "path": "research/protein-lebowski/peanut-butter.jpg",
+    "type": "image/jpeg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b0/Peanut_butter_glass_3.jpg/500px-Peanut_butter_glass_3.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "source": "https://commons.wikimedia.org/wiki/File:Peanut_butter_glass_3.jpg",
+    "credit": "<a href=\"//commons.wikimedia.org/wiki/User:Shisma\" title=\"User:Shisma\">Shisma</a>",
+    "license": "CC BY 4.0"
+  },
+  {
+    "key": "bar",
+    "path": "research/protein-lebowski/bar.jpg",
+    "type": "image/jpeg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/55/Three_protein_bars.jpg/500px-Three_protein_bars.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "source": "https://commons.wikimedia.org/wiki/File:Three_protein_bars.jpg",
+    "credit": "<a href=\"//commons.wikimedia.org/wiki/User:Mx._Granger\" title=\"User:Mx. Granger\">Mx. Granger</a>",
+    "license": "CC0"
+  },
+  {
+    "key": "quark",
+    "path": "research/protein-lebowski/quark.jpg",
+    "type": "image/jpeg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7b/Skimmed_milk_quark_on_spoon.jpg/500px-Skimmed_milk_quark_on_spoon.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "source": "https://commons.wikimedia.org/wiki/File:Skimmed_milk_quark_on_spoon.jpg",
+    "credit": "<a href=\"//commons.wikimedia.org/wiki/User:SKopp\" title=\"User:SKopp\">SKopp</a>",
+    "license": "CC BY-SA 4.0"
+  },
+  {
+    "key": "milk",
+    "path": "research/protein-lebowski/milk.jpg",
+    "type": "image/jpeg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a5/Glass_of_Milk_%2833657535532%29.jpg/500px-Glass_of_Milk_%2833657535532%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "source": "https://commons.wikimedia.org/wiki/File:Glass_of_Milk_(33657535532).jpg",
+    "credit": "<a rel=\"nofollow\" class=\"external text\" href=\"https://www.flickr.com/people/54591706@N02\">NIAID</a>",
+    "license": "CC BY 2.0"
+  },
+  {
+    "key": "almond",
+    "path": "research/protein-lebowski/almond.jpg",
+    "type": "image/jpeg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/de/Home-made_almond_milk%2C_November_2012.jpg/500px-Home-made_almond_milk%2C_November_2012.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "source": "https://commons.wikimedia.org/wiki/File:Home-made_almond_milk,_November_2012.jpg",
+    "credit": "Amazing Almonds",
+    "license": "CC BY 2.0"
+  },
+  {
+    "key": "parmesan",
+    "path": "research/protein-lebowski/parmesan.jpg",
+    "type": "image/jpeg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d1/Parmigiano_Reggiano%2C_Italien%2C_Europ%C3%A4ische_Union.jpg/500px-Parmigiano_Reggiano%2C_Italien%2C_Europ%C3%A4ische_Union.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "source": "https://commons.wikimedia.org/wiki/File:Parmigiano_Reggiano,_Italien,_Europ%C3%A4ische_Union.jpg",
+    "credit": "<a href=\"//commons.wikimedia.org/wiki/User:Naturpuur\" title=\"User:Naturpuur\">Naturpuur</a>",
+    "license": "CC BY-SA 4.0"
+  },
+  {
+    "key": "beans",
+    "path": "research/protein-lebowski/beans.webp",
+    "type": "image/webp",
+    "image": "https://media.bonduelle.com/mzp_111999/03083681003901-hd-weisse_bohnen_bonduelle_maxi_zone_12292.webp",
+    "source": "https://www.bonduelle.cz/zelenina/p/vapeur-cannellini/03083681003901",
+    "credit": "Bonduelle",
+    "license": "Official product image"
+  },
+  {
+    "key": "seeds",
+    "path": "research/protein-lebowski/seeds.jpg",
+    "type": "image/jpeg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/da/Shelled_and_fried_pumpkin_seeds.jpg/500px-Shelled_and_fried_pumpkin_seeds.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "source": "https://commons.wikimedia.org/wiki/File:Shelled_and_fried_pumpkin_seeds.jpg",
+    "credit": "<a href=\"//commons.wikimedia.org/wiki/User:Fumikas_Sagisavas\" title=\"User:Fumikas Sagisavas\">Fumikas Sagisavas</a>",
+    "license": "CC0"
+  },
+  {
+    "key": "tvaruzky",
+    "path": "research/protein-lebowski/tvaruzky.jpg",
+    "type": "image/jpeg",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/82/Olomouck%C3%A9_tvar%C5%AF%C5%BEky_%283%29.jpg/500px-Olomouck%C3%A9_tvar%C5%AF%C5%BEky_%283%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "source": "https://commons.wikimedia.org/wiki/File:Olomouck%C3%A9_tvar%C5%AF%C5%BEky_(3).jpg",
+    "credit": "<a href=\"//commons.wikimedia.org/wiki/User:Chmee2\" title=\"User:Chmee2\">Chmee2</a>",
+    "license": "CC BY-SA 3.0"
+  },
+  {
+    "key": "bigmac",
+    "path": "research/protein-lebowski/bigmac.png",
+    "type": "image/png",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4d/Big_Mac.png/500px-Big_Mac.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "source": "https://commons.wikimedia.org/wiki/File:Big_Mac.png",
+    "credit": "<a href=\"//commons.wikimedia.org/wiki/User:Anemonemma\" title=\"User:Anemonemma\">Anemonemma</a>, <a href=\"//commons.wikimedia.org/wiki/User:3df\" title=\"User:3df\">3df</a>",
+    "license": "CC BY-SA 4.0"
+  }
+]

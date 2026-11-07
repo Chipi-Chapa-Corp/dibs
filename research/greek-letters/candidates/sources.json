@@ -1,0 +1,30 @@
+[
+  {
+    "answer": "Лямбда",
+    "file": "lambda.jpg",
+    "url": "https://www.sijun.com/dhabih/portfolio/images/gordon1.jpg",
+    "source": "https://www.sijun.com/dhabih/portfolio/images/gordon1.html",
+    "description": "Гордон Фримен из Half-Life"
+  },
+  {
+    "answer": "Пи",
+    "file": "pi.png",
+    "url": "https://images.icon-icons.com/2108/PNG/512/raspberry_pi_icon_130847.png",
+    "source": "https://icon-icons.com/icon/raspberry-pi/130847",
+    "description": "Значок Raspberry Pi"
+  },
+  {
+    "answer": "Йота / иота",
+    "file": "iota.png",
+    "url": "https://cdn.aptoide.com/imgs/6/7/5/6757d91e26bfe68c2b1b0d767269f095_icon.png",
+    "source": "https://yota.en.aptoide.com/app",
+    "description": "Значок Yota без названия"
+  },
+  {
+    "answer": "Омега",
+    "file": "omega.jpg",
+    "url": "https://img.youm7.com/ArticleImgs/2018/2/18/97284-fish-oil-capsules-720x480.jpg",
+    "source": "https://m.youm7.com/amp/2018/2/20/3655090",
+    "description": "Капсулы рыбьего жира"
+  }
+]

@@ -1,0 +1,72 @@
+{
+  "gameId": "95AF7D",
+  "categoryName": "График или горы",
+  "installed": [
+    {
+      "sampleId": 1,
+      "questionId": "e9c124c6878c",
+      "value": 300,
+      "answer": "График — Bitcoin · сентябрь 2017 — март 2018",
+      "mediaUrl": "/media/bcbf13e70a23616c3dee4e19e75df1ef1d155efaeed62d64.png",
+      "sha256": "04f116f71498b7eee3c90d58ddc7351af3b60fc5e22779281e1d54ea74709e99",
+      "source": "https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&startTime=1504224000000&endTime=1522540799999&limit=1000",
+      "sourceFile": "btc-2017.json",
+      "sourceSha256": "895fb3492e444b7a55c51455f9648f603dd3a57eec26293a4e97be8e979baa74"
+    },
+    {
+      "sampleId": 2,
+      "questionId": "2bc9cd41c7c9",
+      "value": 600,
+      "answer": "Горы — Маттерхорн · Швейцарские Альпы",
+      "mediaUrl": "/media/03a9f5886891516243b3da6469bbf846ea3ac8df4c9a900a.png",
+      "sha256": "c510eb966e70292e81e1334d30c780f228d24d70412c594016c8a574603bac3d",
+      "source": "https://commons.wikimedia.org/wiki/File:Matterhorn_vom_Gornergrat.jpg",
+      "sourceFile": "matterhorn.jpg",
+      "sourceSha256": "2ad4471cfc43ee0ea63dceb4f7f608f5f69afd4491f93d329a6374935e40917b"
+    },
+    {
+      "sampleId": 3,
+      "questionId": "382a59b1de64",
+      "value": 900,
+      "answer": "График — Bitcoin · 2021 год",
+      "mediaUrl": "/media/c7484b7ac6246e94f3c536f334a25539345d08eaedd20dc0.png",
+      "sha256": "fa1a06c8f08b2f52d9848437620057191c9a0d475735d7929a0dcd57c6ac52c3",
+      "source": "https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&startTime=1609459200000&endTime=1640995199000&limit=1000",
+      "sourceFile": "btc-binance.json",
+      "sourceSha256": "84f5a53150952bedc8d3b4901a385e4e49c089a666d2731a7314ffe7a1e67102"
+    },
+    {
+      "sampleId": 4,
+      "questionId": "5871f346ef97",
+      "value": 1200,
+      "answer": "Горы — Альпийская гряда · вид с Горнерграта",
+      "mediaUrl": "/media/4237290bcbc53945d163ef32777a26fc00db118954a742b7.png",
+      "sha256": "b3d431811bbd404b4257eed2028c8b91a25ec2e583be99efaac5d2dcfbc82faf",
+      "source": "https://commons.wikimedia.org/wiki/File:Matterhorn_vom_Gornergrat.jpg",
+      "sourceFile": "matterhorn.jpg",
+      "sourceSha256": "2ad4471cfc43ee0ea63dceb4f7f608f5f69afd4491f93d329a6374935e40917b"
+    },
+    {
+      "sampleId": 5,
+      "questionId": "87313e132439",
+      "value": 1500,
+      "answer": "График — Ethereum · январь — июнь 2021",
+      "mediaUrl": "/media/4c7dd8efa3f6adb4616b2b5375870876895ae8eb3f37f7d3.png",
+      "sha256": "c70f347b97df55da7234c25c31d2b2b7607b5fbcdeedee52740f8c1c02e2055d",
+      "source": "https://data-api.binance.vision/api/v3/klines?symbol=ETHUSDT&interval=1d&startTime=1609459200000&endTime=1625097599999&limit=1000",
+      "sourceFile": "eth-2021.json",
+      "sourceSha256": "612d41bb44b35f3889e562896cbb3203135e5776c385a9a61752705a14e4a287"
+    },
+    {
+      "sampleId": 6,
+      "questionId": "dbf35448dff1",
+      "value": 1800,
+      "answer": "Горы — Фудзи · Япония",
+      "mediaUrl": "/media/51e30e40a988fcd2d91d623febded042e1eb887ae0544742.png",
+      "sha256": "76b3bac83ace32f236d7aca6f78d6caf40ce86ba5cf91c12aa6d7da73676ba00",
+      "source": "https://www.usgs.gov/media/images/mount-fuji",
+      "sourceFile": "fuji.jpg",
+      "sourceSha256": "772049436d718f9465aedbe01f085c0ee69b835d0d5f43e17dd32919b00e1588"
+    }
+  ]
+}

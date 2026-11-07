@@ -1,0 +1,52 @@
+[
+  {
+    "source": "codex-clipboard-c5778baa-0af4-455b-ab41-72ad8a6b8e98.png",
+    "file": "research/greek-letters/alpha.png",
+    "value": 200,
+    "answer": "Альфа",
+    "accepted": "альфа, alpha, α, Α",
+    "timestamp": 581,
+    "sha256": "6c4b1dea6786f0ccb8ad62201978326dfe16735e1a434af860981772059ef43a",
+    "mediaUrl": "/media/cf0ed1cff1f0a423715ea4c19ba94b6479f80c92107e1ac1.png"
+  },
+  {
+    "source": "codex-clipboard-f1c1d222-2faf-4e1c-aacd-6f897d45cd59.png",
+    "file": "research/greek-letters/kappa.png",
+    "value": 400,
+    "answer": "Каппа",
+    "accepted": "каппа, капа, kappa, κ, Κ",
+    "timestamp": 1297,
+    "sha256": "900c780b34975cb810eda9e813afe280ae7ff8e8f03c35372e1da8258737e5ae",
+    "mediaUrl": "/media/ad4bdda05b5f8d8033839bc010b0ff41416fa5a430fe2365.png"
+  },
+  {
+    "source": "codex-clipboard-a9f170f6-c1e3-449a-9e4e-a195f2924dc5.png",
+    "file": "research/greek-letters/sigma.png",
+    "value": 600,
+    "answer": "Сигма",
+    "accepted": "сигма, sigma, σ, ς, Σ",
+    "timestamp": 1187,
+    "sha256": "e06c4879cbe7f77b0abc1bde66e5647d934e22d4bbc5c6e9fe7ac804eb87b13e",
+    "mediaUrl": "/media/5ded8e86be04327cb58069d3ed7151206ffba59bf7abfccf.png"
+  },
+  {
+    "source": "codex-clipboard-f6e636ec-71e2-4e72-8082-dde807fbe134.png",
+    "file": "research/greek-letters/delta.png",
+    "value": 800,
+    "answer": "Дельта",
+    "accepted": "дельта, delta, δ, Δ",
+    "timestamp": 1034,
+    "sha256": "4d00f4c9950abced759a2c40ac51265c3d278d1321178de31a6d706ee2340fca",
+    "mediaUrl": "/media/87f389b8217ec5d540b40765e985982d71d67d2fc8ef8fe5.png"
+  },
+  {
+    "source": "codex-clipboard-23e6046f-264b-4053-9f62-624ef3722a3c.png",
+    "file": "research/greek-letters/gamma.png",
+    "value": 1000,
+    "answer": "Гамма",
+    "accepted": "гамма, gamma, γ, Γ",
+    "timestamp": 1069,
+    "sha256": "33f784bcac52fc7ec051e785ca00d053593e3782b1c4db0f8880a9afa267dae8",
+    "mediaUrl": "/media/a567745cfe2c5eda18e5c13e5c5128901badb462dd73775b.png"
+  }
+]

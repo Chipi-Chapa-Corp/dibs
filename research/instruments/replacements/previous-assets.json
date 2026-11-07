@@ -1,0 +1,191 @@
+[
+  {
+    "answer": "Скрипка",
+    "files": [
+      "00 Jazz Violin Solo.ogg"
+    ],
+    "author": "VWD",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "accepted": "скрипка",
+    "value": 300,
+    "sources": [
+      {
+        "title": "00 Jazz Violin Solo.ogg",
+        "page": "https://commons.wikimedia.org/wiki/File:00_Jazz_Violin_Solo.ogg",
+        "download": "https://upload.wikimedia.org/wikipedia/commons/3/37/00_Jazz_Violin_Solo.ogg",
+        "original": "/Users/mychkvad/Projects/dibs/research/instruments/original-1-1.ogg"
+      }
+    ],
+    "file": "/Users/mychkvad/Projects/dibs/research/instruments/clip-01.mp3",
+    "duration": 8,
+    "bytes": 161436,
+    "sha256": "8afeba08fc9ab37f81df5140bec2b0d4918acb7606844315df9bc343dc8db900",
+    "changes": "Первые 8 секунд после удаления начальной тишины (или вся запись, если короче); выровнена громкость, короткое плавное начало/окончание, MP3; теги удалены.",
+    "verifiedLoudnessLUFS": -18.7,
+    "mediaUrl": "/media/85ee34b5a0c668040efc485bcc8d62c5c970fdabc30507b6.mp3"
+  },
+  {
+    "answer": "Саксофон",
+    "files": [
+      "Afteryouvegone-first8bars.ogg"
+    ],
+    "author": "Julien Grandgagnage",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "accepted": "саксофон; тенор-саксофон",
+    "value": 600,
+    "sources": [
+      {
+        "title": "Afteryouvegone-first8bars.ogg",
+        "page": "https://commons.wikimedia.org/wiki/File:Afteryouvegone-first8bars.ogg",
+        "download": "https://upload.wikimedia.org/wikipedia/commons/5/59/Afteryouvegone-first8bars.ogg",
+        "original": "/Users/mychkvad/Projects/dibs/research/instruments/original-2-1.ogg"
+      }
+    ],
+    "file": "/Users/mychkvad/Projects/dibs/research/instruments/clip-02.mp3",
+    "duration": 8,
+    "bytes": 161436,
+    "sha256": "0449a913a5a798b106bc15efb135a84dfb13e204bb5470073680fda9bd23ac85",
+    "changes": "Первые 8 секунд после удаления начальной тишины (или вся запись, если короче); выровнена громкость, короткое плавное начало/окончание, MP3; теги удалены.",
+    "verifiedLoudnessLUFS": -18.48,
+    "mediaUrl": "/media/58605f355b3a42727a93ee1b21fb323a8d61bc7310ed34b1.mp3"
+  },
+  {
+    "answer": "Флейта",
+    "files": [
+      "Flute 2.ogg"
+    ],
+    "author": "hokuspokus",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "accepted": "флейта",
+    "value": 900,
+    "sources": [
+      {
+        "title": "Flute 2.ogg",
+        "page": "https://commons.wikimedia.org/wiki/File:Flute_2.ogg",
+        "download": "https://upload.wikimedia.org/wikipedia/commons/e/e0/Flute_2.ogg",
+        "original": "/Users/mychkvad/Projects/dibs/research/instruments/original-3-1.ogg"
+      }
+    ],
+    "file": "/Users/mychkvad/Projects/dibs/research/instruments/clip-03.mp3",
+    "duration": 8,
+    "bytes": 161436,
+    "sha256": "54457d19c156fba319684dcbefcc10870513ac30d16e7482400e6cf5b02753e1",
+    "changes": "Первые 8 секунд после удаления начальной тишины (или вся запись, если короче); выровнена громкость, короткое плавное начало/окончание, MP3; теги удалены.",
+    "verifiedLoudnessLUFS": -18.5,
+    "mediaUrl": "/media/7b4dbc6827d743eb1d0085e19c6583c7dcf08bd1d10f0283.mp3"
+  },
+  {
+    "answer": "Труба",
+    "files": [
+      "05. D5-trumpet.ogg",
+      "06. F5-trumpet.ogg"
+    ],
+    "author": "ПростоУчастник",
+    "license": "CC0 1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "accepted": "труба",
+    "value": 1200,
+    "sources": [
+      {
+        "title": "05. D5-trumpet.ogg",
+        "page": "https://commons.wikimedia.org/wiki/File:05._D5-trumpet.ogg",
+        "download": "https://upload.wikimedia.org/wikipedia/commons/a/a7/05._D5-trumpet.ogg",
+        "original": "/Users/mychkvad/Projects/dibs/research/instruments/original-4-1.ogg"
+      },
+      {
+        "title": "06. F5-trumpet.ogg",
+        "page": "https://commons.wikimedia.org/wiki/File:06._F5-trumpet.ogg",
+        "download": "https://upload.wikimedia.org/wikipedia/commons/f/f7/06._F5-trumpet.ogg",
+        "original": "/Users/mychkvad/Projects/dibs/research/instruments/original-4-2.ogg"
+      }
+    ],
+    "file": "/Users/mychkvad/Projects/dibs/research/instruments/clip-04.mp3",
+    "duration": 6.573333,
+    "bytes": 132702,
+    "sha256": "d49a16e657e06fac3adf9ff316ae1c52862b9b63b02ffb73e089bd10d37cc81f",
+    "changes": "Две исходные ноты трубы соединены последовательно; выровнена громкость, короткое плавное начало/окончание, MP3; теги удалены.",
+    "verifiedLoudnessLUFS": -18.45,
+    "mediaUrl": "/media/ad1e15fe05e8e03908fe9f220053a11e3b59ddd644e3d6eb.mp3"
+  },
+  {
+    "answer": "Аккордеон",
+    "files": [
+      "Accordion registers.ogg"
+    ],
+    "author": "Necz0r",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "accepted": "аккордеон; баян (по короткому аудио не требовать различать клавишный аккордеон и баян)",
+    "value": 1500,
+    "sources": [
+      {
+        "title": "Accordion registers.ogg",
+        "page": "https://commons.wikimedia.org/wiki/File:Accordion_registers.ogg",
+        "download": "https://upload.wikimedia.org/wikipedia/commons/9/91/Accordion_registers.ogg",
+        "original": "/Users/mychkvad/Projects/dibs/research/instruments/original-5-1.ogg"
+      }
+    ],
+    "file": "/Users/mychkvad/Projects/dibs/research/instruments/clip-05.mp3",
+    "duration": 8,
+    "bytes": 161436,
+    "sha256": "15ff78331df8cfced8c3e86e82987d1113ee1084731e20450116c8280adc08c2",
+    "changes": "Первые 8 секунд после удаления начальной тишины (или вся запись, если короче); выровнена громкость, короткое плавное начало/окончание, MP3; теги удалены.",
+    "verifiedLoudnessLUFS": -18.44,
+    "mediaUrl": "/media/6b44212babd4aa730b17d7161ade0630a8cf64f50e68a94b.mp3"
+  },
+  {
+    "answer": "Губная гармошка",
+    "files": [
+      "Harmonica.ogg"
+    ],
+    "author": "mastermesh",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "accepted": "губная гармошка; гармоника; гармошка",
+    "value": 1800,
+    "sources": [
+      {
+        "title": "Harmonica.ogg",
+        "page": "https://commons.wikimedia.org/wiki/File:Harmonica.ogg",
+        "download": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/e5/Harmonica.ogg/Harmonica.ogg.mp3",
+        "original": "/Users/mychkvad/Projects/dibs/research/instruments/original-6-1.mp3"
+      }
+    ],
+    "file": "/Users/mychkvad/Projects/dibs/research/instruments/clip-06.mp3",
+    "duration": 8,
+    "bytes": 161436,
+    "sha256": "1ccb4730573bfed56fbae48b05f408137a3dc890a2c641e3658455a21d9b6836",
+    "changes": "Первые 8 секунд после удаления начальной тишины (или вся запись, если короче); выровнена громкость, короткое плавное начало/окончание, MP3; теги удалены.",
+    "verifiedLoudnessLUFS": -18.51,
+    "mediaUrl": "/media/61e3ae394b837816fe887c1fda6ee0259c34ac3f625df964.mp3"
+  },
+  {
+    "answer": "Волынка",
+    "files": [
+      "Skye Boat Song.ogg"
+    ],
+    "author": "Clan Stewart Pipe Band; Pandora Records",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+    "accepted": "волынка",
+    "value": 2100,
+    "sources": [
+      {
+        "title": "Skye Boat Song.ogg",
+        "page": "https://commons.wikimedia.org/wiki/File:Skye_Boat_Song.ogg",
+        "download": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/3c/Skye_Boat_Song.ogg/Skye_Boat_Song.ogg.mp3",
+        "original": "/Users/mychkvad/Projects/dibs/research/instruments/original-7-1.mp3"
+      }
+    ],
+    "file": "/Users/mychkvad/Projects/dibs/research/instruments/clip-07.mp3",
+    "duration": 8,
+    "bytes": 161436,
+    "sha256": "44cc6f92c12e3638cda846464946e5eb1eccddc15678c934d0e5a756b47773d4",
+    "changes": "Первые 8 секунд после удаления начальной тишины (или вся запись, если короче); выровнена громкость, короткое плавное начало/окончание, MP3; теги удалены.",
+    "verifiedLoudnessLUFS": -18.51,
+    "mediaUrl": "/media/1b66f6e8e14df4773018abf68ba5e1504f2ace190e111759.mp3"
+  }
+]

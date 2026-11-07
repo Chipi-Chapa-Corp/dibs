@@ -1,0 +1,45 @@
+[
+  {
+    "exercise": "Tate_Press",
+    "title": "Жим Тейта",
+    "answer": "Трицепс",
+    "file": "research/gym-candidates/Tate_Press-0.jpg",
+    "accepted": [
+      "трицепс",
+      "трицепсы"
+    ],
+    "sha256": "87a1bf716c922ddf2e16fcfdf200cae1679a7e1afe72e2dcd5aeab1ac7e9314a",
+    "value": 500,
+    "mediaUrl": "/media/c7d1e31cf3466e70a2901aaafc9b49d87af8ca21f88df498.jpg",
+    "source": "https://github.com/yuhonas/free-exercise-db/blob/main/exercises/Tate_Press.json"
+  },
+  {
+    "exercise": "Svend_Press",
+    "title": "Жим Свенда",
+    "answer": "Грудь",
+    "file": "research/gym-candidates/harder/Svend_Press.jpg",
+    "accepted": [
+      "грудь",
+      "грудные мышцы"
+    ],
+    "sha256": "c0923047a6f0284850a339e0bdcfe5eaa36a3fab18f5006770d8b8f1895c91e1",
+    "value": 600,
+    "mediaUrl": "/media/1f8c2cd1f07e466d432b48299a87ee62749ff7da9f0f8f9f.jpg",
+    "source": "https://github.com/yuhonas/free-exercise-db/blob/main/exercises/Svend_Press.json"
+  },
+  {
+    "exercise": "Wrist_Roller",
+    "title": "Наматывание груза на валик",
+    "answer": "Предплечья",
+    "file": "research/gym-candidates/more-static/Wrist_Roller.jpg",
+    "accepted": [
+      "предплечья",
+      "хват",
+      "запястье"
+    ],
+    "sha256": "0a97991223f8f6161b4d697c599c4e5f4958b0d2094bc19a5e36b10741b65f87",
+    "value": 700,
+    "mediaUrl": "/media/2fe4453ca867268c553fb76865eeec4b52c6eb331bad1866.jpg",
+    "source": "https://github.com/yuhonas/free-exercise-db/blob/main/exercises/Wrist_Roller.json"
+  }
+]

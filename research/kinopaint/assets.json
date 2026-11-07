@@ -1,0 +1,67 @@
+[
+  {
+    "name": "green-mile",
+    "answer": "Зелёная миля",
+    "value": 100,
+    "timestamp": 2216,
+    "source": "/var/folders/t3/wh0_r9jx0jz4kqxrwpsvv5rh0000gn/T/codex-clipboard-706dc63d-e4db-4a3a-8bbf-38fb3bb81baf.png",
+    "generatedPath": "/Users/mychkvad/.codex/generated_images/01a1a8ff-d244-7ee2-9a61-bb8ef9eacf43/exec-7eea20cd-59d7-42d9-9fa9-0e6f43a698b4.png",
+    "file": "research/kinopaint/green-mile.png",
+    "method": "built-in image_gen",
+    "prompt": "Use case: precise-object-edit. Edit target: the one supplied screenshot. Asset type: film quiz image. Restore this exact deliberately crude Microsoft Paint drawing, preserving all its content, composition, hand-drawn wobbly black strokes, flat original colors, proportions and facial expressions. Remove ONLY the thin orange/red video borders and grey/green video-edge strips, remove compression blur/halos, make the original lines clean and flat fills consistent. Preserve the black uniformed guard with blue trousers and yellow keys on the left, and the huge orange-clothed prisoner behind black bars on the right. Preserve the tiny existing shirt scribble. Extend clipped drawing edges only minimally if necessary; do not invent new clues. Keep the drawing naive and funny, never convert it to polished illustration, realism, or shading. No title, no film names, no added text or watermark. Keep similar approximately 1.27:1 landscape aspect ratio. Output about 1280×1008 pixels, at most 1080 pixels high; no 4K. Opaque background.",
+    "sha256": "505d5c3543b6179ec96a8ec1836c8492c7289399c0923708b39b23640fdce37d",
+    "mediaUrl": "/media/993425ed347ffcb55ea2deae778d7c3bd67c6d21e6b30f2a.png"
+  },
+  {
+    "name": "interstellar",
+    "answer": "Интерстеллар",
+    "value": 200,
+    "timestamp": 2150,
+    "source": "/var/folders/t3/wh0_r9jx0jz4kqxrwpsvv5rh0000gn/T/codex-clipboard-f2eaec28-0ce2-4c12-b369-14e8ce68b808.png",
+    "generatedPath": "/Users/mychkvad/.codex/generated_images/01a1a8ff-d244-7ee2-9a61-bb8ef9eacf43/exec-bffdf210-b9fb-4761-a3d5-c2184a3789f1.png",
+    "file": "research/kinopaint/interstellar.png",
+    "method": "built-in image_gen",
+    "prompt": "Use case: precise-object-edit. Edit target: the one supplied screenshot. Asset type: film quiz image. Restore this exact deliberately crude Microsoft Paint drawing, preserving all its content, composition, hand-drawn wobbly black strokes, flat original colors, proportions and facial expressions. Remove ONLY the thin orange/red video borders and grey/green video-edge strips, remove compression blur/halos, make the original lines clean and flat fills consistent. Preserve the yellow figure on the left, small falling red book and arrow, central brown vertical wall and grey astronaut on the right against black with yellow scribbles. Extend clipped drawing edges only minimally if necessary; do not invent new clues. Keep the drawing naive and funny, never convert it to polished illustration, realism, or shading. No title, no film names, no added text or watermark. Keep similar approximately 1.27:1 landscape aspect ratio. Output about 1280×1008 pixels, at most 1080 pixels high; no 4K. Opaque background.",
+    "sha256": "858e0f0e5308a3f2891440f9b32896ac1704630aca92d5b375daa4903f1e9a23",
+    "mediaUrl": "/media/fc579281aad5491743068313e1f4de1455591d93db3963da.png"
+  },
+  {
+    "name": "matrix",
+    "answer": "Матрица",
+    "value": 300,
+    "timestamp": 2039,
+    "source": "/var/folders/t3/wh0_r9jx0jz4kqxrwpsvv5rh0000gn/T/codex-clipboard-6b1db5d1-9cc2-4f44-82f1-a1d308aef874.png",
+    "generatedPath": "/Users/mychkvad/.codex/generated_images/01a1a8ff-d244-7ee2-9a61-bb8ef9eacf43/exec-fc172ac8-851f-45a8-b4f2-0a59b1659292.png",
+    "file": "research/kinopaint/matrix.png",
+    "method": "built-in image_gen",
+    "prompt": "Use case: precise-object-edit. Edit target: the one supplied screenshot. Asset type: film quiz image. Restore this exact deliberately crude Microsoft Paint drawing, preserving all its content, composition, hand-drawn wobbly black strokes, flat original colors, proportions and facial expressions. Remove ONLY the thin orange/red video borders and grey/green video-edge strips, remove compression blur/halos, make the original lines clean and flat fills consistent. Preserve three crude buildings, grey street, the black-suited sunglasses figure leaning backward on left dodging a horizontal chain of grey bullets, and black-suited sunglasses gunman on right. Give both figures their complete feet at the bottom if clipped, with only a tiny extension. Extend clipped drawing edges only minimally if necessary; do not invent new clues. Keep the drawing naive and funny, never convert it to polished illustration, realism, or shading. No title, no film names, no added text or watermark. Keep similar approximately 1.27:1 landscape aspect ratio. Output about 1280×1008 pixels, at most 1080 pixels high; no 4K. Opaque background.",
+    "sha256": "575e2d5dcbba40e014dc6ee2d3fd265fa625387208c2be873e7ef86cb8cbe34b",
+    "mediaUrl": "/media/720750b844fd23a6c8d3643f0d78bbc07198581c4781c412.png"
+  },
+  {
+    "name": "whiplash",
+    "answer": "Одержимость",
+    "value": 400,
+    "timestamp": 2120,
+    "source": "/var/folders/t3/wh0_r9jx0jz4kqxrwpsvv5rh0000gn/T/codex-clipboard-c8f0d1d7-dec6-4403-857c-c683353e18bd.png",
+    "generatedPath": "/Users/mychkvad/.codex/generated_images/01a1a8ff-d244-7ee2-9a61-bb8ef9eacf43/exec-da3c8fa5-44a5-467d-ae11-baa9677c68d4.png",
+    "file": "research/kinopaint/whiplash.png",
+    "method": "built-in image_gen",
+    "prompt": "Use case: precise-object-edit. Edit target: the one supplied screenshot. Asset type: film quiz image. Restore this exact deliberately crude Microsoft Paint drawing, preserving all its content, composition, hand-drawn wobbly black strokes, flat original colors, proportions and facial expressions. Remove ONLY the thin orange/red video borders and grey/green video-edge strips, remove compression blur/halos, make the original lines clean and flat fills consistent. Preserve blue-clothed drummer on the left with sticks and simple drums, angry black-shirted blue-trousered figure on right holding a black chair overhead. Preserve original speech bubble text exactly: «лох». Extend clipped drawing edges only minimally if necessary; do not invent new clues. Keep the drawing naive and funny, never convert it to polished illustration, realism, or shading. No title, no film names, no added text or watermark. Keep similar approximately 1.27:1 landscape aspect ratio. Output about 1280×1008 pixels, at most 1080 pixels high; no 4K. Opaque background.",
+    "sha256": "6a5cd39eda9cd4dcbb06947573778e2575ae3efcb0e811c986d9c5acd61c85f0",
+    "mediaUrl": "/media/c2ba667aaee64c0cabbab44f28d4c42bd7cd5938b9224dec.png"
+  },
+  {
+    "name": "titanic",
+    "answer": "Титаник",
+    "value": 500,
+    "timestamp": 1706,
+    "source": "/var/folders/t3/wh0_r9jx0jz4kqxrwpsvv5rh0000gn/T/codex-clipboard-2c6f3db9-b734-4789-8158-f8e10de15ae0.png",
+    "generatedPath": "/Users/mychkvad/.codex/generated_images/01a1a8ff-d244-7ee2-9a61-bb8ef9eacf43/exec-ce2f2a18-5149-4a43-9ef8-0885a7d5c2dc.png",
+    "file": "research/kinopaint/titanic.png",
+    "method": "built-in image_gen",
+    "prompt": "Use case: precise-object-edit. Edit target: the one supplied screenshot. Asset type: film quiz image. Restore this exact deliberately crude Microsoft Paint drawing, preserving all its content, composition, hand-drawn wobbly black strokes, flat original colors, proportions and facial expressions. Remove ONLY the thin orange/red video borders and grey/green video-edge strips, remove compression blur/halos, make the original lines clean and flat fills consistent. Preserve grey ship on left with only the two existing black smokestacks and smoke scribbles, white sky, blue-purple sea, cyan triangular iceberg in lower right. Do not add extra smokestacks. Extend clipped drawing edges only minimally if necessary; do not invent new clues. Keep the drawing naive and funny, never convert it to polished illustration, realism, or shading. No title, no film names, no added text or watermark. Keep similar approximately 1.27:1 landscape aspect ratio. Output about 1280×1008 pixels, at most 1080 pixels high; no 4K. Opaque background.",
+    "sha256": "de2bc21f77a1bbf260841f00f659a2ae6404a330c3f933a95e07136344816250",
+    "mediaUrl": "/media/b4c6fcb517fde58d0d9ab63aa6c1e66ee071c6df3e67be82.png"
+  }
+]

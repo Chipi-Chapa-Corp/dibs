@@ -1,0 +1,61 @@
+{
+  "gameId": "95AF7D",
+  "scoreChangeMagnitude": 600,
+  "insertions": [
+    {
+      "category": "График или горы",
+      "categoryId": "fc77c969182a",
+      "value": 600,
+      "title": "Заначка",
+      "id": "39a5924bdd01"
+    },
+    {
+      "category": "Логика",
+      "categoryId": "4576161cc419",
+      "value": 2100,
+      "title": "Штраф",
+      "id": "5b56536eebc9"
+    }
+  ],
+  "moves": [
+    {
+      "id": "2bc9cd41c7c9",
+      "category": "График или горы",
+      "from": 600,
+      "to": 900
+    },
+    {
+      "id": "382a59b1de64",
+      "category": "График или горы",
+      "from": 900,
+      "to": 1200
+    },
+    {
+      "id": "87313e132439",
+      "category": "График или горы",
+      "from": 1200,
+      "to": 1500
+    },
+    {
+      "id": "5871f346ef97",
+      "category": "График или горы",
+      "from": 1500,
+      "to": 1800
+    },
+    {
+      "id": "e9c124c6878c",
+      "category": "График или горы",
+      "from": 1800,
+      "to": 2100
+    },
+    {
+      "id": "01904deec256",
+      "category": "Логика",
+      "from": 2100,
+      "to": 2400
+    }
+  ],
+  "originalQuestionsPreserved": 103,
+  "totalQuestions": 105,
+  "backup": "research/round-three-modifiers-95AF7D-2026-11-06T23-24-13.448Z"
+}

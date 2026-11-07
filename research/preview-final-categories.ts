@@ -1,0 +1,15 @@
+import {mkdtempSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {startServer} from '../server/index.ts';
+import {act,addPlayer,createGame,joinMember} from '../server/engine.ts';
+import {emptyQuestion} from '../shared/model.ts';
+const dataDir=mkdtempSync(join(tmpdir(),'dibs-final-ui-'));
+const app=await startServer({port:43205,dataDir,dev:false,quiet:true,mediaDir:join(dataDir,'media')});
+const round={id:'final-round',name:'Round 1',type:'final' as const,categories:['Мемы','Майнкрафт','Прага'].map((name,i)=>({id:`cat-${i}`,name,questions:[{...emptyQuestion(0),id:`q-${i}`,responseType:'free' as const,prompt:`Тестовый вопрос: ${name}`,answer:`Тестовый ответ: ${name}`}]}))};
+const g=createGame({name:'Final category playtest',definition:{rounds:[round]}});g.id='FINALUI';const a=addPlayer(g,'Alpha'),b=addPlayer(g,'Beta');a.score=2000;b.score=1500;
+const member=joinMember(g,{name:'Alice',teamId:a.id});
+act(g,'ready',{ready:true},'player',a.id);act(g,'ready',{ready:true},'player',b.id);act(g,'start');app.games.set(g.id,g);
+const draft=createGame({name:'Final editor playtest',definition:{rounds:[round]}});draft.id='FINALEDIT';app.games.set(draft.id,draft);
+console.log(JSON.stringify({url:'http://localhost:43205',dataDir,gameId:g.id,playerToken:member.token}));
+for(const signal of ['SIGINT','SIGTERM'] as const)process.once(signal,()=>void app.close().then(()=>process.exit(0)));

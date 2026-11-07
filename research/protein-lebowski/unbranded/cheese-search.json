@@ -1,0 +1,569 @@
+[
+  {
+    "pageid": 67391843,
+    "ns": 6,
+    "title": "File:Edam cheese.JPG",
+    "index": 4,
+    "imagerepository": "local",
+    "imageinfo": [
+      {
+        "thumburl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/29/Edam_cheese.JPG/500px-Edam_cheese.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "thumbwidth": 500,
+        "thumbheight": 439,
+        "responsiveUrls": {
+          "2": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/29/Edam_cheese.JPG/1280px-Edam_cheese.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        },
+        "thumbattribs": {
+          "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/29/Edam_cheese.JPG/500px-Edam_cheese.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "decoding": "async",
+          "loading": "lazy",
+          "width": 500,
+          "height": 439,
+          "srcset": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/29/Edam_cheese.JPG/1280px-Edam_cheese.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail 2x"
+        },
+        "url": "https://upload.wikimedia.org/wikipedia/commons/2/29/Edam_cheese.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "descriptionurl": "https://commons.wikimedia.org/wiki/File:Edam_cheese.JPG",
+        "descriptionshorturl": "https://commons.wikimedia.org/w/index.php?curid=67391843",
+        "extmetadata": {
+          "DateTime": {
+            "value": "2018-03-16 09:16:15",
+            "source": "mediawiki-metadata",
+            "hidden": ""
+          },
+          "ObjectName": {
+            "value": "Edam cheese",
+            "source": "mediawiki-metadata"
+          },
+          "CommonsMetadataExtension": {
+            "value": 1.2,
+            "source": "extension",
+            "hidden": ""
+          },
+          "Categories": {
+            "value": "Edam cheese|Self-published work",
+            "source": "commons-categories",
+            "hidden": ""
+          },
+          "Assessments": {
+            "value": "",
+            "source": "commons-categories",
+            "hidden": ""
+          },
+          "GPSLatitude": {
+            "value": "52.513472",
+            "source": "commons-desc-page"
+          },
+          "GPSLongitude": {
+            "value": "5.047472",
+            "source": "commons-desc-page"
+          },
+          "GPSMapDatum": {
+            "value": "WGS-84",
+            "source": "commons-desc-page",
+            "hidden": ""
+          },
+          "ImageDescription": {
+            "value": "Edam cheese",
+            "source": "commons-desc-page"
+          },
+          "DateTimeOriginal": {
+            "value": "2005-07",
+            "source": "commons-desc-page"
+          },
+          "Credit": {
+            "value": "<span class=\"int-own-work\" lang=\"en\">Own work</span>",
+            "source": "commons-desc-page"
+          },
+          "Artist": {
+            "value": "<a href=\"//commons.wikimedia.org/w/index.php?title=User:Dguendel&amp;action=edit&amp;redlink=1\" class=\"new\" title=\"User:Dguendel (page does not exist)\">Dguendel</a>",
+            "source": "commons-desc-page"
+          },
+          "LicenseShortName": {
+            "value": "CC BY 4.0",
+            "source": "commons-desc-page",
+            "hidden": ""
+          },
+          "UsageTerms": {
+            "value": "Creative Commons Attribution 4.0",
+            "source": "commons-desc-page"
+          },
+          "AttributionRequired": {
+            "value": "true",
+            "source": "commons-desc-page",
+            "hidden": ""
+          },
+          "LicenseUrl": {
+            "value": "https://creativecommons.org/licenses/by/4.0",
+            "source": "commons-desc-page"
+          },
+          "Copyrighted": {
+            "value": "True",
+            "source": "commons-desc-page",
+            "hidden": ""
+          },
+          "Restrictions": {
+            "value": "",
+            "source": "commons-desc-page",
+            "hidden": ""
+          },
+          "License": {
+            "value": "cc-by-4.0",
+            "source": "commons-templates",
+            "hidden": ""
+          }
+        }
+      }
+    ]
+  },
+  {
+    "pageid": 94084670,
+    "ns": 6,
+    "title": "File:Edams Museum (1530) - First floor - Edam Cheese.jpg",
+    "index": 2,
+    "imagerepository": "local",
+    "imageinfo": [
+      {
+        "thumburl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/22/Edams_Museum_%281530%29_-_First_floor_-_Edam_Cheese.jpg/500px-Edams_Museum_%281530%29_-_First_floor_-_Edam_Cheese.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "thumbwidth": 500,
+        "thumbheight": 334,
+        "responsiveUrls": {
+          "2": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/22/Edams_Museum_%281530%29_-_First_floor_-_Edam_Cheese.jpg/1280px-Edams_Museum_%281530%29_-_First_floor_-_Edam_Cheese.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        },
+        "thumbattribs": {
+          "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/22/Edams_Museum_%281530%29_-_First_floor_-_Edam_Cheese.jpg/500px-Edams_Museum_%281530%29_-_First_floor_-_Edam_Cheese.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "decoding": "async",
+          "loading": "lazy",
+          "width": 500,
+          "height": 334,
+          "srcset": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/22/Edams_Museum_%281530%29_-_First_floor_-_Edam_Cheese.jpg/1280px-Edams_Museum_%281530%29_-_First_floor_-_Edam_Cheese.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail 2x"
+        },
+        "url": "https://upload.wikimedia.org/wikipedia/commons/2/22/Edams_Museum_%281530%29_-_First_floor_-_Edam_Cheese.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "descriptionurl": "https://commons.wikimedia.org/wiki/File:Edams_Museum_(1530)_-_First_floor_-_Edam_Cheese.jpg",
+        "descriptionshorturl": "https://commons.wikimedia.org/w/index.php?curid=94084670",
+        "extmetadata": {
+          "DateTime": {
+            "value": "2020-09-13 18:55:05",
+            "source": "mediawiki-metadata",
+            "hidden": ""
+          },
+          "ObjectName": {
+            "value": "Edams Museum (1530) - First floor - Edam Cheese",
+            "source": "mediawiki-metadata"
+          },
+          "CommonsMetadataExtension": {
+            "value": 1.2,
+            "source": "extension",
+            "hidden": ""
+          },
+          "Categories": {
+            "value": "Edam cheese|Self-published work|Edams Museum",
+            "source": "commons-categories",
+            "hidden": ""
+          },
+          "Assessments": {
+            "value": "",
+            "source": "commons-categories",
+            "hidden": ""
+          },
+          "ImageDescription": {
+            "value": "Edams Museum (1530) - First floor - Edam Cheese",
+            "source": "commons-desc-page"
+          },
+          "DateTimeOriginal": {
+            "value": "2020-09-11 16:11:50",
+            "source": "commons-desc-page"
+          },
+          "Credit": {
+            "value": "<span class=\"int-own-work\" lang=\"en\">Own work</span>",
+            "source": "commons-desc-page"
+          },
+          "Artist": {
+            "value": "<a href=\"//commons.wikimedia.org/wiki/User:Txllxt_TxllxT\" title=\"User:Txllxt TxllxT\">Txllxt TxllxT</a>",
+            "source": "commons-desc-page"
+          },
+          "LicenseShortName": {
+            "value": "CC BY-SA 4.0",
+            "source": "commons-desc-page",
+            "hidden": ""
+          },
+          "UsageTerms": {
+            "value": "Creative Commons Attribution-Share Alike 4.0",
+            "source": "commons-desc-page"
+          },
+          "AttributionRequired": {
+            "value": "true",
+            "source": "commons-desc-page",
+            "hidden": ""
+          },
+          "LicenseUrl": {
+            "value": "https://creativecommons.org/licenses/by-sa/4.0",
+            "source": "commons-desc-page"
+          },
+          "Copyrighted": {
+            "value": "True",
+            "source": "commons-desc-page",
+            "hidden": ""
+          },
+          "Restrictions": {
+            "value": "",
+            "source": "commons-desc-page",
+            "hidden": ""
+          },
+          "License": {
+            "value": "cc-by-sa-4.0",
+            "source": "commons-templates",
+            "hidden": ""
+          }
+        }
+      }
+    ]
+  },
+  {
+    "pageid": 127891345,
+    "ns": 6,
+    "title": "File:20220526.Edam cheese.-012.jpg",
+    "index": 5,
+    "imagerepository": "local",
+    "imageinfo": [
+      {
+        "thumburl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/71/20220526.Edam_cheese.-012.jpg/500px-20220526.Edam_cheese.-012.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "thumbwidth": 500,
+        "thumbheight": 375,
+        "responsiveUrls": {
+          "2": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/71/20220526.Edam_cheese.-012.jpg/1280px-20220526.Edam_cheese.-012.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        },
+        "thumbattribs": {
+          "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/71/20220526.Edam_cheese.-012.jpg/500px-20220526.Edam_cheese.-012.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "decoding": "async",
+          "loading": "lazy",
+          "width": 500,
+          "height": 375,
+          "srcset": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/71/20220526.Edam_cheese.-012.jpg/1280px-20220526.Edam_cheese.-012.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail 2x"
+        },
+        "url": "https://upload.wikimedia.org/wikipedia/commons/7/71/20220526.Edam_cheese.-012.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "descriptionurl": "https://commons.wikimedia.org/wiki/File:20220526.Edam_cheese.-012.jpg",
+        "descriptionshorturl": "https://commons.wikimedia.org/w/index.php?curid=127891345",
+        "extmetadata": {
+          "DateTime": {
+            "value": "2023-01-18 19:46:00",
+            "source": "mediawiki-metadata",
+            "hidden": ""
+          },
+          "ObjectName": {
+            "value": "20220526.Edam cheese.-012",
+            "source": "mediawiki-metadata"
+          },
+          "CommonsMetadataExtension": {
+            "value": 1.2,
+            "source": "extension",
+            "hidden": ""
+          },
+          "Categories": {
+            "value": "Edam cheese|Self-published work|Netherlands photographs taken on 2022-05-26|Photos by User:Bybbisch94/2022",
+            "source": "commons-categories",
+            "hidden": ""
+          },
+          "Assessments": {
+            "value": "",
+            "source": "commons-categories",
+            "hidden": ""
+          },
+          "GPSLatitude": {
+            "value": "52.513475",
+            "source": "commons-desc-page"
+          },
+          "GPSLongitude": {
+            "value": "5.047548",
+            "source": "commons-desc-page"
+          },
+          "GPSMapDatum": {
+            "value": "WGS-84",
+            "source": "commons-desc-page",
+            "hidden": ""
+          },
+          "ImageDescription": {
+            "value": "Edamer ist ein Käse mit dem Ursprungsort Edam. Als Edam Holland ist er seit 2010 ein Produkt mit geschützter geografischer Angabe. Viele Jahrhunderte lang wurde der Edamer aus Rohmilch hergestellt und war schon damals eine geschätzte Exportware. Mit seiner typischen Schärfe diente er im Frankreich des 17. Jahrhunderts als Vorbild für den Mimolette. Heute ist der Rohmilchkäse weitgehend vom Markt verschwunden, weitaus häufiger trifft man nun Fabrik-Edamer aus pasteurisierter Milch an. Heute ist Edamer eine Standardkäsesorte, die in vielen Ländern produziert wird.",
+            "source": "commons-desc-page"
+          },
+          "DateTimeOriginal": {
+            "value": "2022-05-26 11:06:18",
+            "source": "commons-desc-page"
+          },
+          "Credit": {
+            "value": "<span class=\"int-own-work\" lang=\"en\">Own work</span>",
+            "source": "commons-desc-page"
+          },
+          "Artist": {
+            "value": "<a href=\"//commons.wikimedia.org/wiki/User:Bybbisch94\" title=\"User:Bybbisch94\">Bybbisch94, Christian Gebhardt</a>",
+            "source": "commons-desc-page"
+          },
+          "LicenseShortName": {
+            "value": "CC BY-SA 4.0",
+            "source": "commons-desc-page",
+            "hidden": ""
+          },
+          "UsageTerms": {
+            "value": "Creative Commons Attribution-Share Alike 4.0",
+            "source": "commons-desc-page"
+          },
+          "AttributionRequired": {
+            "value": "true",
+            "source": "commons-desc-page",
+            "hidden": ""
+          },
+          "LicenseUrl": {
+            "value": "https://creativecommons.org/licenses/by-sa/4.0",
+            "source": "commons-desc-page"
+          },
+          "Copyrighted": {
+            "value": "True",
+            "source": "commons-desc-page",
+            "hidden": ""
+          },
+          "Restrictions": {
+            "value": "",
+            "source": "commons-desc-page",
+            "hidden": ""
+          },
+          "License": {
+            "value": "cc-by-sa-4.0",
+            "source": "commons-templates",
+            "hidden": ""
+          }
+        }
+      }
+    ]
+  },
+  {
+    "pageid": 127891350,
+    "ns": 6,
+    "title": "File:20220526.Edam cheese.-014.jpg",
+    "index": 3,
+    "imagerepository": "local",
+    "imageinfo": [
+      {
+        "thumburl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/63/20220526.Edam_cheese.-014.jpg/500px-20220526.Edam_cheese.-014.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "thumbwidth": 500,
+        "thumbheight": 667,
+        "responsiveUrls": {
+          "2": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/63/20220526.Edam_cheese.-014.jpg/1280px-20220526.Edam_cheese.-014.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        },
+        "thumbattribs": {
+          "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/63/20220526.Edam_cheese.-014.jpg/500px-20220526.Edam_cheese.-014.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "decoding": "async",
+          "loading": "lazy",
+          "width": 500,
+          "height": 667,
+          "srcset": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/63/20220526.Edam_cheese.-014.jpg/1280px-20220526.Edam_cheese.-014.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail 2x"
+        },
+        "url": "https://upload.wikimedia.org/wikipedia/commons/6/63/20220526.Edam_cheese.-014.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "descriptionurl": "https://commons.wikimedia.org/wiki/File:20220526.Edam_cheese.-014.jpg",
+        "descriptionshorturl": "https://commons.wikimedia.org/w/index.php?curid=127891350",
+        "extmetadata": {
+          "DateTime": {
+            "value": "2023-01-18 19:46:06",
+            "source": "mediawiki-metadata",
+            "hidden": ""
+          },
+          "ObjectName": {
+            "value": "20220526.Edam cheese.-014",
+            "source": "mediawiki-metadata"
+          },
+          "CommonsMetadataExtension": {
+            "value": 1.2,
+            "source": "extension",
+            "hidden": ""
+          },
+          "Categories": {
+            "value": "Edam cheese|Self-published work|Netherlands photographs taken on 2022-05-26|Photos by User:Bybbisch94/2022",
+            "source": "commons-categories",
+            "hidden": ""
+          },
+          "Assessments": {
+            "value": "",
+            "source": "commons-categories",
+            "hidden": ""
+          },
+          "GPSLatitude": {
+            "value": "52.513475",
+            "source": "commons-desc-page"
+          },
+          "GPSLongitude": {
+            "value": "5.047548",
+            "source": "commons-desc-page"
+          },
+          "GPSMapDatum": {
+            "value": "WGS-84",
+            "source": "commons-desc-page",
+            "hidden": ""
+          },
+          "ImageDescription": {
+            "value": "Edamer ist ein Käse mit dem Ursprungsort Edam. Als Edam Holland ist er seit 2010 ein Produkt mit geschützter geografischer Angabe. Viele Jahrhunderte lang wurde der Edamer aus Rohmilch hergestellt und war schon damals eine geschätzte Exportware. Mit seiner typischen Schärfe diente er im Frankreich des 17. Jahrhunderts als Vorbild für den Mimolette. Heute ist der Rohmilchkäse weitgehend vom Markt verschwunden, weitaus häufiger trifft man nun Fabrik-Edamer aus pasteurisierter Milch an. Heute ist Edamer eine Standardkäsesorte, die in vielen Ländern produziert wird.",
+            "source": "commons-desc-page"
+          },
+          "DateTimeOriginal": {
+            "value": "2022-05-26 11:06:49",
+            "source": "commons-desc-page"
+          },
+          "Credit": {
+            "value": "<span class=\"int-own-work\" lang=\"en\">Own work</span>",
+            "source": "commons-desc-page"
+          },
+          "Artist": {
+            "value": "<a href=\"//commons.wikimedia.org/wiki/User:Bybbisch94\" title=\"User:Bybbisch94\">Bybbisch94, Christian Gebhardt</a>",
+            "source": "commons-desc-page"
+          },
+          "LicenseShortName": {
+            "value": "CC BY-SA 4.0",
+            "source": "commons-desc-page",
+            "hidden": ""
+          },
+          "UsageTerms": {
+            "value": "Creative Commons Attribution-Share Alike 4.0",
+            "source": "commons-desc-page"
+          },
+          "AttributionRequired": {
+            "value": "true",
+            "source": "commons-desc-page",
+            "hidden": ""
+          },
+          "LicenseUrl": {
+            "value": "https://creativecommons.org/licenses/by-sa/4.0",
+            "source": "commons-desc-page"
+          },
+          "Copyrighted": {
+            "value": "True",
+            "source": "commons-desc-page",
+            "hidden": ""
+          },
+          "Restrictions": {
+            "value": "",
+            "source": "commons-desc-page",
+            "hidden": ""
+          },
+          "License": {
+            "value": "cc-by-sa-4.0",
+            "source": "commons-templates",
+            "hidden": ""
+          }
+        }
+      }
+    ]
+  },
+  {
+    "pageid": 127891449,
+    "ns": 6,
+    "title": "File:20220526.Edam cheese.-021.jpg",
+    "index": 1,
+    "imagerepository": "local",
+    "imageinfo": [
+      {
+        "thumburl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/89/20220526.Edam_cheese.-021.jpg/500px-20220526.Edam_cheese.-021.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "thumbwidth": 500,
+        "thumbheight": 667,
+        "responsiveUrls": {
+          "2": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/89/20220526.Edam_cheese.-021.jpg/1280px-20220526.Edam_cheese.-021.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        },
+        "thumbattribs": {
+          "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/89/20220526.Edam_cheese.-021.jpg/500px-20220526.Edam_cheese.-021.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "decoding": "async",
+          "loading": "lazy",
+          "width": 500,
+          "height": 667,
+          "srcset": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/89/20220526.Edam_cheese.-021.jpg/1280px-20220526.Edam_cheese.-021.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail 2x"
+        },
+        "url": "https://upload.wikimedia.org/wikipedia/commons/8/89/20220526.Edam_cheese.-021.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "descriptionurl": "https://commons.wikimedia.org/wiki/File:20220526.Edam_cheese.-021.jpg",
+        "descriptionshorturl": "https://commons.wikimedia.org/w/index.php?curid=127891449",
+        "extmetadata": {
+          "DateTime": {
+            "value": "2023-01-18 19:49:55",
+            "source": "mediawiki-metadata",
+            "hidden": ""
+          },
+          "ObjectName": {
+            "value": "20220526.Edam cheese.-021",
+            "source": "mediawiki-metadata"
+          },
+          "CommonsMetadataExtension": {
+            "value": 1.2,
+            "source": "extension",
+            "hidden": ""
+          },
+          "Categories": {
+            "value": "Edam cheese|Self-published work|Netherlands photographs taken on 2022-05-26|FoP-Netherlands|Photographs of flags of the Netherlands in North Holland|Statues in Edam-Volendam|Photos by User:Bybbisch94/2022",
+            "source": "commons-categories",
+            "hidden": ""
+          },
+          "Assessments": {
+            "value": "",
+            "source": "commons-categories",
+            "hidden": ""
+          },
+          "GPSLatitude": {
+            "value": "52.513475",
+            "source": "commons-desc-page"
+          },
+          "GPSLongitude": {
+            "value": "5.047548",
+            "source": "commons-desc-page"
+          },
+          "GPSMapDatum": {
+            "value": "WGS-84",
+            "source": "commons-desc-page",
+            "hidden": ""
+          },
+          "ImageDescription": {
+            "value": "Edamer ist ein Käse mit dem Ursprungsort Edam. Als Edam Holland ist er seit 2010 ein Produkt mit geschützter geografischer Angabe. Viele Jahrhunderte lang wurde der Edamer aus Rohmilch hergestellt und war schon damals eine geschätzte Exportware. Mit seiner typischen Schärfe diente er im Frankreich des 17. Jahrhunderts als Vorbild für den Mimolette. Heute ist der Rohmilchkäse weitgehend vom Markt verschwunden, weitaus häufiger trifft man nun Fabrik-Edamer aus pasteurisierter Milch an. Heute ist Edamer eine Standardkäsesorte, die in vielen Ländern produziert wird.",
+            "source": "commons-desc-page"
+          },
+          "DateTimeOriginal": {
+            "value": "2022-05-26 11:07:24",
+            "source": "commons-desc-page"
+          },
+          "Credit": {
+            "value": "<span class=\"int-own-work\" lang=\"en\">Own work</span>",
+            "source": "commons-desc-page"
+          },
+          "Artist": {
+            "value": "<a href=\"//commons.wikimedia.org/wiki/User:Bybbisch94\" title=\"User:Bybbisch94\">Bybbisch94, Christian Gebhardt</a>",
+            "source": "commons-desc-page"
+          },
+          "LicenseShortName": {
+            "value": "CC BY-SA 4.0",
+            "source": "commons-desc-page",
+            "hidden": ""
+          },
+          "UsageTerms": {
+            "value": "Creative Commons Attribution-Share Alike 4.0",
+            "source": "commons-desc-page"
+          },
+          "AttributionRequired": {
+            "value": "true",
+            "source": "commons-desc-page",
+            "hidden": ""
+          },
+          "LicenseUrl": {
+            "value": "https://creativecommons.org/licenses/by-sa/4.0",
+            "source": "commons-desc-page"
+          },
+          "Copyrighted": {
+            "value": "True",
+            "source": "commons-desc-page",
+            "hidden": ""
+          },
+          "Restrictions": {
+            "value": "",
+            "source": "commons-desc-page",
+            "hidden": ""
+          },
+          "License": {
+            "value": "cc-by-sa-4.0",
+            "source": "commons-templates",
+            "hidden": ""
+          }
+        }
+      }
+    ]
+  }
+]

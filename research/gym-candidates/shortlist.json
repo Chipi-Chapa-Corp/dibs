@@ -1,0 +1,248 @@
+{
+  "status": "Awaiting user approval; no game modifications",
+  "categoryName": "Джим",
+  "source": "https://github.com/yuhonas/free-exercise-db",
+  "candidates": [
+    {
+      "name": "Spider Curl",
+      "force": "pull",
+      "level": "beginner",
+      "mechanic": "isolation",
+      "equipment": "e-z curl bar",
+      "primaryMuscles": [
+        "biceps"
+      ],
+      "secondaryMuscles": [],
+      "instructions": [
+        "Start out by setting the bar on the part of the preacher bench that you would normally sit on. Make sure to align the barbell properly so that it is balanced and will not fall off.",
+        "Move to the front side of the preacher bench (the part where the arms usually lay) and position yourself to lay at a 45 degree slant with your torso and stomach pressed against the front side of the preacher bench.",
+        "Make sure that your feet (especially the toes) are well positioned on the floor and place your upper arms on top of the pad located on the inside part of the preacher bench.",
+        "Use your arms to grab the barbell with a supinated grip (palms facing up) at about shoulder width apart or slightly closer from each other.",
+        "Slowly begin to lift the barbell upwards and exhale. Hold the contracted position for a second as you squeeze the biceps.",
+        "Slowly begin to bring the barbell back to the starting position as your breathe in. .",
+        "Repeat for the recommended amount of repetitions."
+      ],
+      "category": "strength",
+      "images": [
+        "Spider_Curl/0.jpg",
+        "Spider_Curl/1.jpg"
+      ],
+      "id": "Spider_Curl",
+      "suggestedValue": 100,
+      "answer": "Бицепс",
+      "imageUrl": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Spider_Curl/1.jpg",
+      "source": "https://github.com/yuhonas/free-exercise-db/blob/main/exercises/Spider_Curl.json",
+      "localPath": "/Users/mychkvad/Projects/dibs/research/gym-candidates/Spider_Curl-1.jpg"
+    },
+    {
+      "name": "Cable Crunch",
+      "force": "pull",
+      "level": "beginner",
+      "mechanic": "isolation",
+      "equipment": "cable",
+      "primaryMuscles": [
+        "abdominals"
+      ],
+      "secondaryMuscles": [],
+      "instructions": [
+        "Kneel below a high pulley that contains a rope attachment.",
+        "Grasp cable rope attachment and lower the rope until your hands are placed next to your face.",
+        "Flex your hips slightly and allow the weight to hyperextend the lower back. This will be your starting position.",
+        "With the hips stationary, flex the waist as you contract the abs so that the elbows travel towards the middle of the thighs. Exhale as you perform this portion of the movement and hold the contraction for a second.",
+        "Slowly return to the starting position as you inhale. Tip: Make sure that you keep constant tension on the abs throughout the movement. Also, do not choose a weight so heavy that the lower back handles the brunt of the work.",
+        "Repeat for the recommended amount of repetitions."
+      ],
+      "category": "strength",
+      "images": [
+        "Cable_Crunch/0.jpg",
+        "Cable_Crunch/1.jpg"
+      ],
+      "id": "Cable_Crunch",
+      "suggestedValue": 200,
+      "answer": "Пресс",
+      "imageUrl": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Cable_Crunch/1.jpg",
+      "source": "https://github.com/yuhonas/free-exercise-db/blob/main/exercises/Cable_Crunch.json",
+      "localPath": "/Users/mychkvad/Projects/dibs/research/gym-candidates/Cable_Crunch-1.jpg"
+    },
+    {
+      "name": "Donkey Calf Raises",
+      "force": "push",
+      "level": "intermediate",
+      "mechanic": "isolation",
+      "equipment": "other",
+      "primaryMuscles": [
+        "calves"
+      ],
+      "secondaryMuscles": [],
+      "instructions": [
+        "For this exercise you will need access to a donkey calf raise machine. Start by positioning your lower back and hips under the padded lever provided. The tailbone area should be the one making contact with the pad.",
+        "Place both of your arms on the side handles and place the balls of your feet on the calf block with the heels extending off. Align the toes forward, inward or outward, depending on the area you wish to target, and straighten the knees without locking them. This will be your starting position.",
+        "Raise your heels as you breathe out by extending your ankles as high as possible and flexing your calf. Ensure that the knee is kept stationary at all times. There should be no bending at any time. Hold the contracted position by a second before you start to go back down.",
+        "Go back slowly to the starting position as you breathe in by lowering your heels as you bend the ankles until calves are stretched.",
+        "Repeat for the recommended amount of repetitions."
+      ],
+      "category": "strength",
+      "images": [
+        "Donkey_Calf_Raises/0.jpg",
+        "Donkey_Calf_Raises/1.jpg"
+      ],
+      "id": "Donkey_Calf_Raises",
+      "suggestedValue": 300,
+      "answer": "Икры",
+      "imageUrl": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Donkey_Calf_Raises/1.jpg",
+      "source": "https://github.com/yuhonas/free-exercise-db/blob/main/exercises/Donkey_Calf_Raises.json",
+      "localPath": "/Users/mychkvad/Projects/dibs/research/gym-candidates/Donkey_Calf_Raises.jpg"
+    },
+    {
+      "name": "Reverse Flyes",
+      "force": "pull",
+      "level": "beginner",
+      "mechanic": "isolation",
+      "equipment": "dumbbell",
+      "primaryMuscles": [
+        "shoulders"
+      ],
+      "secondaryMuscles": [],
+      "instructions": [
+        "To begin, lie down on an incline bench with the chest and stomach pressing against the incline. Have the dumbbells in each hand with the palms facing each other (neutral grip).",
+        "Extend the arms in front of you so that they are perpendicular to the angle of the bench. The legs should be stationary while applying pressure with the ball of your toes. This is the starting position.",
+        "Maintaining the slight bend of the elbows, move the weights out and away from each other (to the side) in an arc motion while exhaling. Tip: Try to squeeze your shoulder blades together to get the best results from this exercise.",
+        "The arms should be elevated until they are parallel to the floor.",
+        "Feel the contraction and slowly lower the weights back down to the starting position while inhaling.",
+        "Repeat for the recommended amount of repetitions."
+      ],
+      "category": "strength",
+      "images": [
+        "Reverse_Flyes/0.jpg",
+        "Reverse_Flyes/1.jpg"
+      ],
+      "id": "Reverse_Flyes",
+      "suggestedValue": 400,
+      "answer": "Задние дельты / плечи",
+      "imageUrl": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Reverse_Flyes/1.jpg",
+      "source": "https://github.com/yuhonas/free-exercise-db/blob/main/exercises/Reverse_Flyes.json",
+      "localPath": "/Users/mychkvad/Projects/dibs/research/gym-candidates/Reverse_Flyes.jpg"
+    },
+    {
+      "name": "Straight-Arm Pulldown",
+      "force": "pull",
+      "level": "beginner",
+      "mechanic": "isolation",
+      "equipment": "cable",
+      "primaryMuscles": [
+        "lats"
+      ],
+      "secondaryMuscles": [],
+      "instructions": [
+        "You will start by grabbing the wide bar from the top pulley of a pulldown machine and using a wider than shoulder-width pronated (palms down) grip. Step backwards two feet or so.",
+        "Bend your torso forward at the waist by around 30-degrees with your arms fully extended in front of you and a slight bend at the elbows. If your arms are not fully extended then you need to step a bit more backwards until they are. Once your arms are fully extended and your torso is slightly bent at the waist, tighten the lats and then you are ready to begin.",
+        "While keeping the arms straight, pull the bar down by contracting the lats until your hands are next to the side of the thighs. Breathe out as you perform this step.",
+        "While keeping the arms straight, go back to the starting position while breathing in.",
+        "Repeat for the recommended amount of repetitions."
+      ],
+      "category": "strength",
+      "images": [
+        "Straight-Arm_Pulldown/0.jpg",
+        "Straight-Arm_Pulldown/1.jpg"
+      ],
+      "id": "Straight-Arm_Pulldown",
+      "suggestedValue": 500,
+      "answer": "Широчайшие мышцы спины",
+      "imageUrl": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Straight-Arm_Pulldown/1.jpg",
+      "source": "https://github.com/yuhonas/free-exercise-db/blob/main/exercises/Straight-Arm_Pulldown.json",
+      "localPath": "/Users/mychkvad/Projects/dibs/research/gym-candidates/Straight-Arm_Pulldown.jpg"
+    },
+    {
+      "name": "Floor Glute-Ham Raise",
+      "force": "pull",
+      "level": "intermediate",
+      "mechanic": "isolation",
+      "equipment": null,
+      "primaryMuscles": [
+        "hamstrings"
+      ],
+      "secondaryMuscles": [
+        "calves",
+        "glutes"
+      ],
+      "instructions": [
+        "You can use a partner for this exercise or brace your feet under something stable.",
+        "Begin on your knees with your upper legs and torso upright. If using a partner, they will firmly hold your feet to keep you in position. This will be your starting position.",
+        "Lower yourself by extending at the knee, taking care to NOT flex the hips as you go forward.",
+        "Place your hands in front of you as you reach the floor. This movement is very difficult and you may be unable to do it unaided. Use your arms to lightly push off the floor to aid your return to the starting position."
+      ],
+      "category": "strength",
+      "images": [
+        "Floor_Glute-Ham_Raise/0.jpg",
+        "Floor_Glute-Ham_Raise/1.jpg"
+      ],
+      "id": "Floor_Glute-Ham_Raise",
+      "suggestedValue": 600,
+      "answer": "Задняя поверхность бедра",
+      "imageUrl": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Floor_Glute-Ham_Raise/1.jpg",
+      "source": "https://github.com/yuhonas/free-exercise-db/blob/main/exercises/Floor_Glute-Ham_Raise.json",
+      "localPath": "/Users/mychkvad/Projects/dibs/research/gym-candidates/Floor_Glute-Ham_Raise-1.jpg"
+    },
+    {
+      "name": "Tate Press",
+      "force": "push",
+      "level": "intermediate",
+      "mechanic": "isolation",
+      "equipment": "dumbbell",
+      "primaryMuscles": [
+        "triceps"
+      ],
+      "secondaryMuscles": [
+        "chest",
+        "shoulders"
+      ],
+      "instructions": [
+        "Lie down on a flat bench with a dumbbell in each hand on top of your thighs. The palms of your hand will be facing each other.",
+        "By using your thighs to help you get the dumbbells up, clean the dumbbells one arm at a time so that you can hold them in front of you at shoulder width. Note: when holding the dumbbells in front of you, make sure your arms are wider than shoulder width apart from each other using a pronated (palms forward) grip. Allow your elbows to point out. This is your starting position.",
+        "Keeping the upper arms stationary, slowly move the dumbbells in and down in a semi circular motion until they touch the upper chest while inhaling. Keep full control of the dumbbells at all times and do not move the upper arms nor rest the dumbbells on the chest.",
+        "As you breathe out, move the dumbbells up using your triceps and the same semi-circular motion but in reverse. Attempt to keep the dumbbells together as they move up. Lock your arms in the contracted position, hold for a second and then start coming down again slowly again. Tip: It should take at least twice as long to go down than to come up.",
+        "Repeat the movement for the prescribed amount of repetitions of your training program."
+      ],
+      "category": "strength",
+      "images": [
+        "Tate_Press/0.jpg",
+        "Tate_Press/1.jpg"
+      ],
+      "id": "Tate_Press",
+      "suggestedValue": 700,
+      "answer": "Трицепс",
+      "imageUrl": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Tate_Press/0.jpg",
+      "source": "https://github.com/yuhonas/free-exercise-db/blob/main/exercises/Tate_Press.json",
+      "localPath": "/Users/mychkvad/Projects/dibs/research/gym-candidates/Tate_Press-0.jpg"
+    },
+    {
+      "name": "Plate Pinch",
+      "force": "static",
+      "level": "intermediate",
+      "mechanic": "isolation",
+      "equipment": "other",
+      "primaryMuscles": [
+        "forearms"
+      ],
+      "secondaryMuscles": [],
+      "instructions": [
+        "Grab two wide-rimmed plates and put them together with the smooth sides facing outward",
+        "Use your fingers to grip the outside part of the plate and your thumb for the other side thus holding both plates together. This is the starting position.",
+        "Squeeze the plate with your fingers and thumb. Hold this position for as long as you can.",
+        "Repeat for the recommended amount of sets prescribed in your program.",
+        "Switch arms and repeat the movements."
+      ],
+      "category": "strength",
+      "images": [
+        "Plate_Pinch/0.jpg",
+        "Plate_Pinch/1.jpg"
+      ],
+      "id": "Plate_Pinch",
+      "suggestedValue": 800,
+      "answer": "Предплечья / мышцы хвата",
+      "imageUrl": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Plate_Pinch/1.jpg",
+      "source": "https://github.com/yuhonas/free-exercise-db/blob/main/exercises/Plate_Pinch.json",
+      "localPath": "/Users/mychkvad/Projects/dibs/research/gym-candidates/Plate_Pinch.jpg"
+    }
+  ]
+}

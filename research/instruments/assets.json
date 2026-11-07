@@ -1,0 +1,184 @@
+[
+  {
+    "answer": "Гитара",
+    "files": [
+      "Arpegio DoM Guitarra.ogg"
+    ],
+    "author": "Alejandro Galdámez",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "accepted": "гитара; акустическая гитара; классическая гитара",
+    "value": 300,
+    "sources": [
+      {
+        "title": "Arpegio DoM Guitarra.ogg",
+        "page": "https://commons.wikimedia.org/wiki/File:Arpegio_DoM_Guitarra.ogg",
+        "download": "https://upload.wikimedia.org/wikipedia/commons/4/43/Arpegio_DoM_Guitarra.ogg",
+        "original": "/Users/mychkvad/Projects/dibs/research/instruments/replacements/original-1-1.ogg"
+      }
+    ],
+    "file": "/Users/mychkvad/Projects/dibs/research/instruments/replacements/clip-01-final.mp3",
+    "duration": 3.977392,
+    "bytes": 80979,
+    "sha256": "009fe124746dbacf91fcb772d44a8ca93d5837336b794f2076b0fbb05990f4c5",
+    "changes": "Первые 8 секунд после удаления начальной тишины (или вся запись, если короче); выровнена громкость, короткое плавное начало/окончание, MP3; теги удалены. Мягкая компрессия для выравнивания громкости.",
+    "mediaUrl": "/media/82a6f8e3487e6b92941d833445855bdb2f18fcd0ef3c0a84.mp3",
+    "verifiedLoudnessLUFS": -18.45
+  },
+  {
+    "answer": "Пианино",
+    "files": [
+      "Piano.ogg"
+    ],
+    "preferPlayback": true,
+    "author": "Автор не указан; загружено Loveless из французской Википедии",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "accepted": "пианино; фортепиано; рояль",
+    "value": 600,
+    "sources": [
+      {
+        "title": "Piano.ogg",
+        "page": "https://commons.wikimedia.org/wiki/File:Piano.ogg",
+        "download": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/84/Piano.ogg/Piano.ogg.mp3",
+        "original": "/Users/mychkvad/Projects/dibs/research/instruments/replacements/original-2-1.mp3"
+      }
+    ],
+    "file": "/Users/mychkvad/Projects/dibs/research/instruments/replacements/clip-02.mp3",
+    "duration": 5.890794,
+    "bytes": 119118,
+    "sha256": "45d301b44d52e37659988441fb42ffc6af4f8ac8cdc115558057ae30f5da8c4c",
+    "changes": "Первые 8 секунд после удаления начальной тишины (или вся запись, если короче); выровнена громкость, короткое плавное начало/окончание, MP3; теги удалены.",
+    "mediaUrl": "/media/4f11fea833770e5eb46935143f0a215f7dcf7ce2a1b4f7b1.mp3"
+  },
+  {
+    "answer": "Скрипка",
+    "files": [
+      "00 Jazz Violin Solo.ogg"
+    ],
+    "author": "VWD",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "accepted": "скрипка",
+    "value": 900,
+    "sources": [
+      {
+        "title": "00 Jazz Violin Solo.ogg",
+        "page": "https://commons.wikimedia.org/wiki/File:00_Jazz_Violin_Solo.ogg",
+        "download": "https://upload.wikimedia.org/wikipedia/commons/3/37/00_Jazz_Violin_Solo.ogg",
+        "original": "/Users/mychkvad/Projects/dibs/research/instruments/original-1-1.ogg"
+      }
+    ],
+    "file": "/Users/mychkvad/Projects/dibs/research/instruments/clip-01.mp3",
+    "duration": 8,
+    "bytes": 161436,
+    "sha256": "8afeba08fc9ab37f81df5140bec2b0d4918acb7606844315df9bc343dc8db900",
+    "changes": "Первые 8 секунд после удаления начальной тишины (или вся запись, если короче); выровнена громкость, короткое плавное начало/окончание, MP3; теги удалены.",
+    "verifiedLoudnessLUFS": -18.7,
+    "mediaUrl": "/media/85ee34b5a0c668040efc485bcc8d62c5c970fdabc30507b6.mp3"
+  },
+  {
+    "answer": "Саксофон",
+    "files": [
+      "Afteryouvegone-first8bars.ogg"
+    ],
+    "author": "Julien Grandgagnage",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "accepted": "саксофон; тенор-саксофон",
+    "value": 1200,
+    "sources": [
+      {
+        "title": "Afteryouvegone-first8bars.ogg",
+        "page": "https://commons.wikimedia.org/wiki/File:Afteryouvegone-first8bars.ogg",
+        "download": "https://upload.wikimedia.org/wikipedia/commons/5/59/Afteryouvegone-first8bars.ogg",
+        "original": "/Users/mychkvad/Projects/dibs/research/instruments/original-2-1.ogg"
+      }
+    ],
+    "file": "/Users/mychkvad/Projects/dibs/research/instruments/clip-02.mp3",
+    "duration": 8,
+    "bytes": 161436,
+    "sha256": "0449a913a5a798b106bc15efb135a84dfb13e204bb5470073680fda9bd23ac85",
+    "changes": "Первые 8 секунд после удаления начальной тишины (или вся запись, если короче); выровнена громкость, короткое плавное начало/окончание, MP3; теги удалены.",
+    "verifiedLoudnessLUFS": -18.48,
+    "mediaUrl": "/media/58605f355b3a42727a93ee1b21fb323a8d61bc7310ed34b1.mp3"
+  },
+  {
+    "answer": "Флейта",
+    "files": [
+      "Flute 2.ogg"
+    ],
+    "author": "hokuspokus",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "accepted": "флейта",
+    "value": 1500,
+    "sources": [
+      {
+        "title": "Flute 2.ogg",
+        "page": "https://commons.wikimedia.org/wiki/File:Flute_2.ogg",
+        "download": "https://upload.wikimedia.org/wikipedia/commons/e/e0/Flute_2.ogg",
+        "original": "/Users/mychkvad/Projects/dibs/research/instruments/original-3-1.ogg"
+      }
+    ],
+    "file": "/Users/mychkvad/Projects/dibs/research/instruments/clip-03.mp3",
+    "duration": 8,
+    "bytes": 161436,
+    "sha256": "54457d19c156fba319684dcbefcc10870513ac30d16e7482400e6cf5b02753e1",
+    "changes": "Первые 8 секунд после удаления начальной тишины (или вся запись, если короче); выровнена громкость, короткое плавное начало/окончание, MP3; теги удалены.",
+    "verifiedLoudnessLUFS": -18.5,
+    "mediaUrl": "/media/7b4dbc6827d743eb1d0085e19c6583c7dcf08bd1d10f0283.mp3"
+  },
+  {
+    "answer": "Губная гармошка",
+    "files": [
+      "Harmonica.ogg"
+    ],
+    "author": "mastermesh",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "accepted": "губная гармошка; гармоника; гармошка",
+    "value": 1800,
+    "sources": [
+      {
+        "title": "Harmonica.ogg",
+        "page": "https://commons.wikimedia.org/wiki/File:Harmonica.ogg",
+        "download": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/e5/Harmonica.ogg/Harmonica.ogg.mp3",
+        "original": "/Users/mychkvad/Projects/dibs/research/instruments/original-6-1.mp3"
+      }
+    ],
+    "file": "/Users/mychkvad/Projects/dibs/research/instruments/clip-06.mp3",
+    "duration": 8,
+    "bytes": 161436,
+    "sha256": "1ccb4730573bfed56fbae48b05f408137a3dc890a2c641e3658455a21d9b6836",
+    "changes": "Первые 8 секунд после удаления начальной тишины (или вся запись, если короче); выровнена громкость, короткое плавное начало/окончание, MP3; теги удалены.",
+    "verifiedLoudnessLUFS": -18.51,
+    "mediaUrl": "/media/61e3ae394b837816fe887c1fda6ee0259c34ac3f625df964.mp3"
+  },
+  {
+    "answer": "Волынка",
+    "files": [
+      "Skye Boat Song.ogg"
+    ],
+    "author": "Clan Stewart Pipe Band; Pandora Records",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+    "accepted": "волынка",
+    "value": 2100,
+    "sources": [
+      {
+        "title": "Skye Boat Song.ogg",
+        "page": "https://commons.wikimedia.org/wiki/File:Skye_Boat_Song.ogg",
+        "download": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/3c/Skye_Boat_Song.ogg/Skye_Boat_Song.ogg.mp3",
+        "original": "/Users/mychkvad/Projects/dibs/research/instruments/original-7-1.mp3"
+      }
+    ],
+    "file": "/Users/mychkvad/Projects/dibs/research/instruments/clip-07.mp3",
+    "duration": 8,
+    "bytes": 161436,
+    "sha256": "44cc6f92c12e3638cda846464946e5eb1eccddc15678c934d0e5a756b47773d4",
+    "changes": "Первые 8 секунд после удаления начальной тишины (или вся запись, если короче); выровнена громкость, короткое плавное начало/окончание, MP3; теги удалены.",
+    "verifiedLoudnessLUFS": -18.51,
+    "mediaUrl": "/media/1b66f6e8e14df4773018abf68ba5e1504f2ace190e111759.mp3"
+  }
+]

@@ -1,0 +1,1355 @@
+{
+  "format": "jeopardy/1",
+  "name": "Это моя игра",
+  "subtitle": "",
+  "rounds": [
+    {
+      "id": "eyk9sz9y",
+      "name": "Round 1",
+      "type": "board",
+      "categories": [
+        {
+          "id": "3036pxdv",
+          "name": "Шлакоблокунь",
+          "questions": [
+            {
+              "id": "ac9382d1bf34",
+              "value": 100,
+              "prompt": "![Ребус](/media/d62a335636bc37691f8d0c7cfc965cd3b4e7f845dd54931a.png)",
+              "answer": "жабаунти",
+              "notes": "",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "0a45454f09d0",
+              "value": 200,
+              "prompt": "![Ребус](/media/24e5d4e26c0774d6f8b17b977f352611b2ebeb3e1d281d95.png)",
+              "answer": "крабрикос",
+              "notes": "",
+              "dailyDouble": true,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "6ec7e95fbe4e",
+              "value": 300,
+              "prompt": "![Ребус](/media/ab4e958f5c6c6312773fd6ec76aa1d3c67eb738854c6c600.png)",
+              "answer": "крысало",
+              "notes": "",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "21239e0a8947",
+              "value": 400,
+              "prompt": "![Ребус](/media/b3190600cab471f48f88b91e7d5bd83fb5b698c2eaef013a.png)",
+              "answer": "макакао",
+              "notes": "",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "2ff1cdfbc4b3",
+              "value": 500,
+              "prompt": "![Ребус](/media/059845f48c4007fd0a4b4eb291b57c534f67023561ea140d.png)",
+              "answer": "комаркер",
+              "notes": "",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "08faeecc15cf",
+              "value": 600,
+              "prompt": "![Ребус](/media/f184f457bba47860510b44220f673225b5c4d3ab6982397e.png)",
+              "answer": "пудельфин",
+              "notes": "",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "e78b9c03de5c",
+              "value": 700,
+              "prompt": "![Ребус](/media/32446e985f9a1aac0738a10eeb807521579a878c6f02a5f0.png)",
+              "answer": "джинитки",
+              "notes": "",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "b4eb6dc11fdc",
+              "value": 800,
+              "prompt": "![Ребус](/media/e9154cb3d3ec0268d9b7c1f4df863df33282508381a40dfa.png)",
+              "answer": "жемчугорь",
+              "notes": "",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            }
+          ]
+        },
+        {
+          "id": "99490949a690",
+          "name": "Майнкрафтляндия",
+          "questions": [
+            {
+              "id": "8b9aa5ba36b0",
+              "value": 100,
+              "prompt": "Какой город воссоздан в Minecraft?\n\n![Город в Minecraft](/media/6c096dfea1b43975ede51960fd50233d571d9ec0f4027128.jpg)",
+              "answer": "Прага",
+              "notes": "Ориентир: Староместская площадь и Тынский храм\nАвтор: Zeemo\nИсточник: https://www.planetminecraft.com/project/old-town-square-prague-czech/\nИзображение: https://static.planetminecraft.com/files/resource_media/screenshot/1632/prague_610444403_lrg.jpg",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "1edc797de9c7",
+              "value": 200,
+              "prompt": "Какой город воссоздан в Minecraft?\n\n![Город в Minecraft](/media/215add4a3ac70ae4a30c01eeb943fdd565cc958b6a40db96.png)",
+              "answer": "Лондон",
+              "notes": "Ориентир: Биг-Бен, парламент и London Eye\nАвтор: Build the UK / BuildTheEarth\nИсточник: https://buildtheearth.net/gallery?all=1\nИзображение: https://cdn.buildtheearth.net/uploads/eb77848b6a8eeb338e2793a80daa31adf92f81d9aff0627be2d7332c4db68fde",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "8803a1af8ad6",
+              "value": 300,
+              "prompt": "Какой город воссоздан в Minecraft?\n\n![Город в Minecraft](/media/8fa086fe851163f91d5f084ae6c29e06b94937719f5e8871.png)",
+              "answer": "Париж",
+              "notes": "Ориентир: Триумфальная арка\nИсточник: https://www.youtube.com/watch?v=jchmb6wygG4&t=512s\nСкриншот предоставлен пользователем. Удалена рамка и улучшена чёткость встроенным image_gen; оригинал сохранён.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "8104d516b014",
+              "value": 400,
+              "prompt": "Какой город воссоздан в Minecraft?\n\n![Город в Minecraft](/media/57a80ed211e4a63d4b5fe7d130602f2306af55b0114ebccc.webp)",
+              "answer": "Сидней",
+              "notes": "Ориентир: Оперный театр\nАвтор: Lockenoia\nИсточник: https://www.planetminecraft.com/project/sydney-opera-house-4506513/\nИзображение: https://static.planetminecraft.com/files/image/minecraft/project/2020/513/12708289-to_l.jpg",
+              "dailyDouble": true,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "9f3fbae53149",
+              "value": 500,
+              "prompt": "Какой город воссоздан в Minecraft?\n\n![Город в Minecraft](/media/aaf5203ab56e527aa5c07251760c110927d17656726911c8.jpg)",
+              "answer": "Рим",
+              "notes": "Ориентир: Колизей\nАвтор: Octovon\nИсточник: https://www.minecraft.net/en-us/marketplace/pdp/octovon/cityscapes-rome/6468cae2-819f-4390-a64b-ccc4734806cc\nИзображение: https://xforgeassets002.xboxlive.com/pf-namespace-b63a0803d3653643/6e1dd849-1d57-4b05-8d08-05e47ef1993e/Rome_Screenshot_0.jpg",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "1c527a8e6a66",
+              "value": 600,
+              "prompt": "Какой город воссоздан в Minecraft?\n\n![Город в Minecraft](/media/32cb219d23d483cc32269c8d6cbba18eca199f132f630813.png)",
+              "answer": "Рио-де-Жанейро",
+              "notes": "Ориентир: Статуя Христа на Корковаду\nАвтор: BTE Brasil\nИсточник: https://buildtheearth.net/gallery?all=1\nИзображение: https://cdn.buildtheearth.net/uploads/1f815e9908613e64344b9b9206b6cb9a1c2bedc093597fe4a60045e9929a3c2b",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "e825a114ac39",
+              "value": 700,
+              "prompt": "Какой город воссоздан в Minecraft?\n\n![Город в Minecraft](/media/ca87eb16f7141103a3a2a58acca1b9af42d60dbd23406e02.png)",
+              "answer": "Вашингтон",
+              "notes": "Ориентир: Монумент Вашингтону, мемориалы Линкольна и Джефферсона\nИсточник: https://www.youtube.com/watch?v=jchmb6wygG4&t=1272s\nСкриншот предоставлен пользователем. Удалена рамка и улучшена чёткость встроенным image_gen; оригинал сохранён.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "af87d8f310de",
+              "value": 800,
+              "prompt": "Какой город воссоздан в Minecraft?\n\n![Город в Minecraft](/media/4275e6803ba9a0c93461e9d425fc820dab31f0956f06db02.png)",
+              "answer": "Берлин",
+              "notes": "Ориентир: Бранденбургские ворота\nИсточник: https://www.youtube.com/watch?v=jchmb6wygG4&t=1119s\nСкриншот предоставлен пользователем. Удалена рамка и улучшена чёткость встроенным image_gen; оригинал сохранён.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            }
+          ]
+        },
+        {
+          "id": "1e1d9f2c98b8",
+          "name": "Казино",
+          "questions": [
+            {
+              "id": "a9d307e4d408",
+              "value": 100,
+              "prompt": "Красное, чёрное или зеро?",
+              "answer": "красное",
+              "notes": "Угадайте заранее выбранный результат.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "d4d765f083d7",
+              "value": 200,
+              "prompt": "Красное, чёрное или зеро?",
+              "answer": "чёрное",
+              "notes": "Угадайте заранее выбранный результат.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "0cea339995f8",
+              "value": 300,
+              "prompt": "Красное, чёрное или зеро?",
+              "answer": "красное",
+              "notes": "Угадайте заранее выбранный результат.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "e98d3c968d2a",
+              "value": 400,
+              "prompt": "Красное, чёрное или зеро?",
+              "answer": "чёрное",
+              "notes": "Угадайте заранее выбранный результат.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "e098b261e493",
+              "value": 500,
+              "prompt": "Красное, чёрное или зеро?",
+              "answer": "чёрное",
+              "notes": "Угадайте заранее выбранный результат.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "64abfc050aab",
+              "value": 600,
+              "prompt": "Красное, чёрное или зеро?",
+              "answer": "зеро",
+              "notes": "Угадайте заранее выбранный результат.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            }
+          ]
+        },
+        {
+          "id": "3150f1913dd9",
+          "name": "Джим",
+          "questions": [
+            {
+              "id": "38dfbde09e73",
+              "value": 100,
+              "prompt": "Что он тренит?\n\n![Упражнение](/media/847b6c40ef3e9c694a4363697b8852f93dc3c0c960efdcff.jpg)",
+              "answer": "Бицепс",
+              "notes": "Упражнение: Сгибания рук на верхних блоках.\nОсновная целевая группа: Бицепс.\nЗасчитывать: Бицепс, бицепсы.\nИсточник: https://github.com/yuhonas/free-exercise-db/blob/main/exercises/Overhead_Cable_Curl.json",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "a122e729d48e",
+              "value": 200,
+              "prompt": "Что он тренит?\n\n![Упражнение](/media/5c1d4d60c35edc30878d3eb49b3109319c6c68877dc0fe8b.jpg)",
+              "answer": "Пресс",
+              "notes": "Упражнение: Скручивания «лягушка».\nОсновная целевая группа: Пресс.\nЗасчитывать: Пресс, мышцы живота.\nИсточник: https://github.com/yuhonas/free-exercise-db/blob/main/exercises/Frog_Sit-Ups.json",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "f797337e3592",
+              "value": 300,
+              "prompt": "Что он тренит?\n\n![Упражнение](/media/f6251ab8afe5109d20732751e330628f4a46549622905d7a.jpg)",
+              "answer": "Икры",
+              "notes": "Упражнение: Подъёмы на носки сидя со штангой.\nОсновная целевая группа: Икры.\nЗасчитывать: Икры, икроножные, камбаловидные мышцы.\nИсточник: https://github.com/yuhonas/free-exercise-db/blob/main/exercises/Barbell_Seated_Calf_Raise.json",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "8bb2f5270e57",
+              "value": 400,
+              "prompt": "Что он тренит?\n\n![Упражнение](/media/52266bce6e56b8256693a2f4b5f4ad206bd75ba391f8df88.jpg)",
+              "answer": "Ягодицы",
+              "notes": "Упражнение: Протяжка каната между ног.\nОсновная целевая группа: Ягодицы.\nЗасчитывать: Ягодицы, ягодичные мышцы.\nИсточник: https://github.com/yuhonas/free-exercise-db/blob/main/exercises/Pull_Through.json",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "c632510b02df",
+              "value": 500,
+              "prompt": "",
+              "answer": "",
+              "notes": "",
+              "dailyDouble": false,
+              "modifier": {
+                "title": "Умножь баллы на 0,5",
+                "instructions": "Умножь свой текущий счёт на 0,5. Эффект применяется сразу ко всему счёту, включая отрицательные значения."
+              },
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "576eb33815bb",
+              "value": 600,
+              "prompt": "Что он тренит?\n\n![Упражнение](/media/c7d1e31cf3466e70a2901aaafc9b49d87af8ca21f88df498.jpg)",
+              "answer": "Трицепс",
+              "notes": "Упражнение: Жим Тейта.\nОсновная целевая группа: Трицепс.\nЗасчитывать: трицепс / трицепсы.\nИсточник: https://github.com/yuhonas/free-exercise-db/blob/main/exercises/Tate_Press.json",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "cd98a2188d7d",
+              "value": 700,
+              "prompt": "Что он тренит?\n\n![Упражнение](/media/1f8c2cd1f07e466d432b48299a87ee62749ff7da9f0f8f9f.jpg)",
+              "answer": "Грудь",
+              "notes": "Упражнение: Жим Свенда.\nОсновная целевая группа: Грудь.\nЗасчитывать: грудь / грудные мышцы.\nИсточник: https://github.com/yuhonas/free-exercise-db/blob/main/exercises/Svend_Press.json",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            }
+          ]
+        },
+        {
+          "id": "ca3e07787aa1",
+          "name": "Кинопейнт",
+          "questions": [
+            {
+              "id": "eaa5be536fc0",
+              "value": 100,
+              "prompt": "Какой фильм нарисован?\n\n![Рисунок](/media/993425ed347ffcb55ea2deae778d7c3bd67c6d21e6b30f2a.png)",
+              "answer": "Зелёная миля",
+              "notes": "Источник: https://www.youtube.com/watch?v=DMo3G4s_5vs&t=2216s\nСкриншот предоставлен пользователем. Удалена рамка и улучшена чёткость встроенным image_gen; сохранён исходный стиль Paint.\nИсходная стоимость: 200.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "e75e5952ddba",
+              "value": 200,
+              "prompt": "Какой фильм нарисован?\n\n![Рисунок](/media/fc579281aad5491743068313e1f4de1455591d93db3963da.png)",
+              "answer": "Интерстеллар",
+              "notes": "Источник: https://www.youtube.com/watch?v=DMo3G4s_5vs&t=2150s\nСкриншот предоставлен пользователем. Удалена рамка и улучшена чёткость встроенным image_gen; сохранён исходный стиль Paint.\nИсходная стоимость: 400.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "cd2b71eb19d9",
+              "value": 300,
+              "prompt": "",
+              "answer": "",
+              "notes": "",
+              "dailyDouble": false,
+              "modifier": {
+                "title": "Поменяйся баллами",
+                "instructions": "Поменяйся всеми баллами с любой другой командой на твой выбор. Обмен происходит сразу, включая отрицательные значения."
+              },
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "dc8fc1598b5d",
+              "value": 400,
+              "prompt": "Какой фильм нарисован?\n\n![Рисунок](/media/720750b844fd23a6c8d3643f0d78bbc07198581c4781c412.png)",
+              "answer": "Матрица",
+              "notes": "Источник: https://www.youtube.com/watch?v=DMo3G4s_5vs&t=2039s\nСкриншот предоставлен пользователем. Удалена рамка и улучшена чёткость встроенным image_gen; сохранён исходный стиль Paint.\nИсходная стоимость: 600.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "9f61b7711d69",
+              "value": 500,
+              "prompt": "Какой фильм нарисован?\n\n![Рисунок](/media/c2ba667aaee64c0cabbab44f28d4c42bd7cd5938b9224dec.png)",
+              "answer": "Одержимость",
+              "notes": "Источник: https://www.youtube.com/watch?v=DMo3G4s_5vs&t=2120s\nСкриншот предоставлен пользователем. Удалена рамка и улучшена чёткость встроенным image_gen; сохранён исходный стиль Paint.\nИсходная стоимость: 800.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "c5adf812198d",
+              "value": 600,
+              "prompt": "Какой фильм нарисован?\n\n![Рисунок](/media/b4c6fcb517fde58d0d9ab63aa6c1e66ee071c6df3e67be82.png)",
+              "answer": "Титаник",
+              "notes": "Источник: https://www.youtube.com/watch?v=DMo3G4s_5vs&t=1706s\nСкриншот предоставлен пользователем. Удалена рамка и улучшена чёткость встроенным image_gen; сохранён исходный стиль Paint.\nИсходная стоимость: 1000.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "g17ofmg3",
+      "name": "Round 2",
+      "type": "board",
+      "categories": [
+        {
+          "id": "aef3db7257dd",
+          "name": "Брейнрот",
+          "questions": [
+            {
+              "id": "c1f64034fdb2",
+              "value": 200,
+              "prompt": "Как его зовут?\n\n![Персонаж](/media/d1ddc0440dd4e0e1b39b3611460c8774b59cbce62f88673a.jpg)",
+              "answer": "Тралалеро Тралала",
+              "notes": "Засчитывать: Тралалеро Тралала; Тралалело Тралала; Tralalero Tralala; Tralalelo Tralala. Допускать близкое узнаваемое произношение.\nИсточник изображения: https://www.popbela.com/career/inspiration/daftar-nama-anomali-paling-terkenal-00-rxg23-0gmktj\nИзображение: https://image.popbela.com/post/20250421/tralalelo-tralalala-bb10dd7e82668b3c6b3055a45adffdd1.jpg?tr=w-1920\nПерсонаж использован в «Свояке»: https://www.youtube.com/watch?v=vvI8CgA-Wcw&t=1907s",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "69b034f6391a",
+              "value": 400,
+              "prompt": "Как его зовут?\n\n![Персонаж](/media/1ecdeeedf86c8280eb2f643ab44b8f67e44d07139cc2c7f4.webp)",
+              "answer": "Бомбардиро Крокодило",
+              "notes": "Засчитывать: Бомбардиро Крокодило; Бомбардино Крокодило; Bombardiro Crocodilo; Bombardino Crocodilo. Допускать близкое узнаваемое произношение.\nИсточник изображения: https://www.playbrainrot.org/en/character/bombardiro-crocodilo/\nИзображение: https://www.playbrainrot.org/images/characters/bombardiro-crocodilo.webp\nПерсонаж использован в «Свояке»: https://www.youtube.com/watch?v=vvI8CgA-Wcw&t=2181s",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "7445fc1cb814",
+              "value": 600,
+              "prompt": "",
+              "answer": "",
+              "notes": "",
+              "dailyDouble": false,
+              "modifier": {
+                "title": "Спонсор камбэка",
+                "instructions": "Передай 900 своих баллов команде соперников с самым маленьким счётом. Твоя команда не участвует в выборе получателя. Если несколько соперников делят последнее место, выбери одного из них. Перевод происходит сразу и полностью, даже если твой счёт станет отрицательным."
+              },
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "cfcffee7b8ba",
+              "value": 800,
+              "prompt": "Как его зовут?\n\n![Персонаж](/media/1909074bfd0bc8eada7e32bf16d2e287565619fb37a83cb9.png)",
+              "answer": "Тунг Тунг Тунг Сахур",
+              "notes": "Засчитывать: Тунг Тунг Тунг Сахур; Тун Тун Тун Сахур; Tung Tung Tung Sahur. Допускать близкое узнаваемое произношение.\nИсточник изображения: https://www.pngall.com/brainrot-characters-png/download/381687/\nИзображение: https://www.pngall.com/wp-content/uploads/20/Tung-Tung-Tung-Sahur-PNG.png\nДополнительный персонаж по просьбе пользователя; не отдельный вопрос в исходной категории «Свояка».",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "2fa97fef20e5",
+              "value": 1000,
+              "prompt": "Как его зовут?\n\n![Персонаж](/media/0b6d6926db0cf48d28aebc47b7a290615d7f6ecbf6ccbb21.png)",
+              "answer": "Балерина Капучина",
+              "notes": "Засчитывать: Балерина Капучина; Балерина Капучино; Ballerina Cappuccina. Допускать близкое узнаваемое произношение.\nИсточник изображения: https://www.thebyan.com/イタリアンブレインロット図鑑?pgid=mblacfx8-2effe95d-6de4-4b30-a873-199e74b21159\nИзображение: https://static.wixstatic.com/media/4ff8dd_4d306f98b2f64d76acb047255d41ed1d~mv2.png/v1/fill/w_1024%2Ch_1024%2Cq_90%2Cenc_avif%2Cquality_auto/4ff8dd_4d306f98b2f64d76acb047255d41ed1d~mv2.png\nПерсонаж использован в «Свояке»: https://www.youtube.com/watch?v=vvI8CgA-Wcw&t=1808s",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "5e74aadbc3e8",
+              "value": 1200,
+              "prompt": "Как его зовут?\n\n![Персонаж](/media/db66cbdef7aac7173cc28987ef43c77582de0b9862de29b5.webp)",
+              "answer": "Шимпанзини Бананини",
+              "notes": "Засчитывать: Шимпанзини Бананини; Чимпанзини Бананини; Chimpanzini Bananini. Допускать близкое узнаваемое произношение.\nИсточник изображения: https://brainrot-jp.com/characters/chimpanzini-bananini\nИзображение: https://brainrot-jp.com/uploads/20260514/99a5e02c8592dd8f5a4610ccbe2ec1a7.webp\nПерсонаж использован в «Свояке»: https://www.youtube.com/watch?v=vvI8CgA-Wcw&t=1983s",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "9d9e5690bcbe",
+              "value": 1400,
+              "prompt": "Как его зовут?\n\n![Персонаж](/media/8d38a0f4c34beb1de54498115863c0ba515db15a1e01b7c6.png)",
+              "answer": "Бомбомбини Гусини",
+              "notes": "Засчитывать: Бомбомбини Гусини; Бомбомбини Гузини; Bombombini Gusini. Допускать близкое узнаваемое произношение.\nИсточник изображения: https://www.thebyan.com/イタリアンブレインロット図鑑?pgid=mblacfx8-76e2a990-4c2d-42fa-be3a-68d0ef097d02\nИзображение: https://static.wixstatic.com/media/4ff8dd_d44c0a28b5544d5e9c485453d5ca66f6~mv2.png/v1/fill/w_1024%2Ch_1024%2Cq_90%2Cenc_avif%2Cquality_auto/4ff8dd_d44c0a28b5544d5e9c485453d5ca66f6~mv2.png\nПерсонаж использован в «Свояке»: https://www.youtube.com/watch?v=vvI8CgA-Wcw&t=1849s",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            }
+          ]
+        },
+        {
+          "id": "0f3e744a6601",
+          "name": "Неудачные татуировки",
+          "questions": [
+            {
+              "id": "89bd6ab00c46",
+              "value": 200,
+              "prompt": "Кто набит на татуировке?\n\n![Татуировка](/media/ea708fa0314d9ec10d560ac03a58a709634444f72fc50575.png)",
+              "answer": "Фредди Меркьюри",
+              "notes": "Засчитывать: Меркьюри; Фредди Меркьюри; Фредди Меркури; Freddie Mercury.\nИзображение предоставлено пользователем. Сохранено без изменений; искажения портрета являются частью вопроса.\nВопрос в «Свояке»: https://www.youtube.com/watch?v=hwM_3NbFFyw&t=1695s",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "8be27b9d7a81",
+              "value": 400,
+              "prompt": "Кто набит на татуировке?\n\n![Татуировка](/media/9994938aaf38865b7f4d79fc963e8736abd177439bd68e58.png)",
+              "answer": "Мэрилин Монро",
+              "notes": "Засчитывать: Монро; Мэрилин Монро; Мерлин Монро; Marilyn Monroe.\nИзображение предоставлено пользователем. Сохранено без изменений; искажения портрета являются частью вопроса.\nВопрос в «Свояке»: https://www.youtube.com/watch?v=hwM_3NbFFyw&t=1712s",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "b5f13a6a6f4c",
+              "value": 600,
+              "prompt": "Кто набит на татуировке?\n\n![Татуировка](/media/63ffdf4905052c66ac0f38497b819bda973c72cea82668e3.png)",
+              "answer": "Элвис Пресли",
+              "notes": "Засчитывать: Элвис; Пресли; Элвис Пресли; Elvis Presley.\nИзображение предоставлено пользователем. Сохранено без изменений; искажения портрета являются частью вопроса.\nВопрос в «Свояке»: https://www.youtube.com/watch?v=hwM_3NbFFyw&t=1730s",
+              "dailyDouble": true,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "fe75732f25fc",
+              "value": 800,
+              "prompt": "Кто набит на татуировке?\n\n![Татуировка](/media/c87ba780dc5ca2951ea3e72f0b96772de34425026bb6727c.png)",
+              "answer": "Иосиф Сталин",
+              "notes": "Засчитывать: Сталин; Иосиф Сталин; Joseph Stalin.\nИзображение предоставлено пользователем. Сохранено без изменений; искажения портрета являются частью вопроса.\nВопрос в «Свояке»: https://www.youtube.com/watch?v=hwM_3NbFFyw&t=1766s",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "13ab36f4e261",
+              "value": 1000,
+              "prompt": "Кто набит на татуировке?\n\n![Татуировка](/media/fc5f9665fe2933cde61ac18fa55bed57fe57ec3edcf5dca1.png)",
+              "answer": "Барак Обама",
+              "notes": "Засчитывать: Обама; Барак Обама; Barack Obama.\nИзображение предоставлено пользователем. Сохранено без изменений; искажения портрета являются частью вопроса.\nДополнительная татуировка, выбранная пользователем.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "60b4d184e3b3",
+              "value": 1200,
+              "prompt": "Кто набит на татуировке?\n\n![Татуировка](/media/d305787e6068095d7b73516afaf54dcaa338bf1d14b8612c.png)",
+              "answer": "Дональд Трамп",
+              "notes": "Засчитывать: Трамп; Дональд Трамп; Donald Trump.\nИзображение предоставлено пользователем. Сохранено без изменений; искажения портрета являются частью вопроса.\nДополнительная татуировка, выбранная пользователем.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            }
+          ]
+        },
+        {
+          "id": "c234f66cfbf5",
+          "name": "Греческие буквы",
+          "questions": [
+            {
+              "id": "3f8a5b2d44ee",
+              "value": 200,
+              "prompt": "Какая греческая буква зашифрована на картинке?\n\n![Подсказка](/media/cf0ed1cff1f0a423715ea4c19ba94b6479f80c92107e1ac1.png)",
+              "answer": "Альфа",
+              "notes": "Засчитывать: альфа, alpha, α, Α.\nИсточник: https://www.youtube.com/watch?v=1mcvkh7FBPw&t=581s\nИзображение предоставлено пользователем и сохранено без изменений.\nИсходная стоимость: 100.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "1d55d3141588",
+              "value": 400,
+              "prompt": "Какая греческая буква зашифрована на картинке?\n\n![Подсказка](/media/ad4bdda05b5f8d8033839bc010b0ff41416fa5a430fe2365.png)",
+              "answer": "Каппа",
+              "notes": "Засчитывать: каппа, капа, kappa, κ, Κ.\nИсточник: https://www.youtube.com/watch?v=1mcvkh7FBPw&t=1297s\nИзображение предоставлено пользователем и сохранено без изменений.\nИсходная стоимость: 200.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "c2d77e089472",
+              "value": 600,
+              "prompt": "Какая греческая буква зашифрована на картинке?\n\n![Подсказка](/media/5ded8e86be04327cb58069d3ed7151206ffba59bf7abfccf.png)",
+              "answer": "Сигма",
+              "notes": "Засчитывать: сигма, sigma, σ, ς, Σ.\nИсточник: https://www.youtube.com/watch?v=1mcvkh7FBPw&t=1187s\nИзображение предоставлено пользователем и сохранено без изменений.\nИсходная стоимость: 300.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "577fc356efce",
+              "value": 800,
+              "prompt": "Какая греческая буква зашифрована на картинке?\n\n![Подсказка](/media/87f389b8217ec5d540b40765e985982d71d67d2fc8ef8fe5.png)",
+              "answer": "Дельта",
+              "notes": "Засчитывать: дельта, delta, δ, Δ.\nИсточник: https://www.youtube.com/watch?v=1mcvkh7FBPw&t=1034s\nИзображение предоставлено пользователем и сохранено без изменений.\nИсходная стоимость: 400.",
+              "dailyDouble": true,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "7da417497ed3",
+              "value": 1000,
+              "prompt": "Какая греческая буква зашифрована на картинке?\n\n![Подсказка](/media/a567745cfe2c5eda18e5c13e5c5128901badb462dd73775b.png)",
+              "answer": "Гамма",
+              "notes": "Засчитывать: гамма, gamma, γ, Γ.\nИсточник: https://www.youtube.com/watch?v=1mcvkh7FBPw&t=1069s\nИзображение предоставлено пользователем и сохранено без изменений.\nИсходная стоимость: 500.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "3734d7c04cf4",
+              "value": 1200,
+              "prompt": "Какая греческая буква зашифрована на картинке?\n\n![Подсказка](/media/dfa4f640a69768f9bc827b87fcd6e9e3725f2094fb0bab47.jpg)",
+              "answer": "Омега",
+              "notes": "Засчитывать: омега, omega, ω, Ω.\nКапсулы рыбьего жира → омега-3.\nДополнительный авторский вопрос; не из «Свояка».\nИсточник изображения: https://img.youm7.com/ArticleImgs/2018/2/18/97284-fish-oil-capsules-720x480.jpg\nСтраница источника: https://img.youm7.com/ArticleImgs/2018/2/18/97284-fish-oil-capsules-720x480.jpg",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "a489e550c1da",
+              "value": 1400,
+              "prompt": "Какая греческая буква зашифрована на картинке?\n\n![Подсказка](/media/6957d485e1396cb9a502cdcdc9f49eadcb2a5b62fba82ff6.png)",
+              "answer": "Пи",
+              "notes": "Засчитывать: пи, pi, π, Π.\nЛоготип Raspberry Pi. Автор значка: Terence Eden, CC BY 4.0; https://creativecommons.org/licenses/by/4.0/ . Изображение без изменений.\nДополнительный авторский вопрос; не из «Свояка».\nИсточник изображения: https://images.icon-icons.com/2108/PNG/512/raspberry_pi_icon_130847.png\nСтраница источника: https://icon-icons.com/icon/raspberry-pi/130847",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            }
+          ]
+        },
+        {
+          "id": "a6ae3ccfae9d",
+          "name": "Что было раньше?",
+          "questions": [
+            {
+              "id": "b214b44db2d4",
+              "value": 200,
+              "prompt": "Что появилось раньше?",
+              "answer": "Интернет",
+              "notes": "Источник: «Свояк», Данила Горилла / Макс 100500 / Сатир, раунд 3.\nhttps://www.youtube.com/watch?v=tXEM3FSfsWc&t=3515s\nИсходная стоимость: 300. Ответ — как засчитано в выпуске.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "answer",
+              "slowReveal": false,
+              "correctAnswerIndex": 0,
+              "answerOptions": [
+                "Интернет",
+                "Мобильный телефон",
+                "Кубик Рубика"
+              ],
+              "shuffleAnswers": true
+            },
+            {
+              "id": "5f9f320685d6",
+              "value": 400,
+              "prompt": "Что появилось раньше?",
+              "answer": "Микрофон",
+              "notes": "Источник: «Свояк», Данила Горилла / Макс 100500 / Сатир, раунд 3.\nhttps://www.youtube.com/watch?v=tXEM3FSfsWc&t=3334s\nИсходная стоимость: 600. Ответ — как засчитано в выпуске.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "answer",
+              "slowReveal": false,
+              "correctAnswerIndex": 2,
+              "answerOptions": [
+                "Эскалатор",
+                "Скотч",
+                "Микрофон"
+              ],
+              "shuffleAnswers": true
+            },
+            {
+              "id": "d700cf503031",
+              "value": 600,
+              "prompt": "",
+              "answer": "",
+              "notes": "",
+              "dailyDouble": false,
+              "modifier": {
+                "title": "Ограбление лидера",
+                "instructions": "Забери 900 баллов у команды соперников с самым большим счётом и прибавь их к своему счёту. Твоя команда не участвует в выборе донора. Если несколько соперников делят первое место, выбери одного из них. Перевод происходит сразу и полностью, даже если счёт донора станет отрицательным."
+              },
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "28087c86b68e",
+              "value": 800,
+              "prompt": "Что появилось раньше?",
+              "answer": "Зажигалка",
+              "notes": "Источник: «Свояк», Данила Горилла / Макс 100500 / Сатир, раунд 3.\nhttps://www.youtube.com/watch?v=tXEM3FSfsWc&t=3172s\nИсходная стоимость: 900. Ответ — как засчитано в выпуске.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "answer",
+              "slowReveal": false,
+              "correctAnswerIndex": 1,
+              "answerOptions": [
+                "Спички",
+                "Зажигалка",
+                "Термос"
+              ],
+              "shuffleAnswers": true
+            },
+            {
+              "id": "4ec42d010ddc",
+              "value": 1000,
+              "prompt": "Что появилось раньше?",
+              "answer": "Контактные линзы",
+              "notes": "Источник: «Свояк», Данила Горилла / Макс 100500 / Сатир, раунд 3.\nhttps://www.youtube.com/watch?v=tXEM3FSfsWc&t=2805s\nИсходная стоимость: 1200. Ответ — как засчитано в выпуске.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "answer",
+              "slowReveal": false,
+              "correctAnswerIndex": 1,
+              "answerOptions": [
+                "Телевидение",
+                "Контактные линзы",
+                "Баскетбол"
+              ],
+              "shuffleAnswers": true
+            },
+            {
+              "id": "125e77401db8",
+              "value": 1200,
+              "prompt": "Что появилось раньше?",
+              "answer": "Искусственное сердце",
+              "notes": "Источник: «Свояк», Данила Горилла / Макс 100500 / Сатир, раунд 3.\nhttps://www.youtube.com/watch?v=tXEM3FSfsWc&t=2473s\nИсходная стоимость: 1500. Ответ — как засчитано в выпуске.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "answer",
+              "slowReveal": false,
+              "correctAnswerIndex": 0,
+              "answerOptions": [
+                "Искусственное сердце",
+                "MP3-плеер",
+                "Искусственный спутник Земли"
+              ],
+              "shuffleAnswers": true
+            }
+          ]
+        },
+        {
+          "id": "91e78c214420",
+          "name": "Анаграммы",
+          "questions": [
+            {
+              "id": "136bb0e2b752",
+              "value": 200,
+              "prompt": "Составьте слово. Заглавная буква — первая.\n\n## ооТзрм",
+              "answer": "Тормоз",
+              "notes": "Порядок букв сохранён со скриншота пользователя. Подсказка первой буквы передана заглавной буквой внутри анаграммы.\nИсточник: https://www.youtube.com/watch?v=S_RgvOA7CpE&t=794s\nСкриншот-источник: research/anagrams/original-1.png",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "760036b71489",
+              "value": 400,
+              "prompt": "Составьте слово. Заглавная буква — первая.\n\n## ркжаПеддо",
+              "answer": "Поддержка",
+              "notes": "Буквы и регистр точно переписаны со скриншота пользователя.\nИсточник: https://www.youtube.com/watch?v=sirgbkwjbPk&t=1484s\nСкриншот-источник: research/anagrams/original-2.png",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "695d2c296e41",
+              "value": 600,
+              "prompt": "Составьте слово. Заглавная буква — первая.\n\n## мигоарКлм",
+              "answer": "Килограмм",
+              "notes": "Порядок букв сохранён со скриншота пользователя. Подсказка первой буквы передана заглавной буквой внутри анаграммы.\nИсточник: https://www.youtube.com/watch?v=S_RgvOA7CpE&t=1124s\nСкриншот-источник: research/anagrams/original-3.png",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "6d799fa5ca7d",
+              "value": 800,
+              "prompt": "Составьте слово. Заглавная буква — первая.\n\n## даьМверу",
+              "answer": "Муравьед",
+              "notes": "Порядок букв сохранён со скриншота пользователя. Подсказка первой буквы передана заглавной буквой внутри анаграммы.\nИсточник: https://www.youtube.com/watch?v=S_RgvOA7CpE&t=622s\nСкриншот-источник: research/anagrams/original-4.png",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "34bb260f2a69",
+              "value": 1000,
+              "prompt": "Составьте слово. Заглавная буква — первая.\n\n## жОанлхиеед",
+              "answer": "Охлаждение",
+              "notes": "Буквы и регистр точно переписаны со скриншота пользователя.\nИсточник: https://www.youtube.com/watch?v=sirgbkwjbPk&t=1287s\nСкриншот-источник: research/anagrams/original-5.png",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "7eda5219c5d3",
+              "value": 1200,
+              "prompt": "Составьте слово. Заглавная буква — первая.\n\n## рТияортреи",
+              "answer": "Территория",
+              "notes": "Буквы и регистр точно переписаны со скриншота пользователя.\nИсточник: https://www.youtube.com/watch?v=sirgbkwjbPk&t=1233s\nСкриншот-источник: research/anagrams/original-6.png",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "9664d8b6a4bd",
+              "value": 1400,
+              "prompt": "Составьте слово. Заглавная буква — первая.\n\n## иПупороводнкл",
+              "answer": "Полупроводник",
+              "notes": "Буквы и регистр точно переписаны со скриншота пользователя.\nИсточник: https://www.youtube.com/watch?v=sirgbkwjbPk&t=1173s\nСкриншот-источник: research/anagrams/original-7.png",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "9dce074da6fe",
+      "name": "Round 3",
+      "type": "board",
+      "categories": [
+        {
+          "id": "5cef97fcfd1a",
+          "name": "Живая еда",
+          "questions": [
+            {
+              "id": "1d3b335b0f0e",
+              "value": 300,
+              "prompt": "Какая еда зашифрована на картинке?\n\n![Загадка](/media/a61f7b9b88600978af96a5321302c144ab28f34322b17365.png)",
+              "answer": "Селёдка под шубой",
+              "notes": "Засчитывать: селёдка под шубой, сельдь под шубой, шуба.\nИсточник: «Свояк», Данила Горилла / Макс 100500 / Сатир, раунд 3.\nhttps://www.youtube.com/watch?v=tXEM3FSfsWc&t=3460s\nИзображение из скриншота пользователя восстановлено с помощью imagegen: удалена синяя рамка, улучшена чёткость. Максимальная сторона сохранённого изображения — 1080 пикселей.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "d36daa56e638",
+              "value": 600,
+              "prompt": "Какая еда зашифрована на картинке?\n\n![Загадка](/media/80d9026f87ca1f47d25ec90bfb0f8ec3e825489b62cfc9b2.png)",
+              "answer": "Макароны по-флотски",
+              "notes": "Засчитывать: макароны по-флотски, макароны по-флотскому.\nИсточник: «Свояк», Данила Горилла / Макс 100500 / Сатир, раунд 3.\nhttps://www.youtube.com/watch?v=tXEM3FSfsWc&t=3320s\nИзображение из скриншота пользователя восстановлено с помощью imagegen: удалена синяя рамка, улучшена чёткость. Максимальная сторона сохранённого изображения — 1080 пикселей.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "3fa6c494e8ac",
+              "value": 900,
+              "prompt": "Какая еда зашифрована на картинке?\n\n![Загадка](/media/67abcfd2db27c024704cf8b86f066f31bb658d228a38e553.png)",
+              "answer": "Мясо по-французски",
+              "notes": "Засчитывать: мясо по-французски.\nИсточник: «Свояк», Данила Горилла / Макс 100500 / Сатир, раунд 3.\nhttps://www.youtube.com/watch?v=tXEM3FSfsWc&t=2433s\nИзображение из скриншота пользователя восстановлено с помощью imagegen: удалена синяя рамка, улучшена чёткость. Максимальная сторона сохранённого изображения — 1080 пикселей.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "d77c8146fc7e",
+              "value": 1200,
+              "prompt": "Какая еда зашифрована на картинке?\n\n![Загадка](/media/58ffe9f73ea3c31e3940f1039f4f707d2f98c0d13859a9f2.png)",
+              "answer": "Ленивые голубцы",
+              "notes": "Засчитывать: ленивые голубцы.\nИсточник: «Свояк», Данила Горилла / Макс 100500 / Сатир, раунд 3.\nhttps://www.youtube.com/watch?v=tXEM3FSfsWc&t=2979s\nИзображение из скриншота пользователя восстановлено с помощью imagegen: удалена синяя рамка, улучшена чёткость. Максимальная сторона сохранённого изображения — 1080 пикселей.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "0072e8221351",
+              "value": 1500,
+              "prompt": "Какая еда зашифрована на картинке?\n\n![Загадка](/media/119acac5f35f6fada71eee79ea3d515dfb7e8b8897fe123d.png)",
+              "answer": "Докторская колбаса",
+              "notes": "Засчитывать: докторская колбаса, докторская.\nИсточник: «Свояк», Данила Горилла / Макс 100500 / Сатир, раунд 3.\nhttps://www.youtube.com/watch?v=tXEM3FSfsWc&t=2770s\nИзображение из скриншота пользователя восстановлено с помощью imagegen: удалена синяя рамка, улучшена чёткость. Максимальная сторона сохранённого изображения — 1080 пикселей.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "8304539e192d",
+              "value": 1800,
+              "prompt": "Какая еда зашифрована на картинке?\n\n![Загадка](/media/acbfcaa7cffdceb890401f7e9f1df505dd87a98c42356510.png)",
+              "answer": "Цезарь с курицей",
+              "notes": "Засчитывать: цезарь с курицей, салат цезарь с курицей.\nИсточник: «Свояк», Данила Горилла / Макс 100500 / Сатир, раунд 3.\nhttps://www.youtube.com/watch?v=tXEM3FSfsWc&t=2752s\nИзображение из скриншота пользователя восстановлено с помощью imagegen: удалена синяя рамка, улучшена чёткость. Максимальная сторона сохранённого изображения — 1080 пикселей.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "b1927ad1c507",
+              "value": 2100,
+              "prompt": "Какая еда зашифрована на картинке?\n\n![Загадка](/media/52522d4d8a16be63ea18526255df97cfb2e28015d9de4182.png)",
+              "answer": "Гречка по-купечески",
+              "notes": "Засчитывать: гречка по-купечески, купеческая гречка.\nИсточник: «Свояк», Данила Горилла / Макс 100500 / Сатир, раунд 3.\nhttps://www.youtube.com/watch?v=tXEM3FSfsWc&t=2585s\nИзображение из скриншота пользователя восстановлено с помощью imagegen: удалена синяя рамка, улучшена чёткость. Максимальная сторона сохранённого изображения — 1080 пикселей.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            }
+          ]
+        },
+        {
+          "id": "55a59af3a21a",
+          "name": "Музыкальные инструменты",
+          "questions": [
+            {
+              "id": "e91ba4cc8a2e",
+              "value": 300,
+              "prompt": "Какой инструмент звучит?\n\n[Слушать](/media/82a6f8e3487e6b92941d833445855bdb2f18fcd0ef3c0a84.mp3)",
+              "answer": "Гитара",
+              "notes": "Засчитывать: гитара; акустическая гитара; классическая гитара.\nЗапись: Alejandro Galdámez.\nИсточник: Wikimedia Commons.\nArpegio DoM Guitarra.ogg\nhttps://commons.wikimedia.org/wiki/File:Arpegio_DoM_Guitarra.ogg\nЛицензия записи и этого аудиофрагмента: CC BY-SA 4.0 — https://creativecommons.org/licenses/by-sa/4.0/.\nИзменения: Первые 8 секунд после удаления начальной тишины (или вся запись, если короче); выровнена громкость, короткое плавное начало/окончание, MP3; теги удалены.\nДлительность: 3.98 с.\nДля выравнивания с остальными вопросами применена мягкая компрессия громкости.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "f8a337bed434",
+              "value": 600,
+              "prompt": "Какой инструмент звучит?\n\n[Слушать](/media/4f11fea833770e5eb46935143f0a215f7dcf7ce2a1b4f7b1.mp3)",
+              "answer": "Пианино",
+              "notes": "Засчитывать: пианино; фортепиано; рояль.\nЗапись: Автор не указан; загружено Loveless из французской Википедии.\nИсточник: Wikimedia Commons.\nPiano.ogg\nhttps://commons.wikimedia.org/wiki/File:Piano.ogg\nЛицензия записи и этого аудиофрагмента: CC BY-SA 3.0 — https://creativecommons.org/licenses/by-sa/3.0/.\nИзменения: Первые 8 секунд после удаления начальной тишины (или вся запись, если короче); выровнена громкость, короткое плавное начало/окончание, MP3; теги удалены.\nДлительность: 5.89 с.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "df5c5cf3a2c6",
+              "value": 900,
+              "prompt": "Какой инструмент звучит?\n\n[Слушать](/media/85ee34b5a0c668040efc485bcc8d62c5c970fdabc30507b6.mp3)",
+              "answer": "Скрипка",
+              "notes": "Засчитывать: скрипка.\nЗапись: VWD.\nИсточник: Wikimedia Commons.\n00 Jazz Violin Solo.ogg\nhttps://commons.wikimedia.org/wiki/File:00_Jazz_Violin_Solo.ogg\nЛицензия записи и этого аудиофрагмента: Public domain.\nИзменения: Первые 8 секунд после удаления начальной тишины (или вся запись, если короче); выровнена громкость, короткое плавное начало/окончание, MP3; теги удалены.\nДлительность: 8.00 с.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "0d9cbbda3ab4",
+              "value": 1200,
+              "prompt": "Какой инструмент звучит?\n\n[Слушать](/media/58605f355b3a42727a93ee1b21fb323a8d61bc7310ed34b1.mp3)",
+              "answer": "Саксофон",
+              "notes": "Засчитывать: саксофон; тенор-саксофон.\nЗапись: Julien Grandgagnage.\nИсточник: Wikimedia Commons.\nAfteryouvegone-first8bars.ogg\nhttps://commons.wikimedia.org/wiki/File:Afteryouvegone-first8bars.ogg\nЛицензия записи и этого аудиофрагмента: CC BY-SA 3.0 — https://creativecommons.org/licenses/by-sa/3.0/.\nИзменения: Первые 8 секунд после удаления начальной тишины (или вся запись, если короче); выровнена громкость, короткое плавное начало/окончание, MP3; теги удалены.\nДлительность: 8.00 с.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "b7bb7aa317f5",
+              "value": 1500,
+              "prompt": "Какой инструмент звучит?\n\n[Слушать](/media/7b4dbc6827d743eb1d0085e19c6583c7dcf08bd1d10f0283.mp3)",
+              "answer": "Флейта",
+              "notes": "Засчитывать: флейта.\nЗапись: hokuspokus.\nИсточник: Wikimedia Commons.\nFlute 2.ogg\nhttps://commons.wikimedia.org/wiki/File:Flute_2.ogg\nЛицензия записи и этого аудиофрагмента: Public domain.\nИзменения: Первые 8 секунд после удаления начальной тишины (или вся запись, если короче); выровнена громкость, короткое плавное начало/окончание, MP3; теги удалены.\nДлительность: 8.00 с.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "639cd7396c73",
+              "value": 1800,
+              "prompt": "Какой инструмент звучит?\n\n[Слушать](/media/61e3ae394b837816fe887c1fda6ee0259c34ac3f625df964.mp3)",
+              "answer": "Губная гармошка",
+              "notes": "Засчитывать: губная гармошка; гармоника; гармошка.\nЗапись: mastermesh.\nИсточник: Wikimedia Commons.\nHarmonica.ogg\nhttps://commons.wikimedia.org/wiki/File:Harmonica.ogg\nЛицензия записи и этого аудиофрагмента: Public domain.\nИзменения: Первые 8 секунд после удаления начальной тишины (или вся запись, если короче); выровнена громкость, короткое плавное начало/окончание, MP3; теги удалены.\nДлительность: 8.00 с.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "980cbca73092",
+              "value": 2100,
+              "prompt": "Какой инструмент звучит?\n\n[Слушать](/media/1b66f6e8e14df4773018abf68ba5e1504f2ace190e111759.mp3)",
+              "answer": "Волынка",
+              "notes": "Засчитывать: волынка.\nЗапись: Clan Stewart Pipe Band; Pandora Records.\nИсточник: Wikimedia Commons.\nSkye Boat Song.ogg\nhttps://commons.wikimedia.org/wiki/File:Skye_Boat_Song.ogg\nЛицензия записи и этого аудиофрагмента: CC BY-SA 2.0 — https://creativecommons.org/licenses/by-sa/2.0/.\nИзменения: Первые 8 секунд после удаления начальной тишины (или вся запись, если короче); выровнена громкость, короткое плавное начало/окончание, MP3; теги удалены.\nДлительность: 8.00 с.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            }
+          ]
+        },
+        {
+          "id": "fc77c969182a",
+          "name": "График или горы",
+          "questions": [
+            {
+              "id": "dbf35448dff1",
+              "value": 300,
+              "prompt": "График цены или контур гор?\n\n![Контур](/media/51e30e40a988fcd2d91d623febded042e1eb887ae0544742.png)",
+              "answer": "Горы — Фудзи · Япония",
+              "notes": "**Ответ:** Горы — Фудзи · Япония.\n\n**Засчитывать:** Горы; контур гор; горный хребет. Называть актив или гору не требуется.\n\nКонтур вершины из фотографии. Широкая вершина похожа на ценовое плато.\n\n**Проверка:** [Исходная фотография и описание](https://www.usgs.gov/media/images/mount-fuji).\n\n**Фрагмент:** фотография «Mt. Fuji, enhanced», DoctorJoeE; контур выделен по границе неба на участке x=250…1149 копии 1336×615 пикселей.\n\n**Подготовка:** оси, даты и единицы скрыты. Вертикальный и горизонтальный масштабы нормализованы; контур пересэмплирован в 144 точки без разворота.\n\n**Авторство:** DoctorJoeE / Wikimedia Commons, через USGS · CC BY-SA 4.0. Производная: выделение и нормализация контура.\n\n**Лицензия контура:** [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).\n\n**Архив для проверки:** research/candles-or-mountains/fuji.jpg; SHA-256: 772049436d718f9465aedbe01f085c0ee69b835d0d5f43e17dd32919b00e1588. Метод построения: research/candles-or-mountains/build-samples.py.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "39a5924bdd01",
+              "value": 600,
+              "prompt": "",
+              "answer": "",
+              "notes": "",
+              "dailyDouble": false,
+              "modifier": {
+                "title": "Заначка",
+                "instructions": "Получи 600 баллов. Прибавь их к своему текущему счёту сразу после получения модификатора."
+              },
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "2bc9cd41c7c9",
+              "value": 900,
+              "prompt": "График цены или контур гор?\n\n![Контур](/media/03a9f5886891516243b3da6469bbf846ea3ac8df4c9a900a.png)",
+              "answer": "Горы — Маттерхорн · Швейцарские Альпы",
+              "notes": "**Ответ:** Горы — Маттерхорн · Швейцарские Альпы.\n\n**Засчитывать:** Горы; контур гор; горный хребет. Называть актив или гору не требуется.\n\nПриблизительно обведённый контур Маттерхорна на фотографии с Горнерграта.\n\n**Проверка:** [Исходная фотография и описание](https://commons.wikimedia.org/wiki/File:Matterhorn_vom_Gornergrat.jpg).\n\n**Фрагмент:** Маттерхорн в правой части панорамы «Matterhorn vom Gornergrat.jpg», фотография 17.08.2012; приблизительная ручная обводка x=726…836 на копии 960×274 пикселя.\n\n**Подготовка:** оси, даты и единицы скрыты. Вертикальный и горизонтальный масштабы нормализованы; контур пересэмплирован в 144 точки без разворота.\n\n**Авторство:** Hansueli Krapf / Wikimedia Commons · CC BY-SA 4.0. Производная: выделение и нормализация контура.\n\n**Лицензия контура:** [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).\n\n**Архив для проверки:** research/candles-or-mountains/matterhorn.jpg; SHA-256: 2ad4471cfc43ee0ea63dceb4f7f608f5f69afd4491f93d329a6374935e40917b. Метод построения: research/candles-or-mountains/build-samples.py.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "382a59b1de64",
+              "value": 1200,
+              "prompt": "График цены или контур гор?\n\n![Контур](/media/c7484b7ac6246e94f3c536f334a25539345d08eaedd20dc0.png)",
+              "answer": "График — Bitcoin · 2021 год",
+              "notes": "**Ответ:** График — Bitcoin · 2021 год.\n\n**Засчитывать:** График; график цены; биржевой график. Называть актив или гору не требуется.\n\nBTC/USDT, дневные цены закрытия Binance. Два крупных подъёма за один год.\n\n**Проверка:** [Исходные дневные свечи Binance (JSON)](https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&startTime=1609459200000&endTime=1640995199000&limit=1000).\n\n**Данные:** BTC/USDT; 2021-01-01 — 2021-12-31, UTC; 365 дневных свечей. Из каждой свечи взята цена закрытия (элемент 4, нумерация с нуля). Показан линейный график, не тела японских свечей.\n\n**Подготовка:** оси, даты и единицы скрыты. Вертикальный и горизонтальный масштабы нормализованы; контур пересэмплирован в 144 точки без разворота.\n\n**Авторство:** Binance · исторические дневные свечи; показана линия закрытия.\n\n**Архив для проверки:** research/candles-or-mountains/btc-binance.json; SHA-256: 84f5a53150952bedc8d3b4901a385e4e49c089a666d2731a7314ffe7a1e67102. Метод построения: research/candles-or-mountains/build-samples.py.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "87313e132439",
+              "value": 1500,
+              "prompt": "График цены или контур гор?\n\n![Контур](/media/4c7dd8efa3f6adb4616b2b5375870876895ae8eb3f37f7d3.png)",
+              "answer": "График — Ethereum · январь — июнь 2021",
+              "notes": "**Ответ:** График — Ethereum · январь — июнь 2021.\n\n**Засчитывать:** График; график цены; биржевой график. Называть актив или гору не требуется.\n\nETH/USDT, дневные цены закрытия Binance. Весенний подъём и снижение после майского пика.\n\n**Проверка:** [Исходные дневные свечи Binance (JSON)](https://data-api.binance.vision/api/v3/klines?symbol=ETHUSDT&interval=1d&startTime=1609459200000&endTime=1625097599999&limit=1000).\n\n**Данные:** ETH/USDT; 2021-01-01 — 2021-06-30, UTC; 181 дневных свечей. Из каждой свечи взята цена закрытия (элемент 4, нумерация с нуля). Показан линейный график, не тела японских свечей.\n\n**Подготовка:** оси, даты и единицы скрыты. Вертикальный и горизонтальный масштабы нормализованы; контур пересэмплирован в 144 точки без разворота.\n\n**Авторство:** Binance · исторические дневные свечи; показана линия закрытия.\n\n**Архив для проверки:** research/candles-or-mountains/eth-2021.json; SHA-256: 612d41bb44b35f3889e562896cbb3203135e5776c385a9a61752705a14e4a287. Метод построения: research/candles-or-mountains/build-samples.py.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "5871f346ef97",
+              "value": 1800,
+              "prompt": "График цены или контур гор?\n\n![Контур](/media/4237290bcbc53945d163ef32777a26fc00db118954a742b7.png)",
+              "answer": "Горы — Альпийская гряда · вид с Горнерграта",
+              "notes": "**Ответ:** Горы — Альпийская гряда · вид с Горнерграта.\n\n**Засчитывать:** Горы; контур гор; горный хребет. Называть актив или гору не требуется.\n\nПриблизительно обведённый контур соседних вершин в левой части альпийской панорамы.\n\n**Проверка:** [Исходная фотография и описание](https://commons.wikimedia.org/wiki/File:Matterhorn_vom_Gornergrat.jpg).\n\n**Фрагмент:** левая часть той же панорамы «Matterhorn vom Gornergrat.jpg», вид с Горнерграта, 17.08.2012; приблизительная ручная обводка x=18…558 на копии 960×274 пикселя. Отдельные вершины здесь не идентифицируются.\n\n**Подготовка:** оси, даты и единицы скрыты. Вертикальный и горизонтальный масштабы нормализованы; контур пересэмплирован в 144 точки без разворота.\n\n**Авторство:** Hansueli Krapf / Wikimedia Commons · CC BY-SA 4.0. Производная: выделение и нормализация контура.\n\n**Лицензия контура:** [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).\n\n**Архив для проверки:** research/candles-or-mountains/matterhorn.jpg; SHA-256: 2ad4471cfc43ee0ea63dceb4f7f608f5f69afd4491f93d329a6374935e40917b. Метод построения: research/candles-or-mountains/build-samples.py.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "e9c124c6878c",
+              "value": 2100,
+              "prompt": "График цены или контур гор?\n\n![Контур](/media/bcbf13e70a23616c3dee4e19e75df1ef1d155efaeed62d64.png)",
+              "answer": "График — Bitcoin · сентябрь 2017 — март 2018",
+              "notes": "**Ответ:** График — Bitcoin · сентябрь 2017 — март 2018.\n\n**Засчитывать:** График; график цены; биржевой график. Называть актив или гору не требуется.\n\nBTC/USDT, дневные цены закрытия Binance. Взлёт конца 2017 года и последующее снижение.\n\n**Проверка:** [Исходные дневные свечи Binance (JSON)](https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&startTime=1504224000000&endTime=1522540799999&limit=1000).\n\n**Данные:** BTC/USDT; 2017-09-01 — 2018-03-31, UTC; 212 дневных свечей. Из каждой свечи взята цена закрытия (элемент 4, нумерация с нуля). Показан линейный график, не тела японских свечей.\n\n**Подготовка:** оси, даты и единицы скрыты. Вертикальный и горизонтальный масштабы нормализованы; контур пересэмплирован в 144 точки без разворота.\n\n**Авторство:** Binance · исторические дневные свечи; показана линия закрытия.\n\n**Архив для проверки:** research/candles-or-mountains/btc-2017.json; SHA-256: 895fb3492e444b7a55c51455f9648f603dd3a57eec26293a4e97be8e979baa74. Метод построения: research/candles-or-mountains/build-samples.py.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            }
+          ]
+        },
+        {
+          "id": "4576161cc419",
+          "name": "Логика",
+          "questions": [
+            {
+              "id": "678a4c35b015",
+              "value": 300,
+              "prompt": "Электровоз едет на север, ветер дует на запад. Куда летит дым?",
+              "answer": "Дыма нет",
+              "notes": "Электровоз работает на электричестве и не выпускает дым. Засчитывать: «никуда», если игрок поясняет, что дыма нет.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "0c86cbbbfeac",
+              "value": 600,
+              "prompt": "Перед финишем вы обгоняете бегуна, занимающего вторую позицию. Каким финишируете?",
+              "answer": "Вторым",
+              "notes": "Вы занимаете место обогнанного бегуна — второе. Засчитывать: «вторым», «на втором месте», «2».\nИсточник: «Свояк», Даня Кашин / Yanix / Сатир, раунд 1. https://www.youtube.com/watch?v=S_RgvOA7CpE&t=882s",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "14f12d9cf480",
+              "value": 900,
+              "prompt": "Кувшинки каждый день удваивают покрытую ими площадь. За 30 дней они закрыли весь пруд. На какой день была закрыта половина?",
+              "answer": "На 29-й день",
+              "notes": "За день до полного покрытия площадь была вдвое меньше. Засчитывать: «29», «двадцать девятый день».",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "95fb2ceb71e1",
+              "value": 1200,
+              "prompt": "Кирпич весит один килограмм плюс половину собственного веса. Сколько весит кирпич?",
+              "answer": "2 килограмма",
+              "notes": "Половина кирпича весит 1 кг, поэтому целый — 2 кг. Уравнение: x = 1 + x/2. Засчитывать: «2 кг», «два килограмма».",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "0dec4abb7228",
+              "value": 1500,
+              "prompt": "Сколько девяток получится, если выписать все числа от 1 до 100?",
+              "answer": "20",
+              "notes": "Считаются отдельные цифры, а не числа: 10 девяток в разряде единиц и 10 в разряде десятков. В числе 99 две девятки. Засчитывать: «20», «двадцать».\nИсточник: «Свояк», Даня Кашин / Yanix / Сатир, раунд 1. https://www.youtube.com/watch?v=S_RgvOA7CpE&t=251s",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "91df7ed7bb2c",
+              "value": 1800,
+              "prompt": "Какой номер парковочного места закрывает машина на картинке?\n\n![Парковочные места](/media/fa5beb95be086f03797ee438faa6ee47ac02c261d696b6c5.png)",
+              "answer": "87",
+              "notes": "Если перевернуть картинку на 180°, места идут по порядку: 86, 87, 88, 89, 90, 91. Машина закрывает 87. Засчитывать: «87», «восемьдесят семь».\nИсточник: «Свояк», Даня Кашин / Yanix / Сатир, раунд 1. https://www.youtube.com/watch?v=S_RgvOA7CpE&t=1522s\nСкриншот предоставлен пользователем; сохранён без изменений (1910 × 816). Изображение показывается целиком, чтобы все номера были видны одновременно.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "5b56536eebc9",
+              "value": 2100,
+              "prompt": "",
+              "answer": "",
+              "notes": "",
+              "dailyDouble": false,
+              "modifier": {
+                "title": "Штраф",
+                "instructions": "Потеряй 600 баллов. Вычти их из своего текущего счёта сразу после получения модификатора, даже если счёт станет отрицательным."
+              },
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "01904deec256",
+              "value": 2400,
+              "prompt": "Десять монахов раскрывают мешок, ещё пятеро забираются в него. Что зашифровано?",
+              "answer": "Носок",
+              "notes": "Десять пальцев рук растягивают носок, а пять пальцев ноги входят внутрь. Также засчитывать «перчатка»: эта формулировка допускает тот же ответ с пятью пальцами руки.\nИсточник: «Свояк», Даня Кашин / Yanix / Сатир, раунд 1. https://www.youtube.com/watch?v=S_RgvOA7CpE&t=1278s",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            }
+          ]
+        },
+        {
+          "id": "61d44a8f3e54",
+          "name": "Упоротые вывески",
+          "questions": [
+            {
+              "id": "f0d076aa535a",
+              "value": 300,
+              "prompt": "Что здесь написано?\n\n![Вывеска](/media/a5e068c8e19a9c9c612f584d6d0ab4f10e781643a3543f86.png)",
+              "answer": "Кофе с булочкой",
+              "notes": "Прочитать строки сверху вниз: КО / ФЕ / СБ / УЛ / ОЧ / КО / Й.\nИсточник: «Свояк». https://www.youtube.com/watch?v=kiusnXwLDtU&t=1508s\nСкриншот предоставлен пользователем; исходное расположение букв сохранено без изменений. Изображение показывается целиком.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "28e7705b2b6c",
+              "value": 600,
+              "prompt": "Что здесь написано?\n\n![Вывеска](/media/53a9cbd11d4a523ef3064d1b3ea2a56a352ebe2951fc7121.png)",
+              "answer": "Приятного аппетита!",
+              "notes": "Прочитать последовательно сверху вниз, объединяя разбитые части слов.\nИсточник: «Свояк». https://www.youtube.com/watch?v=kiusnXwLDtU&t=1521s\nСкриншот предоставлен пользователем; исходное расположение букв сохранено без изменений. Изображение показывается целиком.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "cc645df72132",
+              "value": 900,
+              "prompt": "Что здесь написано?\n\n![Вывеска](/media/49a1c334c6ad07bc933db629cde50fea0f6d52210d4fbd2a.png)",
+              "answer": "Для бытового мусора",
+              "notes": "Начать с правого контейнера: «ДЛЯ / БЫТОВ / МУ», затем дополнить частями с левого: «ОГО / СОРА».\nИсточник: «Свояк». https://www.youtube.com/watch?v=IXKrQNv2Cb8&t=800s\nСкриншот предоставлен пользователем; исходное расположение букв сохранено без изменений. Изображение показывается целиком.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "8d5676c018c9",
+              "value": 1200,
+              "prompt": "Что здесь написано?\n\n![Вывеска](/media/0187c8c4d1e33050140c7c51e3f9551a4a881c6472fa3b82.png)",
+              "answer": "Глобальное падение цен!",
+              "notes": "Левый столбец: «ГЛ / ОБ / АЛ / ЬН / ОЕ». Правый: «ПА / ДЕ / НИ / Е / ЦЕ / Н».\nИсточник: «Свояк». https://www.youtube.com/watch?v=1cqpwzmA3EQ&t=3424s\nСкриншот предоставлен пользователем; исходное расположение букв сохранено без изменений. Изображение показывается целиком.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "8c8555740456",
+              "value": 1500,
+              "prompt": "Что здесь написано?\n\n![Вывеска](/media/496316ca1ff4852c5a7dd0c599bcc43f636a179c8c7b5048.png)",
+              "answer": "«Горизонт». Мы ищем вожатых!",
+              "notes": "Название «ГОРИЗОНТ» разбито вставкой «МЫ», а «ВОЖАТЫХ» — вставкой «ИЩЕМ». Засчитывать правильную фразу с названием «Горизонт» без требования дословной пунктуации.\nИсточник: «Свояк». https://www.youtube.com/watch?v=IXKrQNv2Cb8&t=428s\nСкриншот предоставлен пользователем; исходное расположение букв сохранено без изменений. Изображение показывается целиком.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "af5153743f70",
+              "value": 1800,
+              "prompt": "Что здесь написано?\n\n![Вывеска](/media/b9c88479fb8e254c580dac61b1eca55d213e76bbb8cfa69a.png)",
+              "answer": "Растормаживание речи",
+              "notes": "Первое слово идёт по диагонали вниз, затем продолжается снизу вверх; «РЕЧИ» находится в центре.\nИсточник: «Свояк». https://www.youtube.com/watch?v=KCTGsqOPjts&t=1376s\nСкриншот предоставлен пользователем; исходное расположение букв сохранено без изменений. Изображение показывается целиком.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "b52bfaed481c",
+              "value": 2100,
+              "prompt": "Что здесь написано?\n\n![Вывеска](/media/6f3ee6f4467d5c4bd136917c7acdb3b310168b8d6504216f.png)",
+              "answer": "Распродажа платьев",
+              "notes": "На левой створке двери зашифровано «РАСПРОДАЖА», на правой — «ПЛАТЬЕВ».\nИсточник: «Свояк». https://www.youtube.com/watch?v=kiusnXwLDtU&t=1179s\nСкриншот предоставлен пользователем; исходное расположение букв сохранено без изменений. Изображение показывается целиком.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "9b15049b7722",
+              "value": 2400,
+              "prompt": "Что здесь написано?\n\n![Вывеска](/media/fa780c9d25044b6b6b5d0013c9ae2b45b6153abe8af2dd45.png)",
+              "answer": "Ликвидация одежды",
+              "notes": "По краям повторяется «ЛИКВИДАЦИЯ», по центру — «ОДЕЖДЫ». Засчитывать «ликвидация одежды»; повторять слово «ликвидация» дважды не требуется.\nИсточник: «Свояк». https://www.youtube.com/watch?v=KCTGsqOPjts&t=1353s\nСкриншот предоставлен пользователем; исходное расположение букв сохранено без изменений. Изображение показывается целиком.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "settings": {
+    "buzzMode": "first",
+    "autoOpenBuzzers": true,
+    "earlyPenaltyMs": 750,
+    "deductWrong": true,
+    "wrongMultiplier": 1,
+    "correctMultiplier": 1,
+    "allowNegative": true,
+    "reopenWrong": true,
+    "lockWrong": true,
+    "revealDelayMs": 900,
+    "showLeaderboardOnStage": true,
+    "startingScore": 0,
+    "finalMaxWager": "score"
+  },
+  "theme": {
+    "preset": "paper",
+    "accent": "#b7482d",
+    "paper": "#ece9e0",
+    "ink": "#252620",
+    "surface": "#f6f3eb",
+    "muted": "#6e7166",
+    "line": "#c9c9be",
+    "displayFont": "serif",
+    "background": "",
+    "motion": true,
+    "sound": false,
+    "title": ""
+  }
+}

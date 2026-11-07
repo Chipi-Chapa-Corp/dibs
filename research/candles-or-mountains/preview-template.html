@@ -1,0 +1,81 @@
+<div id="candles-mountains-quiz">
+  <style>
+    #candles-mountains-quiz { display: grid; gap: calc(var(--font-size-base) * 1); }
+    #candles-mountains-quiz .sample-selector { display: flex; flex-wrap: wrap; gap: calc(var(--font-size-base) * .5); padding-right: 90px; }
+    #candles-mountains-quiz .outline { width: 100%; height: auto; display: block; color: var(--foreground); }
+    #candles-mountains-quiz .answer { display: grid; gap: calc(var(--font-size-base) * .5); }
+    #candles-mountains-quiz [hidden] { display: none; }
+  </style>
+  <div class="sample-selector" role="group" aria-label="Выбрать вопрос">
+    <button class="btn" type="button" data-index="0" aria-pressed="true">1</button>
+    <button class="btn" type="button" data-index="1" aria-pressed="false">2</button>
+    <button class="btn" type="button" data-index="2" aria-pressed="false">3</button>
+    <button class="btn" type="button" data-index="3" aria-pressed="false">4</button>
+    <button class="btn" type="button" data-index="4" aria-pressed="false">5</button>
+    <button class="btn" type="button" data-index="5" aria-pressed="false">6</button>
+  </div>
+  <h2>Свечи или горы?</h2>
+  <svg class="outline" viewBox="0 0 1000 420" role="img" aria-labelledby="cm-outline-title" preserveAspectRatio="none">
+    <title id="cm-outline-title">Вопрос 1: определите источник линии — график цены или контур гор.</title>
+    <path id="cm-line" d="" stroke="currentColor" stroke-width="3" vector-effect="non-scaling-stroke" fill="none" stroke-linejoin="round" stroke-linecap="round"></path>
+  </svg>
+  <div class="viz-controls" role="group" aria-label="Ваш ответ">
+    <button type="button" class="btn" id="cm-market">График цены</button>
+    <button type="button" class="btn" id="cm-mountain">Горы</button>
+  </div>
+  <div class="answer" id="cm-answer" aria-live="polite" hidden>
+    <h3 id="cm-result"></h3>
+    <p id="cm-detail"></p>
+    <div class="viz-row"><a id="cm-source" href="#" target="_blank" rel="noopener noreferrer">Первоисточник</a><a id="cm-license" href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer" hidden>CC BY-SA 4.0</a></div>
+    <p class="text-small" id="cm-credit"></p>
+  </div>
+  <script>
+  (() => {
+    const root = document.getElementById('candles-mountains-quiz');
+    const samples = /*SAMPLES*/[];
+    const $ = id => root.querySelector('#' + id);
+    let current = 0;
+    let answers = {};
+    const valid = value => Number.isInteger(value) && value >= 0 && value < samples.length;
+    function loadState(state) {
+      const p = state?.privateContent;
+      current = valid(p?.current) ? p.current : 0;
+      answers = {};
+      for (const [key, value] of Object.entries(p?.answers || {})) {
+        if (valid(Number(key)) && ['market', 'mountain'].includes(value)) answers[key] = value;
+      }
+    }
+    function draw() {
+      const sample = samples[current];
+      $('cm-line').setAttribute('d', sample.values.map((v,i) => `${i ? 'L' : 'M'}${40+920*i/(sample.values.length-1)},${380-340*v}`).join(' '));
+      $('cm-outline-title').textContent = `Вопрос ${current+1}: определите источник линии — график цены или контур гор.`;
+      root.querySelectorAll('[data-index]').forEach(button => button.setAttribute('aria-pressed', String(Number(button.dataset.index) === current)));
+      const chosen = answers[current];
+      $('cm-answer').hidden = !chosen;
+      $('cm-market').setAttribute('aria-pressed', String(chosen === 'market'));
+      $('cm-mountain').setAttribute('aria-pressed', String(chosen === 'mountain'));
+      if (chosen) {
+        $('cm-result').textContent = `${chosen === sample.kind ? 'Верно' : 'Не угадали'} · ${sample.kind === 'market' ? 'График' : 'Горы'}: ${sample.title}`;
+        $('cm-detail').textContent = sample.detail;
+        $('cm-credit').textContent = sample.credit;
+        $('cm-source').href = sample.source;
+        $('cm-license').hidden = !sample.license;
+      }
+    }
+    function save() {
+      window.openai?.setWidgetState?.({modelContent: {category: 'Свечи или горы?', viewedSample: current+1, answers}, privateContent: {current, answers}})?.catch(() => {});
+    }
+    root.querySelectorAll('[data-index]').forEach(button => button.addEventListener('click', () => {
+      current = Number(button.dataset.index); draw(); save();
+    }));
+    for (const kind of ['market', 'mountain']) $('cm-' + kind).addEventListener('click', () => {
+      answers[current] = kind; draw(); save();
+    });
+    loadState(window.openai?.widgetState);
+    window.addEventListener('openai:set_globals', event => {
+      if (event.detail?.globals?.widgetState) { loadState(event.detail.globals.widgetState); draw(); }
+    });
+    draw();
+  })();
+  </script>
+</div>

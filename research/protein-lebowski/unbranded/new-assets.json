@@ -1,0 +1,56 @@
+[
+  {
+    "key": "eggs",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/12/6-Pack-Chicken-Eggs.jpg/500px-6-Pack-Chicken-Eggs.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "source": "https://commons.wikimedia.org/wiki/File:6-Pack-Chicken-Eggs.jpg",
+    "credit": "<a href=\"//commons.wikimedia.org/wiki/User:Evan-Amos\" title=\"User:Evan-Amos\">Evan-Amos</a>",
+    "license": "Public domain",
+    "type": "image/jpeg",
+    "path": "research/protein-lebowski/unbranded/eggs.jpg"
+  },
+  {
+    "key": "cheese",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/29/Edam_cheese.JPG/500px-Edam_cheese.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "source": "https://commons.wikimedia.org/wiki/File:Edam_cheese.JPG",
+    "credit": "<a href=\"//commons.wikimedia.org/w/index.php?title=User:Dguendel&amp;action=edit&amp;redlink=1\" class=\"new\" title=\"User:Dguendel (page does not exist)\">Dguendel</a>",
+    "license": "CC BY 4.0",
+    "type": "image/jpeg",
+    "path": "research/protein-lebowski/unbranded/cheese.jpg"
+  },
+  {
+    "key": "oats",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c8/Rolled_oats_in_bowl_2.jpg/500px-Rolled_oats_in_bowl_2.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "source": "https://commons.wikimedia.org/wiki/File:Rolled_oats_in_bowl_2.jpg",
+    "credit": "<a href=\"//commons.wikimedia.org/w/index.php?title=User:Bodhi_Peace&amp;action=edit&amp;redlink=1\" class=\"new\" title=\"User:Bodhi Peace (page does not exist)\">Bodhi Peace</a>",
+    "license": "CC BY-SA 4.0",
+    "type": "image/jpeg",
+    "path": "research/protein-lebowski/unbranded/oats.jpg"
+  },
+  {
+    "key": "lentils",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/93/Liat_Portal_for_Foodie_Disorder_-_Cooked_Lentils_with_Caramelized_Onions.jpg/500px-Liat_Portal_for_Foodie_Disorder_-_Cooked_Lentils_with_Caramelized_Onions.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "source": "https://commons.wikimedia.org/wiki/File:Liat_Portal_for_Foodie_Disorder_-_Cooked_Lentils_with_Caramelized_Onions.jpg",
+    "credit": "<a href=\"//commons.wikimedia.org/w/index.php?title=User:HaJunkiyada&amp;action=edit&amp;redlink=1\" class=\"new\" title=\"User:HaJunkiyada (page does not exist)\">HaJunkiyada</a>",
+    "license": "CC BY-SA 4.0",
+    "type": "image/jpeg",
+    "path": "research/protein-lebowski/unbranded/lentils.jpg"
+  },
+  {
+    "key": "yogurt",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Plain_Yogurt.jpg/500px-Plain_Yogurt.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "source": "https://commons.wikimedia.org/wiki/File:Plain_Yogurt.jpg",
+    "credit": "Alabama Extension",
+    "license": "CC0",
+    "type": "image/jpeg",
+    "path": "research/protein-lebowski/unbranded/yogurt.jpg"
+  },
+  {
+    "key": "chicken",
+    "image": "https://www.nutridatabaze.cz/obj/files/1/sys_media_256.jpg",
+    "source": "https://www.nutridatabaze.cz/potraviny/?id=230",
+    "credit": "Nutridatabaze.cz / ÚZEI",
+    "license": "Фото со страницы справочника",
+    "type": "image/jpeg",
+    "path": "research/protein-lebowski/unbranded/chicken.jpg"
+  }
+]

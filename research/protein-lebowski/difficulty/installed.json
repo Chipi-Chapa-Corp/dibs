@@ -1,0 +1,371 @@
+{
+  "gameId": "95AF7D",
+  "round": 3,
+  "category": {
+    "id": "bd0f0c360fe7",
+    "name": "Наелся",
+    "questions": [
+      {
+        "id": "f99d3e34cdfc",
+        "value": 300,
+        "prompt": "Где больше белка по справочным данным?\n\n| Слева | Справа |\n| :---: | :---: |\n| <img src=\"/media/bafeed483e97659c1d6b8151720457a8ad93a176802dc12b.jpg\" alt=\"Куриные яйца, сырые, без скорлупы\" width=\"250\" height=\"180\"> | <img src=\"/media/b80478f6fa72f098fb36905e25ac84a3a649496f668400b4.jpg\" alt=\"Мягкий обезжиренный творог\" width=\"250\" height=\"180\"> |\n| **Куриные яйца, сырые, без скорлупы**<br>**100 г** | **Мягкий обезжиренный творог**<br>**200 г** |\n\nСравниваем указанные порции.",
+        "answer": "**Справа — Мягкий обезжиренный творог: ≈ 24,4 г белка.**\n\nСлева: **≈ 12,5 г** · Справа: **≈ 24,4 г**.",
+        "notes": "Засчитывать: «справа», название еды или очевидный разговорный вариант.\n\nКуриные яйца, сырые, без скорлупы: 12,5 г белка на 100 г съедобной части.\n100 × 12,5 / 100 = 12,5 г; на экране ≈ 12,5 г.\nИсточник: https://www.nutridatabaze.cz/potraviny/?id=78\n\nМягкий обезжиренный творог: 12,2 г белка на 100 г съедобной части.\n200 × 12,2 / 100 = 24,4 г; на экране ≈ 24,4 г.\nИсточник: https://www.nutridatabaze.cz/potraviny/?id=130\n\nРазница по исходным справочным значениям: 11,9 г (48,8% от большего значения). С ростом стоимости уменьшаются и абсолютная, и относительная разница.\n\nПравильный ответ определяется приведёнными справочными значениями для видов еды. Это особенно важно для почти равных сравнений: конкретные продукты и способы приготовления могут давать другие цифры. Округление до 0,1 г применяется после расчёта порции.\n\nСравниваем белок в указанных порциях. Фасоль и чечевица взвешены после варки, овсянка — сухой; яйца и курица — сырыми, яйца без скорлупы. Молоко взвешено в граммах. Фото иллюстративные, массу задаёт подпись.\n\nФото:\nКуриные яйца, сырые, без скорлупы: https://commons.wikimedia.org/wiki/File:6-Pack-Chicken-Eggs.jpg\nАвтор: <a href=\"//commons.wikimedia.org/wiki/User:Evan-Amos\" title=\"User:Evan-Amos\">Evan-Amos</a>; лицензия: Public domain.\n\nМягкий обезжиренный творог: https://commons.wikimedia.org/wiki/File:Skimmed_milk_quark_on_spoon.jpg\nАвтор: <a href=\"//commons.wikimedia.org/wiki/User:SKopp\" title=\"User:SKopp\">SKopp</a>; лицензия: CC BY-SA 4.0.",
+        "dailyDouble": false,
+        "modifier": null,
+        "responseType": "free",
+        "slowReveal": false
+      },
+      {
+        "id": "05501633dd2c",
+        "value": 600,
+        "prompt": "Где больше белка по справочным данным?\n\n| Слева | Справа |\n| :---: | :---: |\n| <img src=\"/media/ae6a58936e40979be4ff9923e4daca4bd9b76ba257a68463.jpg\" alt=\"Арахисовая паста\" width=\"250\" height=\"180\"> | <img src=\"/media/d6fd6aaffd128727d6edc8262d717ee33e12b98a7923ee68.jpg\" alt=\"Натуральный йогурт, 3,5%\" width=\"250\" height=\"180\"> |\n| **Арахисовая паста**<br>**40 г** | **Натуральный йогурт, 3,5%**<br>**200 г** |\n\nСравниваем указанные порции.",
+        "answer": "**Слева — Арахисовая паста: ≈ 11,1 г белка.**\n\nСлева: **≈ 11,1 г** · Справа: **≈ 9 г**.",
+        "notes": "Засчитывать: «слева», название еды или очевидный разговорный вариант.\n\nАрахисовая паста: 27,7 г белка на 100 г съедобной части.\n40 × 27,7 / 100 = 11,08 г; на экране ≈ 11,1 г.\nИсточник: https://www.nutridatabaze.cz/potraviny/?id=464\n\nНатуральный йогурт, 3,5%: 4,5 г белка на 100 г съедобной части.\n200 × 4,5 / 100 = 9 г; на экране ≈ 9 г.\nИсточник: https://www.nutridatabaze.cz/potraviny/?id=126\n\nРазница по исходным справочным значениям: 2,08 г (18,8% от большего значения). С ростом стоимости уменьшаются и абсолютная, и относительная разница.\n\nПравильный ответ определяется приведёнными справочными значениями для видов еды. Это особенно важно для почти равных сравнений: конкретные продукты и способы приготовления могут давать другие цифры. Округление до 0,1 г применяется после расчёта порции.\n\nСравниваем белок в указанных порциях. Фасоль и чечевица взвешены после варки, овсянка — сухой; яйца и курица — сырыми, яйца без скорлупы. Молоко взвешено в граммах. Фото иллюстративные, массу задаёт подпись.\n\nФото:\nАрахисовая паста: https://commons.wikimedia.org/wiki/File:Peanut_butter_glass_3.jpg\nАвтор: <a href=\"//commons.wikimedia.org/wiki/User:Shisma\" title=\"User:Shisma\">Shisma</a>; лицензия: CC BY 4.0.\n\nНатуральный йогурт, 3,5%: https://commons.wikimedia.org/wiki/File:Plain_Yogurt.jpg\nАвтор: Alabama Extension; лицензия: CC0.",
+        "dailyDouble": false,
+        "modifier": null,
+        "responseType": "free",
+        "slowReveal": false
+      },
+      {
+        "id": "95c5d23acda4",
+        "value": 900,
+        "prompt": "Где больше белка по справочным данным?\n\n| Слева | Справа |\n| :---: | :---: |\n| <img src=\"/media/06e690e2fd85fe4944d186d01c54e43da9f86f28520d10c1.webp\" alt=\"Белая фасоль, варёная\" width=\"250\" height=\"180\"> | <img src=\"/media/e8097284891f37dfe24d8a7ce067dc0acce80140ea4f5621.jpg\" alt=\"Молоко, 1,5%\" width=\"250\" height=\"180\"> |\n| **Белая фасоль, варёная**<br>**100 г** | **Молоко, 1,5%**<br>**250 г** |\n\nСравниваем указанные порции.",
+        "answer": "**Слева — Белая фасоль, варёная: ≈ 8,9 г белка.**\n\nСлева: **≈ 8,9 г** · Справа: **≈ 8,3 г**.",
+        "notes": "Засчитывать: «слева», название еды или очевидный разговорный вариант.\n\nБелая фасоль, варёная: 8,9 г белка на 100 г съедобной части.\n100 × 8,9 / 100 = 8,9 г; на экране ≈ 8,9 г.\nИсточник: https://www.nutridatabaze.cz/potraviny/?id=496\n\nМолоко, 1,5%: 3,3 г белка на 100 г съедобной части.\n250 × 3,3 / 100 = 8,25 г; на экране ≈ 8,3 г.\nИсточник: https://www.nutridatabaze.cz/potraviny/?id=113\n\nРазница по исходным справочным значениям: 0,65 г (7,3% от большего значения). С ростом стоимости уменьшаются и абсолютная, и относительная разница.\n\nПравильный ответ определяется приведёнными справочными значениями для видов еды. Это особенно важно для почти равных сравнений: конкретные продукты и способы приготовления могут давать другие цифры. Округление до 0,1 г применяется после расчёта порции.\n\nСравниваем белок в указанных порциях. Фасоль и чечевица взвешены после варки, овсянка — сухой; яйца и курица — сырыми, яйца без скорлупы. Молоко взвешено в граммах. Фото иллюстративные, массу задаёт подпись.\n\nФото:\nБелая фасоль, варёная: https://www.bonduelle.cz/zelenina/p/vapeur-cannellini/03083681003901\nАвтор: Bonduelle; лицензия: Official product image.\n\nМолоко, 1,5%: https://commons.wikimedia.org/wiki/File:Glass_of_Milk_(33657535532).jpg\nАвтор: <a rel=\"nofollow\" class=\"external text\" href=\"https://www.flickr.com/people/54591706@N02\">NIAID</a>; лицензия: CC BY 2.0.",
+        "dailyDouble": false,
+        "modifier": null,
+        "responseType": "free",
+        "slowReveal": false
+      },
+      {
+        "id": "068c8a49437a",
+        "value": 1200,
+        "prompt": "Где больше белка по справочным данным?\n\n| Слева | Справа |\n| :---: | :---: |\n| <img src=\"/media/8dd234b8c9c3bb9702398be3369e162f6ea2109d42e1b4ab.jpg\" alt=\"Чечевица, варёная\" width=\"250\" height=\"180\"> | <img src=\"/media/6ac153a3fb12a966f270a5298e7f8a3da88da55839d18f57.jpg\" alt=\"Овсяные хлопья, сухие\" width=\"250\" height=\"180\"> |\n| **Чечевица, варёная**<br>**160 г** | **Овсяные хлопья, сухие**<br>**100 г** |\n\nСравниваем указанные порции.",
+        "answer": "**Справа — Овсяные хлопья, сухие: ≈ 13,1 г белка.**\n\nСлева: **≈ 12,6 г** · Справа: **≈ 13,1 г**.",
+        "notes": "Засчитывать: «справа», название еды или очевидный разговорный вариант.\n\nЧечевица, варёная: 7,9 г белка на 100 г съедобной части.\n160 × 7,9 / 100 = 12,64 г; на экране ≈ 12,6 г.\nИсточник: https://www.nutridatabaze.cz/potraviny/?id=495\n\nОвсяные хлопья, сухие: 13,1 г белка на 100 г съедобной части.\n100 × 13,1 / 100 = 13,1 г; на экране ≈ 13,1 г.\nИсточник: https://www.nutridatabaze.cz/potraviny/?id=188\n\nРазница по исходным справочным значениям: 0,46 г (3,5% от большего значения). С ростом стоимости уменьшаются и абсолютная, и относительная разница.\n\nПравильный ответ определяется приведёнными справочными значениями для видов еды. Это особенно важно для почти равных сравнений: конкретные продукты и способы приготовления могут давать другие цифры. Округление до 0,1 г применяется после расчёта порции.\n\nСравниваем белок в указанных порциях. Фасоль и чечевица взвешены после варки, овсянка — сухой; яйца и курица — сырыми, яйца без скорлупы. Молоко взвешено в граммах. Фото иллюстративные, массу задаёт подпись.\n\nФото:\nЧечевица, варёная: https://commons.wikimedia.org/wiki/File:Liat_Portal_for_Foodie_Disorder_-_Cooked_Lentils_with_Caramelized_Onions.jpg\nАвтор: <a href=\"//commons.wikimedia.org/w/index.php?title=User:HaJunkiyada&amp;action=edit&amp;redlink=1\" class=\"new\" title=\"User:HaJunkiyada (page does not exist)\">HaJunkiyada</a>; лицензия: CC BY-SA 4.0.\n\nОвсяные хлопья, сухие: https://commons.wikimedia.org/wiki/File:Rolled_oats_in_bowl_2.jpg\nАвтор: <a href=\"//commons.wikimedia.org/w/index.php?title=User:Bodhi_Peace&amp;action=edit&amp;redlink=1\" class=\"new\" title=\"User:Bodhi Peace (page does not exist)\">Bodhi Peace</a>; лицензия: CC BY-SA 4.0.",
+        "dailyDouble": false,
+        "modifier": null,
+        "responseType": "free",
+        "slowReveal": false
+      },
+      {
+        "id": "6f553d05f63b",
+        "value": 1500,
+        "prompt": "Где больше белка по справочным данным?\n\n| Слева | Справа |\n| :---: | :---: |\n| <img src=\"/media/e8097284891f37dfe24d8a7ce067dc0acce80140ea4f5621.jpg\" alt=\"Молоко, 1,5%\" width=\"250\" height=\"180\"> | <img src=\"/media/e6ce74113961435a95111e7037ccc1061d859f8adf3c971e.jpg\" alt=\"Тыквенные семечки, очищенные\" width=\"250\" height=\"180\"> |\n| **Молоко, 1,5%**<br>**500 г** | **Тыквенные семечки, очищенные**<br>**50 г** |\n\nСравниваем указанные порции.",
+        "answer": "**Справа — Тыквенные семечки, очищенные: ≈ 16,9 г белка.**\n\nСлева: **≈ 16,5 г** · Справа: **≈ 16,9 г**.",
+        "notes": "Засчитывать: «справа», название еды или очевидный разговорный вариант.\n\nМолоко, 1,5%: 3,3 г белка на 100 г съедобной части.\n500 × 3,3 / 100 = 16,5 г; на экране ≈ 16,5 г.\nИсточник: https://www.nutridatabaze.cz/potraviny/?id=113\n\nТыквенные семечки, очищенные: 33,8 г белка на 100 г съедобной части.\n50 × 33,8 / 100 = 16,9 г; на экране ≈ 16,9 г.\nИсточник: https://www.nutridatabaze.cz/potraviny/?id=369\n\nРазница по исходным справочным значениям: 0,4 г (2,4% от большего значения). С ростом стоимости уменьшаются и абсолютная, и относительная разница.\n\nПравильный ответ определяется приведёнными справочными значениями для видов еды. Это особенно важно для почти равных сравнений: конкретные продукты и способы приготовления могут давать другие цифры. Округление до 0,1 г применяется после расчёта порции.\n\nСравниваем белок в указанных порциях. Фасоль и чечевица взвешены после варки, овсянка — сухой; яйца и курица — сырыми, яйца без скорлупы. Молоко взвешено в граммах. Фото иллюстративные, массу задаёт подпись.\n\nФото:\nМолоко, 1,5%: https://commons.wikimedia.org/wiki/File:Glass_of_Milk_(33657535532).jpg\nАвтор: <a rel=\"nofollow\" class=\"external text\" href=\"https://www.flickr.com/people/54591706@N02\">NIAID</a>; лицензия: CC BY 2.0.\n\nТыквенные семечки, очищенные: https://commons.wikimedia.org/wiki/File:Shelled_and_fried_pumpkin_seeds.jpg\nАвтор: <a href=\"//commons.wikimedia.org/wiki/User:Fumikas_Sagisavas\" title=\"User:Fumikas Sagisavas\">Fumikas Sagisavas</a>; лицензия: CC0.",
+        "dailyDouble": false,
+        "modifier": null,
+        "responseType": "free",
+        "slowReveal": false
+      },
+      {
+        "id": "345e42470312",
+        "value": 1800,
+        "prompt": "Где больше белка по справочным данным?\n\n| Слева | Справа |\n| :---: | :---: |\n| <img src=\"/media/c38ef87dd8ba663ccdf9633e895bd98b82efcace376bf8c6.jpg\" alt=\"Пармезан\" width=\"250\" height=\"180\"> | <img src=\"/media/a4efaa86c3fa37667f657afb9d5d9d7d575bebad1241c570.jpg\" alt=\"Куриная грудка без кожи, сырая\" width=\"250\" height=\"180\"> |\n| **Пармезан**<br>**70 г** | **Куриная грудка без кожи, сырая**<br>**100 г** |\n\nСравниваем указанные порции.",
+        "answer": "**Справа — Куриная грудка без кожи, сырая: ≈ 22,8 г белка.**\n\nСлева: **≈ 22,7 г** · Справа: **≈ 22,8 г**.",
+        "notes": "Засчитывать: «справа», название еды или очевидный разговорный вариант.\n\nПармезан: 32,4 г белка на 100 г съедобной части.\n70 × 32,4 / 100 = 22,68 г; на экране ≈ 22,7 г.\nИсточник: https://www.parmigianoreggiano.com/product-guide-nutritional-characteristics\n\nКуриная грудка без кожи, сырая: 22,8 г белка на 100 г съедобной части.\n100 × 22,8 / 100 = 22,8 г; на экране ≈ 22,8 г.\nИсточник: https://www.nutridatabaze.cz/potraviny/?id=230\n\nРазница по исходным справочным значениям: 0,12 г (0,5% от большего значения). С ростом стоимости уменьшаются и абсолютная, и относительная разница.\n\nПравильный ответ определяется приведёнными справочными значениями для видов еды. Это особенно важно для почти равных сравнений: конкретные продукты и способы приготовления могут давать другие цифры. Округление до 0,1 г применяется после расчёта порции.\n\nСравниваем белок в указанных порциях. Фасоль и чечевица взвешены после варки, овсянка — сухой; яйца и курица — сырыми, яйца без скорлупы. Молоко взвешено в граммах. Фото иллюстративные, массу задаёт подпись.\n\nФото:\nПармезан: https://commons.wikimedia.org/wiki/File:Parmigiano_Reggiano,_Italien,_Europ%C3%A4ische_Union.jpg\nАвтор: <a href=\"//commons.wikimedia.org/wiki/User:Naturpuur\" title=\"User:Naturpuur\">Naturpuur</a>; лицензия: CC BY-SA 4.0.\n\nКуриная грудка без кожи, сырая: https://www.nutridatabaze.cz/potraviny/?id=230\nАвтор: Nutridatabaze.cz / ÚZEI; лицензия: Фото со страницы справочника.",
+        "dailyDouble": false,
+        "modifier": null,
+        "responseType": "free",
+        "slowReveal": false
+      }
+    ]
+  },
+  "entries": [
+    [
+      {
+        "key": "eggs",
+        "label": "Куриные яйца, сырые, без скорлупы",
+        "grams": 100,
+        "per100": 12.5,
+        "protein": 12.5,
+        "source": "https://www.nutridatabaze.cz/potraviny/?id=78",
+        "exactProtein": 12.5
+      },
+      {
+        "key": "quark",
+        "label": "Мягкий обезжиренный творог",
+        "grams": 200,
+        "per100": 12.2,
+        "protein": 24.4,
+        "source": "https://www.nutridatabaze.cz/potraviny/?id=130",
+        "exactProtein": 24.4
+      }
+    ],
+    [
+      {
+        "key": "peanut-butter",
+        "label": "Арахисовая паста",
+        "grams": 40,
+        "per100": 27.7,
+        "protein": 11.1,
+        "source": "https://www.nutridatabaze.cz/potraviny/?id=464",
+        "exactProtein": 11.08
+      },
+      {
+        "key": "yogurt",
+        "label": "Натуральный йогурт, 3,5%",
+        "grams": 200,
+        "per100": 4.5,
+        "protein": 9,
+        "source": "https://www.nutridatabaze.cz/potraviny/?id=126",
+        "exactProtein": 9
+      }
+    ],
+    [
+      {
+        "key": "beans",
+        "label": "Белая фасоль, варёная",
+        "grams": 100,
+        "per100": 8.9,
+        "protein": 8.9,
+        "source": "https://www.nutridatabaze.cz/potraviny/?id=496",
+        "exactProtein": 8.9
+      },
+      {
+        "key": "milk",
+        "label": "Молоко, 1,5%",
+        "grams": 250,
+        "per100": 3.3,
+        "protein": 8.3,
+        "source": "https://www.nutridatabaze.cz/potraviny/?id=113",
+        "exactProtein": 8.25
+      }
+    ],
+    [
+      {
+        "key": "lentils",
+        "label": "Чечевица, варёная",
+        "grams": 160,
+        "per100": 7.9,
+        "protein": 12.6,
+        "source": "https://www.nutridatabaze.cz/potraviny/?id=495",
+        "exactProtein": 12.64
+      },
+      {
+        "key": "oats",
+        "label": "Овсяные хлопья, сухие",
+        "grams": 100,
+        "per100": 13.1,
+        "protein": 13.1,
+        "source": "https://www.nutridatabaze.cz/potraviny/?id=188",
+        "exactProtein": 13.1
+      }
+    ],
+    [
+      {
+        "key": "milk",
+        "label": "Молоко, 1,5%",
+        "grams": 500,
+        "per100": 3.3,
+        "protein": 16.5,
+        "source": "https://www.nutridatabaze.cz/potraviny/?id=113",
+        "exactProtein": 16.5
+      },
+      {
+        "key": "seeds",
+        "label": "Тыквенные семечки, очищенные",
+        "grams": 50,
+        "per100": 33.8,
+        "protein": 16.9,
+        "source": "https://www.nutridatabaze.cz/potraviny/?id=369",
+        "exactProtein": 16.9
+      }
+    ],
+    [
+      {
+        "key": "parmesan",
+        "label": "Пармезан",
+        "grams": 70,
+        "per100": 32.4,
+        "protein": 22.7,
+        "source": "https://www.parmigianoreggiano.com/product-guide-nutritional-characteristics",
+        "exactProtein": 22.68
+      },
+      {
+        "key": "chicken",
+        "label": "Куриная грудка без кожи, сырая",
+        "grams": 100,
+        "per100": 22.8,
+        "protein": 22.8,
+        "source": "https://www.nutridatabaze.cz/potraviny/?id=230",
+        "exactProtein": 22.8
+      }
+    ]
+  ],
+  "assets": [
+    {
+      "key": "eggs",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/12/6-Pack-Chicken-Eggs.jpg/500px-6-Pack-Chicken-Eggs.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "source": "https://commons.wikimedia.org/wiki/File:6-Pack-Chicken-Eggs.jpg",
+      "credit": "<a href=\"//commons.wikimedia.org/wiki/User:Evan-Amos\" title=\"User:Evan-Amos\">Evan-Amos</a>",
+      "license": "Public domain",
+      "type": "image/jpeg",
+      "path": "research/protein-lebowski/unbranded/eggs.jpg",
+      "sha256": "61b0e99e716dd6d9dcca844a546afc5e57866fff243d6a99cad233f30203f796",
+      "mediaUrl": "/media/bafeed483e97659c1d6b8151720457a8ad93a176802dc12b.jpg"
+    },
+    {
+      "key": "quark",
+      "path": "research/protein-lebowski/quark.jpg",
+      "type": "image/jpeg",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7b/Skimmed_milk_quark_on_spoon.jpg/500px-Skimmed_milk_quark_on_spoon.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "source": "https://commons.wikimedia.org/wiki/File:Skimmed_milk_quark_on_spoon.jpg",
+      "credit": "<a href=\"//commons.wikimedia.org/wiki/User:SKopp\" title=\"User:SKopp\">SKopp</a>",
+      "license": "CC BY-SA 4.0",
+      "sha256": "56d69612a3e176a150ced4c6a0fa07da6929789a6269f9e61209332b3766ad52",
+      "mediaUrl": "/media/b80478f6fa72f098fb36905e25ac84a3a649496f668400b4.jpg"
+    },
+    {
+      "key": "peanut-butter",
+      "path": "research/protein-lebowski/peanut-butter.jpg",
+      "type": "image/jpeg",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b0/Peanut_butter_glass_3.jpg/500px-Peanut_butter_glass_3.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "source": "https://commons.wikimedia.org/wiki/File:Peanut_butter_glass_3.jpg",
+      "credit": "<a href=\"//commons.wikimedia.org/wiki/User:Shisma\" title=\"User:Shisma\">Shisma</a>",
+      "license": "CC BY 4.0",
+      "sha256": "98c9643c810d24f72a78b24ff618116f775ce8e160a028456dbdd2b3563f0d7f",
+      "mediaUrl": "/media/ae6a58936e40979be4ff9923e4daca4bd9b76ba257a68463.jpg"
+    },
+    {
+      "key": "yogurt",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Plain_Yogurt.jpg/500px-Plain_Yogurt.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "source": "https://commons.wikimedia.org/wiki/File:Plain_Yogurt.jpg",
+      "credit": "Alabama Extension",
+      "license": "CC0",
+      "type": "image/jpeg",
+      "path": "research/protein-lebowski/unbranded/yogurt.jpg",
+      "sha256": "639eef40b7985d18027c1834eef8f664b815e295a29ec39701898894cce6c2d2",
+      "mediaUrl": "/media/d6fd6aaffd128727d6edc8262d717ee33e12b98a7923ee68.jpg"
+    },
+    {
+      "key": "beans",
+      "path": "research/protein-lebowski/beans.webp",
+      "type": "image/webp",
+      "image": "https://media.bonduelle.com/mzp_111999/03083681003901-hd-weisse_bohnen_bonduelle_maxi_zone_12292.webp",
+      "source": "https://www.bonduelle.cz/zelenina/p/vapeur-cannellini/03083681003901",
+      "credit": "Bonduelle",
+      "license": "Official product image",
+      "sha256": "ce97b69c82063ef5757a3d7fb62befd2a38278910b995f9963059bd657ad4f68",
+      "mediaUrl": "/media/06e690e2fd85fe4944d186d01c54e43da9f86f28520d10c1.webp"
+    },
+    {
+      "key": "milk",
+      "path": "research/protein-lebowski/milk.jpg",
+      "type": "image/jpeg",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a5/Glass_of_Milk_%2833657535532%29.jpg/500px-Glass_of_Milk_%2833657535532%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "source": "https://commons.wikimedia.org/wiki/File:Glass_of_Milk_(33657535532).jpg",
+      "credit": "<a rel=\"nofollow\" class=\"external text\" href=\"https://www.flickr.com/people/54591706@N02\">NIAID</a>",
+      "license": "CC BY 2.0",
+      "sha256": "6f87f6f559b6506599f9d24bf5f7ed94375ae8fe509d4c85bf68e45cc9b30f60",
+      "mediaUrl": "/media/e8097284891f37dfe24d8a7ce067dc0acce80140ea4f5621.jpg"
+    },
+    {
+      "key": "lentils",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/93/Liat_Portal_for_Foodie_Disorder_-_Cooked_Lentils_with_Caramelized_Onions.jpg/500px-Liat_Portal_for_Foodie_Disorder_-_Cooked_Lentils_with_Caramelized_Onions.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "source": "https://commons.wikimedia.org/wiki/File:Liat_Portal_for_Foodie_Disorder_-_Cooked_Lentils_with_Caramelized_Onions.jpg",
+      "credit": "<a href=\"//commons.wikimedia.org/w/index.php?title=User:HaJunkiyada&amp;action=edit&amp;redlink=1\" class=\"new\" title=\"User:HaJunkiyada (page does not exist)\">HaJunkiyada</a>",
+      "license": "CC BY-SA 4.0",
+      "type": "image/jpeg",
+      "path": "research/protein-lebowski/unbranded/lentils.jpg",
+      "sha256": "77addce00162459c63ede6c650ca308bcfc600630a8b98ded6a3a43deee37790",
+      "mediaUrl": "/media/8dd234b8c9c3bb9702398be3369e162f6ea2109d42e1b4ab.jpg"
+    },
+    {
+      "key": "oats",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c8/Rolled_oats_in_bowl_2.jpg/500px-Rolled_oats_in_bowl_2.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "source": "https://commons.wikimedia.org/wiki/File:Rolled_oats_in_bowl_2.jpg",
+      "credit": "<a href=\"//commons.wikimedia.org/w/index.php?title=User:Bodhi_Peace&amp;action=edit&amp;redlink=1\" class=\"new\" title=\"User:Bodhi Peace (page does not exist)\">Bodhi Peace</a>",
+      "license": "CC BY-SA 4.0",
+      "type": "image/jpeg",
+      "path": "research/protein-lebowski/unbranded/oats.jpg",
+      "sha256": "e89aa17612e238063c951ac920e098c232db87b5d77f7b4bb602600f5b4532d4",
+      "mediaUrl": "/media/6ac153a3fb12a966f270a5298e7f8a3da88da55839d18f57.jpg"
+    },
+    {
+      "key": "seeds",
+      "path": "research/protein-lebowski/seeds.jpg",
+      "type": "image/jpeg",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/da/Shelled_and_fried_pumpkin_seeds.jpg/500px-Shelled_and_fried_pumpkin_seeds.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "source": "https://commons.wikimedia.org/wiki/File:Shelled_and_fried_pumpkin_seeds.jpg",
+      "credit": "<a href=\"//commons.wikimedia.org/wiki/User:Fumikas_Sagisavas\" title=\"User:Fumikas Sagisavas\">Fumikas Sagisavas</a>",
+      "license": "CC0",
+      "sha256": "1adcbff4ca8bf0b8adf14f22cb563880a1a1e7fe23307b631bf426976f7583e1",
+      "mediaUrl": "/media/e6ce74113961435a95111e7037ccc1061d859f8adf3c971e.jpg"
+    },
+    {
+      "key": "parmesan",
+      "path": "research/protein-lebowski/parmesan.jpg",
+      "type": "image/jpeg",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d1/Parmigiano_Reggiano%2C_Italien%2C_Europ%C3%A4ische_Union.jpg/500px-Parmigiano_Reggiano%2C_Italien%2C_Europ%C3%A4ische_Union.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "source": "https://commons.wikimedia.org/wiki/File:Parmigiano_Reggiano,_Italien,_Europ%C3%A4ische_Union.jpg",
+      "credit": "<a href=\"//commons.wikimedia.org/wiki/User:Naturpuur\" title=\"User:Naturpuur\">Naturpuur</a>",
+      "license": "CC BY-SA 4.0",
+      "sha256": "181b5fa3e9368fd3fa33b5c343fa64cf9003f78f20e458b83d6a0cae167f6af9",
+      "mediaUrl": "/media/c38ef87dd8ba663ccdf9633e895bd98b82efcace376bf8c6.jpg"
+    },
+    {
+      "key": "chicken",
+      "image": "https://www.nutridatabaze.cz/obj/files/1/sys_media_256.jpg",
+      "source": "https://www.nutridatabaze.cz/potraviny/?id=230",
+      "credit": "Nutridatabaze.cz / ÚZEI",
+      "license": "Фото со страницы справочника",
+      "type": "image/jpeg",
+      "path": "research/protein-lebowski/unbranded/chicken.jpg",
+      "sha256": "425551d2f37f93d095418cf3c772c1ebfdba97bc60bdfde86685905c988a7c1c",
+      "mediaUrl": "/media/a4efaa86c3fa37667f657afb9d5d9d7d575bebad1241c570.jpg"
+    }
+  ],
+  "difficulty": [
+    {
+      "value": 300,
+      "left": 12.5,
+      "right": 24.4,
+      "exactGap": 11.899999999999999,
+      "displayedGap": 11.9,
+      "relativeGap": 0.48770491803278687
+    },
+    {
+      "value": 600,
+      "left": 11.1,
+      "right": 9,
+      "exactGap": 2.08,
+      "displayedGap": 2.1,
+      "relativeGap": 0.18772563176895307
+    },
+    {
+      "value": 900,
+      "left": 8.9,
+      "right": 8.3,
+      "exactGap": 0.6500000000000004,
+      "displayedGap": 0.6,
+      "relativeGap": 0.07303370786516858
+    },
+    {
+      "value": 1200,
+      "left": 12.6,
+      "right": 13.1,
+      "exactGap": 0.4599999999999991,
+      "displayedGap": 0.5,
+      "relativeGap": 0.035114503816793825
+    },
+    {
+      "value": 1500,
+      "left": 16.5,
+      "right": 16.9,
+      "exactGap": 0.3999999999999986,
+      "displayedGap": 0.4,
+      "relativeGap": 0.023668639053254354
+    },
+    {
+      "value": 1800,
+      "left": 22.7,
+      "right": 22.8,
+      "exactGap": 0.120000000000001,
+      "displayedGap": 0.1,
+      "relativeGap": 0.005263157894736885
+    }
+  ]
+}

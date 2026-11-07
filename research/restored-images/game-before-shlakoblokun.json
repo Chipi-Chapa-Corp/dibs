@@ -1,0 +1,60 @@
+{
+  "format": "jeopardy/1",
+  "name": "Это моя игра",
+  "subtitle": "",
+  "rounds": [
+    {
+      "id": "eyk9sz9y",
+      "name": "Round 1",
+      "type": "board",
+      "categories": [
+        {
+          "id": "3036pxdv",
+          "name": "Шлакоблокунь",
+          "questions": [
+            {
+              "id": "21239e0a8947",
+              "value": 500,
+              "prompt": "![Ребус](/media/b3190600cab471f48f88b91e7d5bd83fb5b698c2eaef013a.png)",
+              "answer": "макакао",
+              "notes": "",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "settings": {
+    "buzzMode": "first",
+    "autoOpenBuzzers": true,
+    "earlyPenaltyMs": 750,
+    "deductWrong": true,
+    "wrongMultiplier": 1,
+    "correctMultiplier": 1,
+    "allowNegative": true,
+    "reopenWrong": true,
+    "lockWrong": true,
+    "revealDelayMs": 900,
+    "showLeaderboardOnStage": true,
+    "startingScore": 0,
+    "finalMaxWager": "score"
+  },
+  "theme": {
+    "preset": "paper",
+    "accent": "#b7482d",
+    "paper": "#ece9e0",
+    "ink": "#252620",
+    "surface": "#f6f3eb",
+    "muted": "#6e7166",
+    "line": "#c9c9be",
+    "displayFont": "serif",
+    "background": "",
+    "motion": true,
+    "sound": false,
+    "title": ""
+  }
+}

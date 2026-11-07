@@ -1,0 +1,42 @@
+{
+  "status": "Research only; awaiting approval before creating category",
+  "candidates": [
+    {
+      "name": "Обратный нордик",
+      "answer": "Квадрицепсы",
+      "path": "/Users/mychkvad/Projects/dibs/research/gym-candidates/harder/reverse-nordic.gif",
+      "source": "https://www.strengthlog.com/reverse-nordic/",
+      "url": "https://www.strengthlog.com/wp-content/uploads/2025/06/reverse-nordic.gif"
+    },
+    {
+      "name": "Копенгагенская планка",
+      "answer": "Приводящие мышцы бедра",
+      "path": "/Users/mychkvad/Projects/dibs/research/gym-candidates/harder/copenhagen.gif",
+      "source": "https://www.strengthlog.com/copenhagen-plank/",
+      "url": "https://www.strengthlog.com/wp-content/uploads/2025/06/copenhagen-plank.gif"
+    },
+    {
+      "name": "Разгибания на низкой перекладине",
+      "answer": "Трицепс",
+      "path": "/Users/mychkvad/Projects/dibs/research/gym-candidates/harder/bodyweight-triceps-extension.gif",
+      "source": "https://www.strengthlog.com/triceps-bodyweight-extension/",
+      "url": "https://www.strengthlog.com/wp-content/uploads/2023/02/Bodyweight-triceps-extension.gif"
+    },
+    {
+      "name": "Сисси-приседания",
+      "answer": "Квадрицепсы",
+      "path": "/Users/mychkvad/Projects/dibs/research/gym-candidates/harder/sissy-squat.gif",
+      "source": "https://www.strengthlog.com/best-bodyweight-exercises/",
+      "url": "https://www.strengthlog.com/wp-content/uploads/2025/11/Sissy-squat.gif"
+    }
+  ],
+  "notes": [
+    "Bar triceps extension is a related alternative to the previously proposed floor Body-Up.",
+    "Sissy squat is an extra option; it repeats the reverse Nordic quadriceps answer.",
+    "Around-the-worlds GIF rejected from main shortlist due to 321x213 quality.",
+    "Kneeling squat available as a low-detail two-frame sketch only.",
+    "No suitable clean anti-gravity GIF verified.",
+    "GIF upload verified in isolated temporary server; real game unchanged.",
+    "Buzz pauses reveal mask, not GIF frame playback."
+  ]
+}

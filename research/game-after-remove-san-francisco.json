@@ -1,0 +1,303 @@
+{
+  "format": "jeopardy/1",
+  "name": "Это моя игра",
+  "subtitle": "",
+  "rounds": [
+    {
+      "id": "eyk9sz9y",
+      "name": "Round 1",
+      "type": "board",
+      "categories": [
+        {
+          "id": "3036pxdv",
+          "name": "Шлакоблокунь",
+          "questions": [
+            {
+              "id": "ac9382d1bf34",
+              "value": 100,
+              "prompt": "![Ребус](/media/d62a335636bc37691f8d0c7cfc965cd3b4e7f845dd54931a.png)",
+              "answer": "жабаунти",
+              "notes": "",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "0a45454f09d0",
+              "value": 200,
+              "prompt": "![Ребус](/media/24e5d4e26c0774d6f8b17b977f352611b2ebeb3e1d281d95.png)",
+              "answer": "крабрикос",
+              "notes": "",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "6ec7e95fbe4e",
+              "value": 300,
+              "prompt": "![Ребус](/media/ab4e958f5c6c6312773fd6ec76aa1d3c67eb738854c6c600.png)",
+              "answer": "крысало",
+              "notes": "",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "21239e0a8947",
+              "value": 400,
+              "prompt": "![Ребус](/media/b3190600cab471f48f88b91e7d5bd83fb5b698c2eaef013a.png)",
+              "answer": "макакао",
+              "notes": "",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "2ff1cdfbc4b3",
+              "value": 500,
+              "prompt": "![Ребус](/media/059845f48c4007fd0a4b4eb291b57c534f67023561ea140d.png)",
+              "answer": "комаркер",
+              "notes": "",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "08faeecc15cf",
+              "value": 600,
+              "prompt": "![Ребус](/media/f184f457bba47860510b44220f673225b5c4d3ab6982397e.png)",
+              "answer": "пудельфин",
+              "notes": "",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "e78b9c03de5c",
+              "value": 700,
+              "prompt": "![Ребус](/media/32446e985f9a1aac0738a10eeb807521579a878c6f02a5f0.png)",
+              "answer": "джинитки",
+              "notes": "",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "b4eb6dc11fdc",
+              "value": 800,
+              "prompt": "![Ребус](/media/e9154cb3d3ec0268d9b7c1f4df863df33282508381a40dfa.png)",
+              "answer": "жемчугорь",
+              "notes": "",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            }
+          ]
+        },
+        {
+          "id": "99490949a690",
+          "name": "Майнкрафтляндия",
+          "questions": [
+            {
+              "id": "8b9aa5ba36b0",
+              "value": 100,
+              "prompt": "Какой город воссоздан в Minecraft?\n\n![Город в Minecraft](/media/6c096dfea1b43975ede51960fd50233d571d9ec0f4027128.jpg)",
+              "answer": "Прага",
+              "notes": "Ориентир: Староместская площадь и Тынский храм\nАвтор: Zeemo\nИсточник: https://www.planetminecraft.com/project/old-town-square-prague-czech/\nИзображение: https://static.planetminecraft.com/files/resource_media/screenshot/1632/prague_610444403_lrg.jpg",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "1edc797de9c7",
+              "value": 200,
+              "prompt": "Какой город воссоздан в Minecraft?\n\n![Город в Minecraft](/media/215add4a3ac70ae4a30c01eeb943fdd565cc958b6a40db96.png)",
+              "answer": "Лондон",
+              "notes": "Ориентир: Биг-Бен, парламент и London Eye\nАвтор: Build the UK / BuildTheEarth\nИсточник: https://buildtheearth.net/gallery?all=1\nИзображение: https://cdn.buildtheearth.net/uploads/eb77848b6a8eeb338e2793a80daa31adf92f81d9aff0627be2d7332c4db68fde",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "8803a1af8ad6",
+              "value": 300,
+              "prompt": "Какой город воссоздан в Minecraft?\n\n![Город в Minecraft](/media/8fa086fe851163f91d5f084ae6c29e06b94937719f5e8871.png)",
+              "answer": "Париж",
+              "notes": "Ориентир: Триумфальная арка\nИсточник: https://www.youtube.com/watch?v=jchmb6wygG4&t=512s\nСкриншот предоставлен пользователем. Удалена рамка и улучшена чёткость встроенным image_gen; оригинал сохранён.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "8104d516b014",
+              "value": 400,
+              "prompt": "Какой город воссоздан в Minecraft?\n\n![Город в Minecraft](/media/57a80ed211e4a63d4b5fe7d130602f2306af55b0114ebccc.webp)",
+              "answer": "Сидней",
+              "notes": "Ориентир: Оперный театр\nАвтор: Lockenoia\nИсточник: https://www.planetminecraft.com/project/sydney-opera-house-4506513/\nИзображение: https://static.planetminecraft.com/files/image/minecraft/project/2020/513/12708289-to_l.jpg",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "9f3fbae53149",
+              "value": 500,
+              "prompt": "Какой город воссоздан в Minecraft?\n\n![Город в Minecraft](/media/aaf5203ab56e527aa5c07251760c110927d17656726911c8.jpg)",
+              "answer": "Рим",
+              "notes": "Ориентир: Колизей\nАвтор: Octovon\nИсточник: https://www.minecraft.net/en-us/marketplace/pdp/octovon/cityscapes-rome/6468cae2-819f-4390-a64b-ccc4734806cc\nИзображение: https://xforgeassets002.xboxlive.com/pf-namespace-b63a0803d3653643/6e1dd849-1d57-4b05-8d08-05e47ef1993e/Rome_Screenshot_0.jpg",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "1c527a8e6a66",
+              "value": 600,
+              "prompt": "Какой город воссоздан в Minecraft?\n\n![Город в Minecraft](/media/32cb219d23d483cc32269c8d6cbba18eca199f132f630813.png)",
+              "answer": "Рио-де-Жанейро",
+              "notes": "Ориентир: Статуя Христа на Корковаду\nАвтор: BTE Brasil\nИсточник: https://buildtheearth.net/gallery?all=1\nИзображение: https://cdn.buildtheearth.net/uploads/1f815e9908613e64344b9b9206b6cb9a1c2bedc093597fe4a60045e9929a3c2b",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "e825a114ac39",
+              "value": 800,
+              "prompt": "Какой город воссоздан в Minecraft?\n\n![Город в Minecraft](/media/ca87eb16f7141103a3a2a58acca1b9af42d60dbd23406e02.png)",
+              "answer": "Вашингтон",
+              "notes": "Ориентир: Монумент Вашингтону, мемориалы Линкольна и Джефферсона\nИсточник: https://www.youtube.com/watch?v=jchmb6wygG4&t=1272s\nСкриншот предоставлен пользователем. Удалена рамка и улучшена чёткость встроенным image_gen; оригинал сохранён.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            },
+            {
+              "id": "af87d8f310de",
+              "value": 900,
+              "prompt": "Какой город воссоздан в Minecraft?\n\n![Город в Minecraft](/media/4275e6803ba9a0c93461e9d425fc820dab31f0956f06db02.png)",
+              "answer": "Берлин",
+              "notes": "Ориентир: Бранденбургские ворота\nИсточник: https://www.youtube.com/watch?v=jchmb6wygG4&t=1119s\nСкриншот предоставлен пользователем. Удалена рамка и улучшена чёткость встроенным image_gen; оригинал сохранён.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": true
+            }
+          ]
+        },
+        {
+          "id": "1e1d9f2c98b8",
+          "name": "Казино",
+          "questions": [
+            {
+              "id": "a9d307e4d408",
+              "value": 100,
+              "prompt": "Красное, чёрное или зеро?",
+              "answer": "красное",
+              "notes": "Угадайте заранее выбранный результат.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "d4d765f083d7",
+              "value": 200,
+              "prompt": "Красное, чёрное или зеро?",
+              "answer": "чёрное",
+              "notes": "Угадайте заранее выбранный результат.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "0cea339995f8",
+              "value": 300,
+              "prompt": "Красное, чёрное или зеро?",
+              "answer": "красное",
+              "notes": "Угадайте заранее выбранный результат.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "e98d3c968d2a",
+              "value": 400,
+              "prompt": "Красное, чёрное или зеро?",
+              "answer": "чёрное",
+              "notes": "Угадайте заранее выбранный результат.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "e098b261e493",
+              "value": 500,
+              "prompt": "Красное, чёрное или зеро?",
+              "answer": "чёрное",
+              "notes": "Угадайте заранее выбранный результат.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            },
+            {
+              "id": "64abfc050aab",
+              "value": 600,
+              "prompt": "Красное, чёрное или зеро?",
+              "answer": "зеро",
+              "notes": "Угадайте заранее выбранный результат.",
+              "dailyDouble": false,
+              "modifier": null,
+              "responseType": "free",
+              "slowReveal": false
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "settings": {
+    "buzzMode": "first",
+    "autoOpenBuzzers": true,
+    "earlyPenaltyMs": 750,
+    "deductWrong": true,
+    "wrongMultiplier": 1,
+    "correctMultiplier": 1,
+    "allowNegative": true,
+    "reopenWrong": true,
+    "lockWrong": true,
+    "revealDelayMs": 900,
+    "showLeaderboardOnStage": true,
+    "startingScore": 0,
+    "finalMaxWager": "score"
+  },
+  "theme": {
+    "preset": "paper",
+    "accent": "#b7482d",
+    "paper": "#ece9e0",
+    "ink": "#252620",
+    "surface": "#f6f3eb",
+    "muted": "#6e7166",
+    "line": "#c9c9be",
+    "displayFont": "serif",
+    "background": "",
+    "motion": true,
+    "sound": false,
+    "title": ""
+  }
+}

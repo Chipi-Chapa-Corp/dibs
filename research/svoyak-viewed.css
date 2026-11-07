@@ -1,0 +1,10 @@
+th.viewed-heading, td.viewed-cell { width: 90px; text-align: center; }
+.viewed-label { display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; }
+.viewed-label input[type="checkbox"] { flex: none; min-width: 0; width: 22px; height: 22px; margin: 0; padding: 0; accent-color: #64785a; cursor: pointer; }
+.viewed-label input:focus-visible { outline: 3px solid #9c351b; outline-offset: 4px; }
+.viewed-label span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+@media (max-width: 800px) {
+  td.viewed-cell { width: auto; text-align: left; }
+  .viewed-label { padding: 8px 0; }
+  .viewed-label span { position: static; width: auto; height: auto; overflow: visible; clip-path: none; font-size: 14px; }
+}

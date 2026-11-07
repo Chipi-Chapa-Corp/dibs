@@ -1,0 +1,51 @@
+{
+  "gameId": "95AF7D",
+  "categoryId": "3150f1913dd9",
+  "categoryName": "Джим",
+  "questions": [
+    {
+      "exercise": "Overhead_Cable_Curl",
+      "answer": "Бицепс",
+      "value": 100,
+      "file": "Overhead_Cable_Curl.jpg",
+      "title": "Сгибания рук на верхних блоках",
+      "accepted": "Бицепс, бицепсы.",
+      "sha256": "a7a46fedb3f080efb01f334abf208f108b312197b0c9da43e2964874456e73af",
+      "mediaUrl": "/media/847b6c40ef3e9c694a4363697b8852f93dc3c0c960efdcff.jpg",
+      "source": "https://github.com/yuhonas/free-exercise-db/blob/main/exercises/Overhead_Cable_Curl.json"
+    },
+    {
+      "exercise": "Frog_Sit-Ups",
+      "answer": "Пресс",
+      "value": 200,
+      "file": "Frog_Sit-Ups-1.jpg",
+      "title": "Скручивания «лягушка»",
+      "accepted": "Пресс, мышцы живота.",
+      "sha256": "c7abcbf34aaad8fd080cdcc5de5f7bc88c1adc155b1af68781e250d219be53c6",
+      "mediaUrl": "/media/5c1d4d60c35edc30878d3eb49b3109319c6c68877dc0fe8b.jpg",
+      "source": "https://github.com/yuhonas/free-exercise-db/blob/main/exercises/Frog_Sit-Ups.json"
+    },
+    {
+      "exercise": "Barbell_Seated_Calf_Raise",
+      "answer": "Икры",
+      "value": 300,
+      "file": "Barbell_Seated_Calf_Raise.jpg",
+      "title": "Подъёмы на носки сидя со штангой",
+      "accepted": "Икры, икроножные, камбаловидные мышцы.",
+      "sha256": "d0a2841d94553d27e044315358a2f0c68c24e647355f49e05c228c6702f05232",
+      "mediaUrl": "/media/f6251ab8afe5109d20732751e330628f4a46549622905d7a.jpg",
+      "source": "https://github.com/yuhonas/free-exercise-db/blob/main/exercises/Barbell_Seated_Calf_Raise.json"
+    },
+    {
+      "exercise": "Pull_Through",
+      "answer": "Ягодицы",
+      "value": 400,
+      "file": "Pull_Through-0.jpg",
+      "title": "Протяжка каната между ног",
+      "accepted": "Ягодицы, ягодичные мышцы.",
+      "sha256": "9c0d877f1cfc455f655cac63d7b13ad41b987d46879069b5a36fb271d20cc684",
+      "mediaUrl": "/media/52266bce6e56b8256693a2f4b5f4ad206bd75ba391f8df88.jpg",
+      "source": "https://github.com/yuhonas/free-exercise-db/blob/main/exercises/Pull_Through.json"
+    }
+  ]
+}

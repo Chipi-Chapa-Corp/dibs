@@ -1,0 +1,46 @@
+[
+  {
+    "name": "paris",
+    "city": "Париж",
+    "source": "https://www.youtube.com/watch?v=jchmb6wygG4&t=512s",
+    "detail": "Preserve the central Arc de Triomphe, its existing French tricolor flags, cobblestone avenue and cubic trees, pale stone buildings on both sides, original blue Minecraft sky, and central vanishing point. Remove the wide cyan vertical bars at both sides. Do not add an Eiffel Tower or alter the landmark.",
+    "prompt": "Use case: precise-object-edit. Asset type: screenshot restoration for a Minecraft city identification quiz. The supplied image is the EDIT TARGET. Restore this exact Minecraft screenshot, not a new interpretation. Remove every cyan/blue video-frame strip and thin border along the edges, filling the removed frame only with matching continuation of the pictured scene. Improve sharpness and reduce video blur/compression while preserving crisp cubic Minecraft block geometry, original architecture, block textures, perspective, camera crop, lighting and colors. Do not turn the build into a realistic photograph or add architecture, signs, landmarks, decorations or objects. Keep recognizable details and all useful clue content in exactly the same arrangement. Clean edge-to-edge landscape scene, no external frame, no caption or city name, no logo, no text or watermark. About 1080p class, ideally 1440x1080 or similar suitable landscape aspect ratio, not 4K. Preserve the central Arc de Triomphe, its existing French tricolor flags, cobblestone avenue and cubic trees, pale stone buildings on both sides, original blue Minecraft sky, and central vanishing point. Remove the wide cyan vertical bars at both sides. Do not add an Eiffel Tower or alter the landmark.",
+    "path": "research/minecraft-images/paris-restored.png",
+    "generatedPath": "/Users/mychkvad/.codex/generated_images/01a1a8ff-d244-7ee2-9a61-bb8ef9eacf43/exec-994f8359-ab1f-48c2-9579-0190957cff2c.png",
+    "sha256": "32029044cc204b166df9ee730aa0fa5e7a742583e1c89d3fd536d30aab645573",
+    "mediaUrl": "/media/8fa086fe851163f91d5f084ae6c29e06b94937719f5e8871.png"
+  },
+  {
+    "name": "washington",
+    "city": "Вашингтон",
+    "source": "https://www.youtube.com/watch?v=jchmb6wygG4&t=1272s",
+    "detail": "Preserve the Washington Monument obelisk left of center, long rectangular reflecting pool in foreground left, colonnaded memorial in the center background, domed Jefferson Memorial on the right, water and cherry trees, and the square Minecraft sun near upper left. Keep this exact existing build layout rather than correcting geography or substituting the Capitol. Remove only thin cyan border, clean image blur.",
+    "prompt": "Use case: precise-object-edit. Asset type: screenshot restoration for a Minecraft city identification quiz. The supplied image is the EDIT TARGET. Restore this exact Minecraft screenshot, not a new interpretation. Remove every cyan/blue video-frame strip and thin border along the edges, filling the removed frame only with matching continuation of the pictured scene. Improve sharpness and reduce video blur/compression while preserving crisp cubic Minecraft block geometry, original architecture, block textures, perspective, camera crop, lighting and colors. Do not turn the build into a realistic photograph or add architecture, signs, landmarks, decorations or objects. Keep recognizable details and all useful clue content in exactly the same arrangement. Clean edge-to-edge landscape scene, no external frame, no caption or city name, no logo, no text or watermark. About 1080p class, ideally 1440x1080 or similar suitable landscape aspect ratio, not 4K. Preserve the Washington Monument obelisk left of center, long rectangular reflecting pool in foreground left, colonnaded memorial in the center background, domed Jefferson Memorial on the right, water and cherry trees, and the square Minecraft sun near upper left. Keep this exact existing build layout rather than correcting geography or substituting the Capitol. Remove only thin cyan border, clean image blur.",
+    "path": "research/minecraft-images/washington-restored.png",
+    "generatedPath": "/Users/mychkvad/.codex/generated_images/01a1a8ff-d244-7ee2-9a61-bb8ef9eacf43/exec-bb2678f5-36ea-40d8-a5c9-e96bd6d3e506.png",
+    "sha256": "68739fe4a62f8f4ab58f1acf8ca9ae8fed0685eea7bf3d98a827309d84e78555",
+    "mediaUrl": "/media/ca87eb16f7141103a3a2a58acca1b9af42d60dbd23406e02.png"
+  },
+  {
+    "name": "san-francisco",
+    "city": "Сан-Франциско",
+    "source": "https://www.youtube.com/watch?v=jchmb6wygG4&t=1206s",
+    "detail": "Preserve the red Golden Gate suspension bridge with its main block-built tower right of center, gray/yellowish hanging cables, red deck running off the right edge and receding left into fog, blocky clouds and blue sky, water and grassy rocky shore lower left. Preserve this low camera angle and crop. Do not invent the whole bridge to fit in frame, retain its off-frame continuation. Remove thin cyan edge strips.",
+    "prompt": "Use case: precise-object-edit. Asset type: screenshot restoration for a Minecraft city identification quiz. The supplied image is the EDIT TARGET. Restore this exact Minecraft screenshot, not a new interpretation. Remove every cyan/blue video-frame strip and thin border along the edges, filling the removed frame only with matching continuation of the pictured scene. Improve sharpness and reduce video blur/compression while preserving crisp cubic Minecraft block geometry, original architecture, block textures, perspective, camera crop, lighting and colors. Do not turn the build into a realistic photograph or add architecture, signs, landmarks, decorations or objects. Keep recognizable details and all useful clue content in exactly the same arrangement. Clean edge-to-edge landscape scene, no external frame, no caption or city name, no logo, no text or watermark. About 1080p class, ideally 1440x1080 or similar suitable landscape aspect ratio, not 4K. Preserve the red Golden Gate suspension bridge with its main block-built tower right of center, gray/yellowish hanging cables, red deck running off the right edge and receding left into fog, blocky clouds and blue sky, water and grassy rocky shore lower left. Preserve this low camera angle and crop. Do not invent the whole bridge to fit in frame, retain its off-frame continuation. Remove thin cyan edge strips.",
+    "path": "research/minecraft-images/san-francisco-restored.png",
+    "generatedPath": "/Users/mychkvad/.codex/generated_images/01a1a8ff-d244-7ee2-9a61-bb8ef9eacf43/exec-1833e907-39fe-492e-8735-68e6081b40c6.png",
+    "sha256": "58d7ec92db5562fb8dcd83c856e5d400402443f00f79f988ad030a856b25fcb0",
+    "mediaUrl": "/media/a6843c1a79d2108b0fbc99fe7717f45e75448d86b30aece1.png"
+  },
+  {
+    "name": "berlin",
+    "city": "Берлин",
+    "source": "https://www.youtube.com/watch?v=jchmb6wygG4&t=1119s",
+    "detail": "Preserve this close low-angle frontal Minecraft Brandenburg Gate with the central six-column portico, blocky quadriga sculpture above, warm golden lamps between columns, pale stone with reddish decorative accents and dramatic cloudy gray sky. Keep original viewpoint and geometry; gently restore crisp block edges. Remove cyan frame on all sides, retain the same monumental crop.",
+    "prompt": "Use case: precise-object-edit. Asset type: screenshot restoration for a Minecraft city identification quiz. The supplied image is the EDIT TARGET. Restore this exact Minecraft screenshot, not a new interpretation. Remove every cyan/blue video-frame strip and thin border along the edges, filling the removed frame only with matching continuation of the pictured scene. Improve sharpness and reduce video blur/compression while preserving crisp cubic Minecraft block geometry, original architecture, block textures, perspective, camera crop, lighting and colors. Do not turn the build into a realistic photograph or add architecture, signs, landmarks, decorations or objects. Keep recognizable details and all useful clue content in exactly the same arrangement. Clean edge-to-edge landscape scene, no external frame, no caption or city name, no logo, no text or watermark. About 1080p class, ideally 1440x1080 or similar suitable landscape aspect ratio, not 4K. Preserve this close low-angle frontal Minecraft Brandenburg Gate with the central six-column portico, blocky quadriga sculpture above, warm golden lamps between columns, pale stone with reddish decorative accents and dramatic cloudy gray sky. Keep original viewpoint and geometry; gently restore crisp block edges. Remove cyan frame on all sides, retain the same monumental crop.",
+    "path": "research/minecraft-images/berlin-restored.png",
+    "generatedPath": "/Users/mychkvad/.codex/generated_images/01a1a8ff-d244-7ee2-9a61-bb8ef9eacf43/exec-59c85756-f5ca-4087-af49-1f0f87379707.png",
+    "sha256": "f4ced0bfb80a299f4cd4f72bbdef80fcb5eed11077a546948f30f1e2f3772b9a",
+    "mediaUrl": "/media/4275e6803ba9a0c93461e9d425fc820dab31f0956f06db02.png"
+  }
+]

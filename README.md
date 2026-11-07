@@ -124,7 +124,7 @@ On the first startup with the default data directory, the bundled sample is copi
 
 ## Played game: Это моя игра
 
-The completed Russian-language game is available as [examples/eto-moya-igra.json](examples/eto-moya-igra.json), with its images and audio bundled in `public/played-games/eto-moya-igra/`. Import it through **Create game → Import JSON** to play a fresh copy. See the [game guide](examples/eto-moya-igra.md) for details. Local saved sessions and preparation research remain excluded from Git.
+The completed Russian-language game is available as [examples/eto-moya-igra.json](examples/eto-moya-igra.json), with its images and audio bundled in `public/played-games/eto-moya-igra/`. Import it through **Create game → Import JSON** to play a fresh copy. See the [game guide](examples/eto-moya-igra.md) for details. Reports, sources and preparation assets are published in [research/](research/README.md). Local saved sessions remain excluded from Git.
 
 ## Commands
 

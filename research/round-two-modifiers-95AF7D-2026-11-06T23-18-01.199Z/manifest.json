@@ -1,0 +1,67 @@
+{
+  "gameId": "95AF7D",
+  "transferAmount": 900,
+  "insertions": [
+    {
+      "category": "Что было раньше?",
+      "categoryId": "a6ae3ccfae9d",
+      "value": 600,
+      "title": "Ограбление лидера",
+      "id": "d700cf503031"
+    },
+    {
+      "category": "Брейнрот",
+      "categoryId": "aef3db7257dd",
+      "value": 600,
+      "title": "Спонсор камбэка",
+      "id": "7445fc1cb814"
+    }
+  ],
+  "moves": [
+    {
+      "id": "28087c86b68e",
+      "category": "Что было раньше?",
+      "from": 600,
+      "to": 800
+    },
+    {
+      "id": "4ec42d010ddc",
+      "category": "Что было раньше?",
+      "from": 800,
+      "to": 1000
+    },
+    {
+      "id": "125e77401db8",
+      "category": "Что было раньше?",
+      "from": 1000,
+      "to": 1200
+    },
+    {
+      "id": "cfcffee7b8ba",
+      "category": "Брейнрот",
+      "from": 600,
+      "to": 800
+    },
+    {
+      "id": "2fa97fef20e5",
+      "category": "Брейнрот",
+      "from": 800,
+      "to": 1000
+    },
+    {
+      "id": "5e74aadbc3e8",
+      "category": "Брейнрот",
+      "from": 1000,
+      "to": 1200
+    },
+    {
+      "id": "9d9e5690bcbe",
+      "category": "Брейнрот",
+      "from": 1200,
+      "to": 1400
+    }
+  ],
+  "originalQuestionsPreserved": 101,
+  "totalQuestions": 103,
+  "backup": "research/round-two-modifiers-95AF7D-2026-11-06T23-18-01.199Z"
+}

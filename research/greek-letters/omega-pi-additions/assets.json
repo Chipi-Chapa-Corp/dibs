@@ -1,0 +1,22 @@
+[
+  {
+    "answer": "Омега",
+    "file": "research/greek-letters/candidates/omega.jpg",
+    "url": "https://img.youm7.com/ArticleImgs/2018/2/18/97284-fish-oil-capsules-720x480.jpg",
+    "source": "https://m.youm7.com/amp/2018/2/20/3655090",
+    "description": "Капсулы рыбьего жира",
+    "value": 1200,
+    "mediaUrl": "/media/dfa4f640a69768f9bc827b87fcd6e9e3725f2094fb0bab47.jpg",
+    "sha256": "53028cadd5162ac5da4e9878b7cd8651312f8107716d955f73fe2720a5cc03bc"
+  },
+  {
+    "answer": "Пи",
+    "file": "research/greek-letters/candidates/pi.png",
+    "url": "https://images.icon-icons.com/2108/PNG/512/raspberry_pi_icon_130847.png",
+    "source": "https://icon-icons.com/icon/raspberry-pi/130847",
+    "description": "Значок Raspberry Pi",
+    "value": 1400,
+    "mediaUrl": "/media/6957d485e1396cb9a502cdcdc9f49eadcb2a5b62fba82ff6.png",
+    "sha256": "bca4092f89c9cdad0bb848868d98b76a4dc5182f9d15303141bf9477d3c5739e"
+  }
+]

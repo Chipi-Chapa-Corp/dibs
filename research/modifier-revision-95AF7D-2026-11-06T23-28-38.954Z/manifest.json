@@ -1,0 +1,50 @@
+{
+  "gameId": "95AF7D",
+  "removed": [
+    "Спонсор камбэка",
+    "Заначка"
+  ],
+  "remainingPenalty": {
+    "category": "График или горы",
+    "value": 600,
+    "modifier": {
+      "title": "Штраф",
+      "instructions": "Потеряй 600 баллов. Вычти их из своего текущего счёта сразу после получения модификатора, даже если счёт станет отрицательным."
+    }
+  },
+  "moves": [
+    {
+      "id": "cfcffee7b8ba",
+      "category": "Брейнрот",
+      "from": 800,
+      "to": 600
+    },
+    {
+      "id": "2fa97fef20e5",
+      "category": "Брейнрот",
+      "from": 1000,
+      "to": 800
+    },
+    {
+      "id": "5e74aadbc3e8",
+      "category": "Брейнрот",
+      "from": 1200,
+      "to": 1000
+    },
+    {
+      "id": "9d9e5690bcbe",
+      "category": "Брейнрот",
+      "from": 1400,
+      "to": 1200
+    },
+    {
+      "id": "01904deec256",
+      "category": "Логика",
+      "from": 2400,
+      "to": 2100
+    }
+  ],
+  "regularQuestionsPreserved": 99,
+  "totalQuestions": 103,
+  "backup": "research/modifier-revision-95AF7D-2026-11-06T23-28-38.954Z"
+}

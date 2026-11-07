@@ -1,0 +1,1414 @@
+{
+  "title": "СВОЯК — модификаторы по выпускам и раундам",
+  "reviewed_on": "2026-11-06",
+  "methodology": [
+    "Проверены сохранённые русские автосубтитры 22 выпусков из каталога, включая 18 выпусков сверх четырёх подробно разобранных ранее. Это повторный аудит модификаторов, а не просмотр всех видео целиком и не поиск новых выпусков после №23.",
+    "№12 с Utopia Show исключён по просьбе пользователя.",
+    "Считались появления отдельных скрытых карточек с эффектом, а не каждое произнесение слова «модификатор». Учитывались также ранние «бафы/дебафы».",
+    "«Вопрос с секретом», обычные ответы, ставки финала, произвольные подарки ведущего и шутки о правилах отдельно не считались.",
+    "Раунд определён по объявлению начала/конца и составу категорий. Перенос действующего эффекта на следующий раунд не создаёт новую карточку.",
+    "Числа — подтверждённый минимум по опубликованному монтажу и доступной расшифровке. Это не официальный полный реестр игровых пакетов. Ноль означает «не найдено уверенного события», а не гарантированное отсутствие.",
+    "Для неоднозначного повтора ×0,5 в выпуске16 дополнительно сверены публичные кадры YouTube storyboard. В выпуске14 часть третьего раунда отсутствует в самом видео."
+  ],
+  "statistics": {
+    "confirmed_occurrences": 93,
+    "probable_occurrences": 1,
+    "by_round": [
+      27,
+      34,
+      32
+    ],
+    "median_per_episode": 4.0,
+    "patterns": {
+      "1/2/1": 6,
+      "0/1/1": 1,
+      "1/1/1": 2,
+      "2/1/2": 2,
+      "1/2/2": 3,
+      "2/2/2": 2,
+      "1/1/3": 1,
+      "1/1/0": 1,
+      "2/2/1": 1,
+      "2/1/1": 1,
+      "1/1/2": 2
+    }
+  },
+  "effects": {
+    "steal500": "Забрать 500 у выбранного соперника",
+    "steal1000": "Забрать 1 000 у выбранного соперника",
+    "steal2000": "Забрать 2 000 у выбранного соперника",
+    "beg": "Попросить у ведущего произвольное число баллов и убедить его",
+    "swapLast": "Обменяться счётом с отстающим игроком",
+    "threshold": "Если счёт выше порога — потерять 1 000, ниже — получить 1 000",
+    "penalty500": "Потерять 500 без вопроса",
+    "swapRight": "Обменяться счётом с соседом справа",
+    "stealLeader1000": "Забрать 1 000 у лидера",
+    "robinNoop": "Забрать 1 000 у лидера; если сам лидер — без изменений",
+    "halfToLast": "Передать половину своего счёта отстающему",
+    "rotate": "Перераспределить все счета по кругу слева направо",
+    "bonusLast1000": "Добавить 1 000 отстающему",
+    "flip": "Сменить знак всего счёта: ×−1",
+    "coolLeader": "Вычесть 1 000 у лидера",
+    "giveLast1000": "Передать 1 000 из своего счёта отстающему",
+    "bonus500": "Получить 500 без вопроса",
+    "swapLeft": "Обменяться счётом с соседом слева",
+    "robin1000": "Забрать 1 000 у лидера; если сам лидер — передать 1 000 отстающему",
+    "approx": "Отвечать приблизительно; срок и допустимость определяет ведущий",
+    "nominal": "Получить номинал выбранной клетки без вопроса",
+    "bonus1000": "Получить 1 000 без вопроса",
+    "hint": "Получить право на одну подсказку до конца игры",
+    "robin2000": "Перераспределить 2 000 между лидером и отстающим по условию карточки",
+    "compliments": "Получать по 100 за комплименты ведущему",
+    "ambiguous": "Модификатор объявлен, но эффект противоречив: ×10 / −2 000 / фактически обсуждают +200",
+    "penalty2000": "Потерять 2 000 без вопроса",
+    "justify2000": "Получить 2 000, обосновав, почему их заслуживаешь",
+    "half": "Умножить весь счёт на 0,5",
+    "swapAny": "Обменяться счётом с любым выбранным соперником",
+    "roulette": "Сыграть в рулетку со ставкой 2 000: красное / чёрное",
+    "giveAny1000": "Передать 1 000 выбранному сопернику"
+  },
+  "episodes": [
+    {
+      "episode": 1,
+      "title": "Бустер I Орлов I Сатир",
+      "url": "https://www.youtube.com/watch?v=vvI8CgA-Wcw",
+      "confirmed_by_round": [
+        1,
+        2,
+        1
+      ],
+      "confirmed_total": 4,
+      "notes": "В раннем выпуске используются названия «баф», «дебаф», «Упс», а не «модификатор».",
+      "events": [
+        {
+          "episode": 1,
+          "round": 1,
+          "time": "10:08",
+          "seconds": 608,
+          "effect_id": "steal500",
+          "effect": "Забрать 500 у выбранного соперника",
+          "url": "https://www.youtube.com/watch?v=vvI8CgA-Wcw&t=608s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 1,
+          "round": 2,
+          "time": "35:12",
+          "seconds": 2112,
+          "effect_id": "beg",
+          "effect": "Попросить у ведущего произвольное число баллов и убедить его",
+          "url": "https://www.youtube.com/watch?v=vvI8CgA-Wcw&t=2112s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 1,
+          "round": 2,
+          "time": "44:49",
+          "seconds": 2689,
+          "effect_id": "swapLast",
+          "effect": "Обменяться счётом с отстающим игроком",
+          "url": "https://www.youtube.com/watch?v=vvI8CgA-Wcw&t=2689s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 1,
+          "round": 3,
+          "time": "59:20",
+          "seconds": 3560,
+          "effect_id": "threshold",
+          "effect": "Если счёт выше порога — потерять 1 000, ниже — получить 1 000",
+          "url": "https://www.youtube.com/watch?v=vvI8CgA-Wcw&t=3560s",
+          "certainty": "confirmed_occurrence",
+          "note": "Автосубтитры содержат самокоррекцию «500 / 5 000». Порог, вероятно, 5 000; точное число и случай равенства требуют проверки по видео. Сам эффект и изменение на 1 000 ясны."
+        }
+      ]
+    },
+    {
+      "episode": 2,
+      "title": "Тамби I Сабина Хайрова I Сатир",
+      "url": "https://www.youtube.com/watch?v=IjBrkn6SObQ",
+      "confirmed_by_round": [
+        0,
+        1,
+        1
+      ],
+      "confirmed_total": 2,
+      "notes": "Штраф −500 в первом раунде вероятен, но формулировка автосубтитров неоднозначна.",
+      "events": [
+        {
+          "episode": 2,
+          "round": 1,
+          "time": "20:48",
+          "seconds": 1248,
+          "effect_id": "penalty500",
+          "effect": "Потерять 500 без вопроса",
+          "url": "https://www.youtube.com/watch?v=IjBrkn6SObQ&t=1248s",
+          "certainty": "probable",
+          "note": "Вероятное событие: автосубтитры дают «минимум 500», контекст — штраф после открытия клетки. В статистику уверенных событий не включено."
+        },
+        {
+          "episode": 2,
+          "round": 2,
+          "time": "25:54",
+          "seconds": 1554,
+          "effect_id": "swapRight",
+          "effect": "Обменяться счётом с соседом справа",
+          "url": "https://www.youtube.com/watch?v=IjBrkn6SObQ&t=1554s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 2,
+          "round": 3,
+          "time": "41:24",
+          "seconds": 2484,
+          "effect_id": "stealLeader1000",
+          "effect": "Забрать 1 000 у лидера",
+          "url": "https://www.youtube.com/watch?v=IjBrkn6SObQ&t=2484s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "episode": 3,
+      "title": "Гудков I Frame Tamer I Сатир",
+      "url": "https://www.youtube.com/watch?v=jchmb6wygG4",
+      "confirmed_by_round": [
+        1,
+        1,
+        1
+      ],
+      "confirmed_total": 3,
+      "notes": "",
+      "events": [
+        {
+          "episode": 3,
+          "round": 1,
+          "time": "22:16",
+          "seconds": 1336,
+          "effect_id": "penalty500",
+          "effect": "Потерять 500 без вопроса",
+          "url": "https://www.youtube.com/watch?v=jchmb6wygG4&t=1336s",
+          "certainty": "confirmed_occurrence",
+          "note": "Ведущий объясняет эти клетки как бафы/дебафы; слово «модификатор» не используется."
+        },
+        {
+          "episode": 3,
+          "round": 2,
+          "time": "27:20",
+          "seconds": 1640,
+          "effect_id": "robinNoop",
+          "effect": "Забрать 1 000 у лидера; если сам лидер — без изменений",
+          "url": "https://www.youtube.com/watch?v=jchmb6wygG4&t=1640s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 3,
+          "round": 3,
+          "time": "1:11:53",
+          "seconds": 4313,
+          "effect_id": "halfToLast",
+          "effect": "Передать половину своего счёта отстающему",
+          "url": "https://www.youtube.com/watch?v=jchmb6wygG4&t=4313s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "episode": 4,
+      "title": "Динара Курбанова I Илья Куруч I Сатир",
+      "url": "https://www.youtube.com/watch?v=SGLkFmexRJw",
+      "confirmed_by_round": [
+        2,
+        1,
+        2
+      ],
+      "confirmed_total": 5,
+      "notes": "",
+      "events": [
+        {
+          "episode": 4,
+          "round": 1,
+          "time": "10:58",
+          "seconds": 658,
+          "effect_id": "rotate",
+          "effect": "Перераспределить все счета по кругу слева направо",
+          "url": "https://www.youtube.com/watch?v=SGLkFmexRJw&t=658s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 4,
+          "round": 1,
+          "time": "23:28",
+          "seconds": 1408,
+          "effect_id": "bonusLast1000",
+          "effect": "Добавить 1 000 отстающему",
+          "url": "https://www.youtube.com/watch?v=SGLkFmexRJw&t=1408s",
+          "certainty": "confirmed_occurrence",
+          "note": "Получатель выбран ведущим; не следует считать из этого фрагмента, что всегда автоматически выбирается математически последний."
+        },
+        {
+          "episode": 4,
+          "round": 2,
+          "time": "39:37",
+          "seconds": 2377,
+          "effect_id": "flip",
+          "effect": "Сменить знак всего счёта: ×−1",
+          "url": "https://www.youtube.com/watch?v=SGLkFmexRJw&t=2377s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 4,
+          "round": 3,
+          "time": "54:09",
+          "seconds": 3249,
+          "effect_id": "steal1000",
+          "effect": "Забрать 1 000 у выбранного соперника",
+          "url": "https://www.youtube.com/watch?v=SGLkFmexRJw&t=3249s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 4,
+          "round": 3,
+          "time": "59:11",
+          "seconds": 3551,
+          "effect_id": "coolLeader",
+          "effect": "Вычесть 1 000 у лидера",
+          "url": "https://www.youtube.com/watch?v=SGLkFmexRJw&t=3551s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "episode": 5,
+      "title": "Лиза Варвара Аранова I Гоша Карцев I Сатир",
+      "url": "https://www.youtube.com/watch?v=hwM_3NbFFyw",
+      "confirmed_by_round": [
+        1,
+        2,
+        2
+      ],
+      "confirmed_total": 5,
+      "notes": "",
+      "events": [
+        {
+          "episode": 5,
+          "round": 1,
+          "time": "17:39",
+          "seconds": 1059,
+          "effect_id": "beg",
+          "effect": "Попросить у ведущего произвольное число баллов и убедить его",
+          "url": "https://www.youtube.com/watch?v=hwM_3NbFFyw&t=1059s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 5,
+          "round": 2,
+          "time": "22:29",
+          "seconds": 1349,
+          "effect_id": "flip",
+          "effect": "Сменить знак всего счёта: ×−1",
+          "url": "https://www.youtube.com/watch?v=hwM_3NbFFyw&t=1349s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 5,
+          "round": 2,
+          "time": "29:07",
+          "seconds": 1747,
+          "effect_id": "giveLast1000",
+          "effect": "Передать 1 000 из своего счёта отстающему",
+          "url": "https://www.youtube.com/watch?v=hwM_3NbFFyw&t=1747s",
+          "certainty": "confirmed_occurrence",
+          "note": "Ведущий явно снимает 1 000 у Гоши и передаёт другому игроку."
+        },
+        {
+          "episode": 5,
+          "round": 3,
+          "time": "47:12",
+          "seconds": 2832,
+          "effect_id": "rotate",
+          "effect": "Перераспределить все счета по кругу слева направо",
+          "url": "https://www.youtube.com/watch?v=hwM_3NbFFyw&t=2832s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 5,
+          "round": 3,
+          "time": "51:36",
+          "seconds": 3096,
+          "effect_id": "steal1000",
+          "effect": "Забрать 1 000 у выбранного соперника",
+          "url": "https://www.youtube.com/watch?v=hwM_3NbFFyw&t=3096s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "episode": 6,
+      "title": "Андрей Кокошка I Илья Макаров I Сатир",
+      "url": "https://www.youtube.com/watch?v=FjnxQ1x3rqg",
+      "confirmed_by_round": [
+        2,
+        2,
+        2
+      ],
+      "confirmed_total": 6,
+      "notes": "",
+      "events": [
+        {
+          "episode": 6,
+          "round": 1,
+          "time": "25:20",
+          "seconds": 1520,
+          "effect_id": "beg",
+          "effect": "Попросить у ведущего произвольное число баллов и убедить его",
+          "url": "https://www.youtube.com/watch?v=FjnxQ1x3rqg&t=1520s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 6,
+          "round": 1,
+          "time": "26:29",
+          "seconds": 1589,
+          "effect_id": "bonus500",
+          "effect": "Получить 500 без вопроса",
+          "url": "https://www.youtube.com/watch?v=FjnxQ1x3rqg&t=1589s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 6,
+          "round": 2,
+          "time": "45:12",
+          "seconds": 2712,
+          "effect_id": "swapLeft",
+          "effect": "Обменяться счётом с соседом слева",
+          "url": "https://www.youtube.com/watch?v=FjnxQ1x3rqg&t=2712s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 6,
+          "round": 2,
+          "time": "55:53",
+          "seconds": 3353,
+          "effect_id": "robin1000",
+          "effect": "Забрать 1 000 у лидера; если сам лидер — передать 1 000 отстающему",
+          "url": "https://www.youtube.com/watch?v=FjnxQ1x3rqg&t=3353s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 6,
+          "round": 3,
+          "time": "59:22",
+          "seconds": 3562,
+          "effect_id": "approx",
+          "effect": "Отвечать приблизительно; срок и допустимость определяет ведущий",
+          "url": "https://www.youtube.com/watch?v=FjnxQ1x3rqg&t=3562s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 6,
+          "round": 3,
+          "time": "1:11:56",
+          "seconds": 4316,
+          "effect_id": "steal2000",
+          "effect": "Забрать 2 000 у выбранного соперника",
+          "url": "https://www.youtube.com/watch?v=FjnxQ1x3rqg&t=4316s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "episode": 7,
+      "title": "Exile I Алексей Щербаков I Сатир",
+      "url": "https://www.youtube.com/watch?v=KCTGsqOPjts",
+      "confirmed_by_round": [
+        1,
+        1,
+        3
+      ],
+      "confirmed_total": 5,
+      "notes": "",
+      "events": [
+        {
+          "episode": 7,
+          "round": 1,
+          "time": "27:54",
+          "seconds": 1674,
+          "effect_id": "bonus500",
+          "effect": "Получить 500 без вопроса",
+          "url": "https://www.youtube.com/watch?v=KCTGsqOPjts&t=1674s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 7,
+          "round": 2,
+          "time": "46:11",
+          "seconds": 2771,
+          "effect_id": "swapLeft",
+          "effect": "Обменяться счётом с соседом слева",
+          "url": "https://www.youtube.com/watch?v=KCTGsqOPjts&t=2771s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 7,
+          "round": 3,
+          "time": "49:23",
+          "seconds": 2963,
+          "effect_id": "beg",
+          "effect": "Попросить у ведущего произвольное число баллов и убедить его",
+          "url": "https://www.youtube.com/watch?v=KCTGsqOPjts&t=2963s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 7,
+          "round": 3,
+          "time": "58:27",
+          "seconds": 3507,
+          "effect_id": "robin1000",
+          "effect": "Забрать 1 000 у лидера; если сам лидер — передать 1 000 отстающему",
+          "url": "https://www.youtube.com/watch?v=KCTGsqOPjts&t=3507s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 7,
+          "round": 3,
+          "time": "1:02:52",
+          "seconds": 3772,
+          "effect_id": "approx",
+          "effect": "Отвечать приблизительно; срок и допустимость определяет ведущий",
+          "url": "https://www.youtube.com/watch?v=KCTGsqOPjts&t=3772s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "episode": 8,
+      "title": "Денис Кукояка I Леша Кореш I Сатир",
+      "url": "https://www.youtube.com/watch?v=VFEmNfzkmx8",
+      "confirmed_by_round": [
+        1,
+        2,
+        2
+      ],
+      "confirmed_total": 5,
+      "notes": "",
+      "events": [
+        {
+          "episode": 8,
+          "round": 1,
+          "time": "7:53",
+          "seconds": 473,
+          "effect_id": "steal500",
+          "effect": "Забрать 500 у выбранного соперника",
+          "url": "https://www.youtube.com/watch?v=VFEmNfzkmx8&t=473s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 8,
+          "round": 2,
+          "time": "40:33",
+          "seconds": 2433,
+          "effect_id": "beg",
+          "effect": "Попросить у ведущего произвольное число баллов и убедить его",
+          "url": "https://www.youtube.com/watch?v=VFEmNfzkmx8&t=2433s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 8,
+          "round": 2,
+          "time": "44:17",
+          "seconds": 2657,
+          "effect_id": "flip",
+          "effect": "Сменить знак всего счёта: ×−1",
+          "url": "https://www.youtube.com/watch?v=VFEmNfzkmx8&t=2657s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 8,
+          "round": 3,
+          "time": "53:20",
+          "seconds": 3200,
+          "effect_id": "nominal",
+          "effect": "Получить номинал выбранной клетки без вопроса",
+          "url": "https://www.youtube.com/watch?v=VFEmNfzkmx8&t=3200s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 8,
+          "round": 3,
+          "time": "56:49",
+          "seconds": 3409,
+          "effect_id": "robin1000",
+          "effect": "Забрать 1 000 у лидера; если сам лидер — передать 1 000 отстающему",
+          "url": "https://www.youtube.com/watch?v=VFEmNfzkmx8&t=3409s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "episode": 9,
+      "title": "Илья Соболев I Анар Абдуллаев I Сатир",
+      "url": "https://www.youtube.com/watch?v=DMo3G4s_5vs",
+      "confirmed_by_round": [
+        1,
+        1,
+        0
+      ],
+      "confirmed_total": 2,
+      "notes": "В расшифровке удалось выделить только две уверенные карточки. Упоминания «модификатора» в 8:11 и 16:46 не сопровождаются отдельным ясным эффектом; в третьем раунде карточка не подтверждена. Это минимум, не доказательство отсутствия других.",
+      "events": [
+        {
+          "episode": 9,
+          "round": 1,
+          "time": "8:00",
+          "seconds": 480,
+          "effect_id": "flip",
+          "effect": "Сменить знак всего счёта: ×−1",
+          "url": "https://www.youtube.com/watch?v=DMo3G4s_5vs&t=480s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 9,
+          "round": 2,
+          "time": "23:32",
+          "seconds": 1412,
+          "effect_id": "steal1000",
+          "effect": "Забрать 1 000 у выбранного соперника",
+          "url": "https://www.youtube.com/watch?v=DMo3G4s_5vs&t=1412s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "episode": 10,
+      "title": "Саша Парадеевич I Марат SQWOZ BAB I Сатир",
+      "url": "https://www.youtube.com/watch?v=LT11Y4YZYgc",
+      "confirmed_by_round": [
+        2,
+        2,
+        2
+      ],
+      "confirmed_total": 6,
+      "notes": "Новогодний выпуск: ведущие часто импровизируют со счётом. Одна карточка имеет противоречивый эффект.",
+      "events": [
+        {
+          "episode": 10,
+          "round": 1,
+          "time": "11:55",
+          "seconds": 715,
+          "effect_id": "flip",
+          "effect": "Сменить знак всего счёта: ×−1",
+          "url": "https://www.youtube.com/watch?v=LT11Y4YZYgc&t=715s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 10,
+          "round": 1,
+          "time": "23:20",
+          "seconds": 1400,
+          "effect_id": "bonus1000",
+          "effect": "Получить 1 000 без вопроса",
+          "url": "https://www.youtube.com/watch?v=LT11Y4YZYgc&t=1400s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 10,
+          "round": 2,
+          "time": "48:12",
+          "seconds": 2892,
+          "effect_id": "hint",
+          "effect": "Получить право на одну подсказку до конца игры",
+          "url": "https://www.youtube.com/watch?v=LT11Y4YZYgc&t=2892s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 10,
+          "round": 2,
+          "time": "57:10",
+          "seconds": 3430,
+          "effect_id": "robin2000",
+          "effect": "Перераспределить 2 000 между лидером и отстающим по условию карточки",
+          "url": "https://www.youtube.com/watch?v=LT11Y4YZYgc&t=3430s",
+          "certainty": "confirmed_occurrence",
+          "note": "Карточка объявлена, но игрок в середине таблицы не подходит под обе роли; ведущие спорят и не применяют перевод. Считается появлением карточки, а не гарантированно исполненным эффектом."
+        },
+        {
+          "episode": 10,
+          "round": 3,
+          "time": "1:12:02",
+          "seconds": 4322,
+          "effect_id": "compliments",
+          "effect": "Получать по 100 за комплименты ведущему",
+          "url": "https://www.youtube.com/watch?v=LT11Y4YZYgc&t=4322s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 10,
+          "round": 3,
+          "time": "1:24:40",
+          "seconds": 5080,
+          "effect_id": "ambiguous",
+          "effect": "Модификатор объявлен, но эффект противоречив: ×10 / −2 000 / фактически обсуждают +200",
+          "url": "https://www.youtube.com/watch?v=LT11Y4YZYgc&t=5080s",
+          "certainty": "confirmed_occurrence",
+          "note": "Появление модификатора уверенное; точную операцию установить нельзя. Не учитывать как подтверждённый ×10."
+        }
+      ]
+    },
+    {
+      "episode": 11,
+      "title": "Эмир Кашоков I Наташа Генсуха I Сатир",
+      "url": "https://www.youtube.com/watch?v=1mcvkh7FBPw",
+      "confirmed_by_round": [
+        2,
+        2,
+        1
+      ],
+      "confirmed_total": 5,
+      "notes": "",
+      "events": [
+        {
+          "episode": 11,
+          "round": 1,
+          "time": "6:23",
+          "seconds": 383,
+          "effect_id": "flip",
+          "effect": "Сменить знак всего счёта: ×−1",
+          "url": "https://www.youtube.com/watch?v=1mcvkh7FBPw&t=383s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 11,
+          "round": 1,
+          "time": "16:28",
+          "seconds": 988,
+          "effect_id": "steal1000",
+          "effect": "Забрать 1 000 у выбранного соперника",
+          "url": "https://www.youtube.com/watch?v=1mcvkh7FBPw&t=988s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 11,
+          "round": 2,
+          "time": "25:32",
+          "seconds": 1532,
+          "effect_id": "robin2000",
+          "effect": "Перераспределить 2 000 между лидером и отстающим по условию карточки",
+          "url": "https://www.youtube.com/watch?v=1mcvkh7FBPw&t=1532s",
+          "certainty": "confirmed_occurrence",
+          "note": "После обсуждения ведущий переводит 2 000 от Наташи Эмиру."
+        },
+        {
+          "episode": 11,
+          "round": 2,
+          "time": "38:37",
+          "seconds": 2317,
+          "effect_id": "hint",
+          "effect": "Получить право на одну подсказку до конца игры",
+          "url": "https://www.youtube.com/watch?v=1mcvkh7FBPw&t=2317s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 11,
+          "round": 3,
+          "time": "1:00:19",
+          "seconds": 3619,
+          "effect_id": "penalty2000",
+          "effect": "Потерять 2 000 без вопроса",
+          "url": "https://www.youtube.com/watch?v=1mcvkh7FBPw&t=3619s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "episode": 13,
+      "title": "Данила Горилла I Макс 100500 I Сатир",
+      "url": "https://www.youtube.com/watch?v=tXEM3FSfsWc",
+      "confirmed_by_round": [
+        2,
+        1,
+        2
+      ],
+      "confirmed_total": 5,
+      "notes": "",
+      "events": [
+        {
+          "episode": 13,
+          "round": 1,
+          "time": "6:34",
+          "seconds": 394,
+          "effect_id": "steal1000",
+          "effect": "Забрать 1 000 у выбранного соперника",
+          "url": "https://www.youtube.com/watch?v=tXEM3FSfsWc&t=394s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 13,
+          "round": 1,
+          "time": "7:44",
+          "seconds": 464,
+          "effect_id": "bonus1000",
+          "effect": "Получить 1 000 без вопроса",
+          "url": "https://www.youtube.com/watch?v=tXEM3FSfsWc&t=464s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 13,
+          "round": 2,
+          "time": "25:04",
+          "seconds": 1504,
+          "effect_id": "flip",
+          "effect": "Сменить знак всего счёта: ×−1",
+          "url": "https://www.youtube.com/watch?v=tXEM3FSfsWc&t=1504s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 13,
+          "round": 3,
+          "time": "42:26",
+          "seconds": 2546,
+          "effect_id": "penalty2000",
+          "effect": "Потерять 2 000 без вопроса",
+          "url": "https://www.youtube.com/watch?v=tXEM3FSfsWc&t=2546s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 13,
+          "round": 3,
+          "time": "49:09",
+          "seconds": 2949,
+          "effect_id": "justify2000",
+          "effect": "Получить 2 000, обосновав, почему их заслуживаешь",
+          "url": "https://www.youtube.com/watch?v=tXEM3FSfsWc&t=2949s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "episode": 14,
+      "title": "Влад Куертов | Влад Раговский | Сатир",
+      "url": "https://www.youtube.com/watch?v=hVGjnKkdJ6I",
+      "confirmed_by_round": [
+        1,
+        2,
+        1
+      ],
+      "confirmed_total": 4,
+      "notes": "В 55:21–55:36 прямо сообщают, что половина третьего раунда потеряна. Полный состав модификаторов этого раунда восстановить нельзя.",
+      "events": [
+        {
+          "episode": 14,
+          "round": 1,
+          "time": "8:15",
+          "seconds": 495,
+          "effect_id": "flip",
+          "effect": "Сменить знак всего счёта: ×−1",
+          "url": "https://www.youtube.com/watch?v=hVGjnKkdJ6I&t=495s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 14,
+          "round": 2,
+          "time": "31:52",
+          "seconds": 1912,
+          "effect_id": "justify2000",
+          "effect": "Получить 2 000, обосновав, почему их заслуживаешь",
+          "url": "https://www.youtube.com/watch?v=hVGjnKkdJ6I&t=1912s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 14,
+          "round": 2,
+          "time": "34:52",
+          "seconds": 2092,
+          "effect_id": "half",
+          "effect": "Умножить весь счёт на 0,5",
+          "url": "https://www.youtube.com/watch?v=hVGjnKkdJ6I&t=2092s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 14,
+          "round": 3,
+          "time": "53:31",
+          "seconds": 3211,
+          "effect_id": "steal1000",
+          "effect": "Забрать 1 000 у выбранного соперника",
+          "url": "https://www.youtube.com/watch?v=hVGjnKkdJ6I&t=3211s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "episode": 15,
+      "title": "Артемий Лебедев | Nowkie | Сатир",
+      "url": "https://www.youtube.com/watch?v=kiusnXwLDtU",
+      "confirmed_by_round": [
+        1,
+        1,
+        1
+      ],
+      "confirmed_total": 3,
+      "notes": "Подтверждены три карточки; обычные просьбы о подсказке и возврате баллов не считались модификаторами.",
+      "events": [
+        {
+          "episode": 15,
+          "round": 1,
+          "time": "8:44",
+          "seconds": 524,
+          "effect_id": "flip",
+          "effect": "Сменить знак всего счёта: ×−1",
+          "url": "https://www.youtube.com/watch?v=kiusnXwLDtU&t=524s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 15,
+          "round": 2,
+          "time": "23:37",
+          "seconds": 1417,
+          "effect_id": "swapAny",
+          "effect": "Обменяться счётом с любым выбранным соперником",
+          "url": "https://www.youtube.com/watch?v=kiusnXwLDtU&t=1417s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 15,
+          "round": 3,
+          "time": "48:28",
+          "seconds": 2908,
+          "effect_id": "roulette",
+          "effect": "Сыграть в рулетку со ставкой 2 000: красное / чёрное",
+          "url": "https://www.youtube.com/watch?v=kiusnXwLDtU&t=2908s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "episode": 16,
+      "title": "Ваня Дмитриенко | Вася Шакулин | Сатир",
+      "url": "https://www.youtube.com/watch?v=a53zfx1qXWs",
+      "confirmed_by_round": [
+        2,
+        1,
+        1
+      ],
+      "confirmed_total": 4,
+      "notes": "Повтор фразы про ×0,5 в 35:41 не посчитан новой карточкой: проверены кадры 34:10–36:00, а счёт Сатира в этом промежутке остаётся 3 802. Шутка про постоянный первый ответ при ремонте кнопки тоже исключена.",
+      "events": [
+        {
+          "episode": 16,
+          "round": 1,
+          "time": "3:32",
+          "seconds": 212,
+          "effect_id": "flip",
+          "effect": "Сменить знак всего счёта: ×−1",
+          "url": "https://www.youtube.com/watch?v=a53zfx1qXWs&t=212s",
+          "certainty": "confirmed_occurrence",
+          "note": "При нулевом счёте смена знака ничего не меняет; ведущий отдельно дарит 1 000. Это импровизация, не второй модификатор."
+        },
+        {
+          "episode": 16,
+          "round": 1,
+          "time": "19:44",
+          "seconds": 1184,
+          "effect_id": "compliments",
+          "effect": "Получать по 100 за комплименты ведущему",
+          "url": "https://www.youtube.com/watch?v=a53zfx1qXWs&t=1184s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 16,
+          "round": 2,
+          "time": "34:26",
+          "seconds": 2066,
+          "effect_id": "half",
+          "effect": "Умножить весь счёт на 0,5",
+          "url": "https://www.youtube.com/watch?v=a53zfx1qXWs&t=2066s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 16,
+          "round": 3,
+          "time": "50:24",
+          "seconds": 3024,
+          "effect_id": "robin1000",
+          "effect": "Забрать 1 000 у лидера; если сам лидер — передать 1 000 отстающему",
+          "url": "https://www.youtube.com/watch?v=a53zfx1qXWs&t=3024s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "episode": 17,
+      "title": "Егорик | Стас Пьеха | Сатир",
+      "url": "https://www.youtube.com/watch?v=IivxXos2328",
+      "confirmed_by_round": [
+        1,
+        1,
+        2
+      ],
+      "confirmed_total": 4,
+      "notes": "",
+      "events": [
+        {
+          "episode": 17,
+          "round": 1,
+          "time": "17:33",
+          "seconds": 1053,
+          "effect_id": "flip",
+          "effect": "Сменить знак всего счёта: ×−1",
+          "url": "https://www.youtube.com/watch?v=IivxXos2328&t=1053s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 17,
+          "round": 2,
+          "time": "45:47",
+          "seconds": 2747,
+          "effect_id": "approx",
+          "effect": "Отвечать приблизительно; срок и допустимость определяет ведущий",
+          "url": "https://www.youtube.com/watch?v=IivxXos2328&t=2747s",
+          "certainty": "confirmed_occurrence",
+          "note": "Получен в конце второго раунда и явно перенесён на третий; позже ведущий отзывает право. Перенос не считается второй карточкой."
+        },
+        {
+          "episode": 17,
+          "round": 3,
+          "time": "53:46",
+          "seconds": 3226,
+          "effect_id": "hint",
+          "effect": "Получить право на одну подсказку до конца игры",
+          "url": "https://www.youtube.com/watch?v=IivxXos2328&t=3226s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 17,
+          "round": 3,
+          "time": "1:01:17",
+          "seconds": 3677,
+          "effect_id": "half",
+          "effect": "Умножить весь счёт на 0,5",
+          "url": "https://www.youtube.com/watch?v=IivxXos2328&t=3677s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "episode": 18,
+      "title": "BRB | Дипинс | Сатир",
+      "url": "https://www.youtube.com/watch?v=IXKrQNv2Cb8",
+      "confirmed_by_round": [
+        1,
+        2,
+        2
+      ],
+      "confirmed_total": 5,
+      "notes": "",
+      "events": [
+        {
+          "episode": 18,
+          "round": 1,
+          "time": "5:36",
+          "seconds": 336,
+          "effect_id": "flip",
+          "effect": "Сменить знак всего счёта: ×−1",
+          "url": "https://www.youtube.com/watch?v=IXKrQNv2Cb8&t=336s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 18,
+          "round": 2,
+          "time": "33:23",
+          "seconds": 2003,
+          "effect_id": "half",
+          "effect": "Умножить весь счёт на 0,5",
+          "url": "https://www.youtube.com/watch?v=IXKrQNv2Cb8&t=2003s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 18,
+          "round": 2,
+          "time": "36:41",
+          "seconds": 2201,
+          "effect_id": "approx",
+          "effect": "Отвечать приблизительно; срок и допустимость определяет ведущий",
+          "url": "https://www.youtube.com/watch?v=IXKrQNv2Cb8&t=2201s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 18,
+          "round": 3,
+          "time": "49:24",
+          "seconds": 2964,
+          "effect_id": "hint",
+          "effect": "Получить право на одну подсказку до конца игры",
+          "url": "https://www.youtube.com/watch?v=IXKrQNv2Cb8&t=2964s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 18,
+          "round": 3,
+          "time": "54:20",
+          "seconds": 3260,
+          "effect_id": "steal2000",
+          "effect": "Забрать 2 000 у выбранного соперника",
+          "url": "https://www.youtube.com/watch?v=IXKrQNv2Cb8&t=3260s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "episode": 19,
+      "title": "Лимба | GORILLA GLUE | Сатир",
+      "url": "https://www.youtube.com/watch?v=1cqpwzmA3EQ",
+      "confirmed_by_round": [
+        1,
+        1,
+        2
+      ],
+      "confirmed_total": 4,
+      "notes": "",
+      "events": [
+        {
+          "episode": 19,
+          "round": 1,
+          "time": "28:15",
+          "seconds": 1695,
+          "effect_id": "flip",
+          "effect": "Сменить знак всего счёта: ×−1",
+          "url": "https://www.youtube.com/watch?v=1cqpwzmA3EQ&t=1695s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 19,
+          "round": 2,
+          "time": "34:56",
+          "seconds": 2096,
+          "effect_id": "approx",
+          "effect": "Отвечать приблизительно; срок и допустимость определяет ведущий",
+          "url": "https://www.youtube.com/watch?v=1cqpwzmA3EQ&t=2096s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 19,
+          "round": 3,
+          "time": "1:02:19",
+          "seconds": 3739,
+          "effect_id": "giveAny1000",
+          "effect": "Передать 1 000 выбранному сопернику",
+          "url": "https://www.youtube.com/watch?v=1cqpwzmA3EQ&t=3739s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 19,
+          "round": 3,
+          "time": "1:10:35",
+          "seconds": 4235,
+          "effect_id": "steal2000",
+          "effect": "Забрать 2 000 у выбранного соперника",
+          "url": "https://www.youtube.com/watch?v=1cqpwzmA3EQ&t=4235s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "episode": 20,
+      "title": "Сабина Хайрова | Саша Ни | Орлов",
+      "url": "https://www.youtube.com/watch?v=sirgbkwjbPk",
+      "confirmed_by_round": [
+        1,
+        2,
+        1
+      ],
+      "confirmed_total": 4,
+      "notes": "",
+      "events": [
+        {
+          "episode": 20,
+          "round": 1,
+          "time": "16:16",
+          "seconds": 976,
+          "effect_id": "flip",
+          "effect": "Сменить знак всего счёта: ×−1",
+          "url": "https://www.youtube.com/watch?v=sirgbkwjbPk&t=976s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 20,
+          "round": 2,
+          "time": "35:29",
+          "seconds": 2129,
+          "effect_id": "swapAny",
+          "effect": "Обменяться счётом с любым выбранным соперником",
+          "url": "https://www.youtube.com/watch?v=sirgbkwjbPk&t=2129s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 20,
+          "round": 2,
+          "time": "39:15",
+          "seconds": 2355,
+          "effect_id": "approx",
+          "effect": "Отвечать приблизительно; срок и допустимость определяет ведущий",
+          "url": "https://www.youtube.com/watch?v=sirgbkwjbPk&t=2355s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 20,
+          "round": 3,
+          "time": "56:56",
+          "seconds": 3416,
+          "effect_id": "steal2000",
+          "effect": "Забрать 2 000 у выбранного соперника",
+          "url": "https://www.youtube.com/watch?v=sirgbkwjbPk&t=3416s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "episode": 21,
+      "title": "Lovv66 | Madk1d | Сатир",
+      "url": "https://www.youtube.com/watch?v=yRJtjOKCgRE",
+      "confirmed_by_round": [
+        1,
+        2,
+        1
+      ],
+      "confirmed_total": 4,
+      "notes": "",
+      "events": [
+        {
+          "episode": 21,
+          "round": 1,
+          "time": "18:10",
+          "seconds": 1090,
+          "effect_id": "flip",
+          "effect": "Сменить знак всего счёта: ×−1",
+          "url": "https://www.youtube.com/watch?v=yRJtjOKCgRE&t=1090s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 21,
+          "round": 2,
+          "time": "34:29",
+          "seconds": 2069,
+          "effect_id": "swapAny",
+          "effect": "Обменяться счётом с любым выбранным соперником",
+          "url": "https://www.youtube.com/watch?v=yRJtjOKCgRE&t=2069s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 21,
+          "round": 2,
+          "time": "36:01",
+          "seconds": 2161,
+          "effect_id": "approx",
+          "effect": "Отвечать приблизительно; срок и допустимость определяет ведущий",
+          "url": "https://www.youtube.com/watch?v=yRJtjOKCgRE&t=2161s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 21,
+          "round": 3,
+          "time": "1:07:14",
+          "seconds": 4034,
+          "effect_id": "steal2000",
+          "effect": "Забрать 2 000 у выбранного соперника",
+          "url": "https://www.youtube.com/watch?v=yRJtjOKCgRE&t=4034s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "episode": 22,
+      "title": "Даня Кашин | Yanix | Сатир",
+      "url": "https://www.youtube.com/watch?v=S_RgvOA7CpE",
+      "confirmed_by_round": [
+        1,
+        2,
+        1
+      ],
+      "confirmed_total": 4,
+      "notes": "",
+      "events": [
+        {
+          "episode": 22,
+          "round": 1,
+          "time": "14:11",
+          "seconds": 851,
+          "effect_id": "flip",
+          "effect": "Сменить знак всего счёта: ×−1",
+          "url": "https://www.youtube.com/watch?v=S_RgvOA7CpE&t=851s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 22,
+          "round": 2,
+          "time": "30:03",
+          "seconds": 1803,
+          "effect_id": "approx",
+          "effect": "Отвечать приблизительно; срок и допустимость определяет ведущий",
+          "url": "https://www.youtube.com/watch?v=S_RgvOA7CpE&t=1803s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 22,
+          "round": 2,
+          "time": "37:53",
+          "seconds": 2273,
+          "effect_id": "swapAny",
+          "effect": "Обменяться счётом с любым выбранным соперником",
+          "url": "https://www.youtube.com/watch?v=S_RgvOA7CpE&t=2273s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 22,
+          "round": 3,
+          "time": "1:00:04",
+          "seconds": 3604,
+          "effect_id": "steal2000",
+          "effect": "Забрать 2 000 у выбранного соперника",
+          "url": "https://www.youtube.com/watch?v=S_RgvOA7CpE&t=3604s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "episode": 23,
+      "title": "Пушной | Шальнов | Сатир",
+      "url": "https://www.youtube.com/watch?v=1kPm1gRez24",
+      "confirmed_by_round": [
+        1,
+        2,
+        1
+      ],
+      "confirmed_total": 4,
+      "notes": "",
+      "events": [
+        {
+          "episode": 23,
+          "round": 1,
+          "time": "23:53",
+          "seconds": 1433,
+          "effect_id": "flip",
+          "effect": "Сменить знак всего счёта: ×−1",
+          "url": "https://www.youtube.com/watch?v=1kPm1gRez24&t=1433s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 23,
+          "round": 2,
+          "time": "47:53",
+          "seconds": 2873,
+          "effect_id": "steal1000",
+          "effect": "Забрать 1 000 у выбранного соперника",
+          "url": "https://www.youtube.com/watch?v=1kPm1gRez24&t=2873s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 23,
+          "round": 2,
+          "time": "55:38",
+          "seconds": 3338,
+          "effect_id": "half",
+          "effect": "Умножить весь счёт на 0,5",
+          "url": "https://www.youtube.com/watch?v=1kPm1gRez24&t=3338s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        },
+        {
+          "episode": 23,
+          "round": 3,
+          "time": "1:07:36",
+          "seconds": 4056,
+          "effect_id": "swapAny",
+          "effect": "Обменяться счётом с любым выбранным соперником",
+          "url": "https://www.youtube.com/watch?v=1kPm1gRez24&t=4056s",
+          "certainty": "confirmed_occurrence",
+          "note": ""
+        }
+      ]
+    }
+  ]
+}

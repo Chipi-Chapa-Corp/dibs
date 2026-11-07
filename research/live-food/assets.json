@@ -1,0 +1,79 @@
+[
+  {
+    "index": 1,
+    "original": "/var/folders/t3/wh0_r9jx0jz4kqxrwpsvv5rh0000gn/T/codex-clipboard-33253e34-7508-4f8a-addf-d01b17756373.png",
+    "generated": "/Users/mychkvad/.codex/generated_images/01a1a8ff-d244-7ee2-9a61-bb8ef9eacf43/exec-0eca391f-4998-4833-94ec-8f10d294a1cc.png",
+    "file": "research/live-food/herring.png",
+    "prompt": "Use case: precise-object-edit. Asset type: quiz image restored from a video screenshot. Image 1 is the edit target. Remove the thin blue screenshot border completely and restore compression-blurred detail. Preserve the same composition, subjects, clothing, expressions, props, background, lighting, visual joke and recognizable design. Do not redesign, add text, answer labels, frames or new objects. Do not remove any clue or crop existing subject matter. Keep the original aspect ratio and framing. Output at approximately 720p to 1080p resolution; maximum long edge 1080 pixels, never 4K. Restore only this image: the fish-headed figure wearing a cream fur coat and holding a matching handbag in a vegetable market.",
+    "value": 300,
+    "answer": "Селёдка под шубой",
+    "sha256": "6eea08256f4256ab16fec64af7c885eb97299df7287a48e71aa64760bf7ad2a4",
+    "mediaUrl": "/media/a61f7b9b88600978af96a5321302c144ab28f34322b17365.png"
+  },
+  {
+    "index": 2,
+    "original": "/var/folders/t3/wh0_r9jx0jz4kqxrwpsvv5rh0000gn/T/codex-clipboard-2b7d85d4-b934-45a3-bc18-9095955ee8df.png",
+    "generated": "/Users/mychkvad/.codex/generated_images/01a1a8ff-d244-7ee2-9a61-bb8ef9eacf43/exec-329aca4c-eab3-4f73-9c1b-de2023cda934.png",
+    "file": "research/live-food/navy-pasta.png",
+    "prompt": "Use case: precise-object-edit. Asset type: quiz image restored from a video screenshot. Image 1 is the edit target. Remove the thin blue screenshot border completely and restore compression-blurred detail. Preserve the same composition, subjects, clothing, expressions, props, background, lighting, visual joke and recognizable design. Do not redesign, add text, answer labels, frames or new objects. Do not remove any clue or crop existing subject matter. Keep the original aspect ratio and framing. Output at approximately 720p to 1080p resolution; maximum long edge 1080 pixels, never 4K. Restore only this image: the four pasta-headed sailors in dark navy uniforms, saluting on a ship, with the distant orange explosion.",
+    "value": 600,
+    "answer": "Макароны по-флотски",
+    "sha256": "fcd6a48a3936a5203f7b7e0c64584d2dc6e5a4d2b8013103df6f2cfba1b823dc",
+    "mediaUrl": "/media/80d9026f87ca1f47d25ec90bfb0f8ec3e825489b62cfc9b2.png"
+  },
+  {
+    "index": 3,
+    "original": "/var/folders/t3/wh0_r9jx0jz4kqxrwpsvv5rh0000gn/T/codex-clipboard-aa4676d5-2a67-456f-9983-1cb59daaeeee.png",
+    "generated": "/Users/mychkvad/.codex/generated_images/01a1a8ff-d244-7ee2-9a61-bb8ef9eacf43/exec-93ec96b5-07f9-4ca0-9a92-82dafb4418d4.png",
+    "file": "research/live-food/french-meat.png",
+    "prompt": "Use case: precise-object-edit. Asset type: quiz image restored from a video screenshot. Image 1 is the edit target. Remove the thin blue screenshot border completely and restore compression-blurred detail. Preserve the same composition, subjects, clothing, expressions, props, background, lighting, visual joke and recognizable design. Do not redesign, add text, answer labels, frames or new objects. Do not remove any clue or crop existing subject matter. Keep the original aspect ratio and framing. Output at approximately 720p to 1080p resolution; maximum long edge 1080 pixels, never 4K. Restore only this image: the steak-headed French gentleman wearing a black beret, curly moustache and scarf, holding a tiny ballerina and a glass of red wine, Eiffel Tower behind.",
+    "value": 900,
+    "answer": "Мясо по-французски",
+    "sha256": "af9f798ee95e39de83e2555ff2f684f3fd2c00b424f21a5378f87c93ded988a5",
+    "mediaUrl": "/media/67abcfd2db27c024704cf8b86f066f31bb658d228a38e553.png"
+  },
+  {
+    "index": 4,
+    "original": "/var/folders/t3/wh0_r9jx0jz4kqxrwpsvv5rh0000gn/T/codex-clipboard-57ff906a-2c4f-4e46-8126-02ea9380e9cb.png",
+    "generated": "/Users/mychkvad/.codex/generated_images/01a1a8ff-d244-7ee2-9a61-bb8ef9eacf43/exec-1c077bae-d7f2-429a-875b-4068e00a2ea0.png",
+    "file": "research/live-food/lazy-cabbage.png",
+    "prompt": "Use case: precise-object-edit. Asset type: quiz image restored from a video screenshot. Image 1 is the edit target. Remove the thin blue screenshot border completely and restore compression-blurred detail. Preserve the same composition, subjects, clothing, expressions, props, background, lighting, visual joke and recognizable design. Do not redesign, add text, answer labels, frames or new objects. Do not remove any clue or crop existing subject matter. Keep the original aspect ratio and framing. Output at approximately 720p to 1080p resolution; maximum long edge 1080 pixels, never 4K. Restore only this image: the two sleepy cabbage-headed people on a sofa, in striped pajamas and a salmon cardigan, holding a television remote.",
+    "value": 1200,
+    "answer": "Ленивые голубцы",
+    "sha256": "b85afdbf6ec332a45e94983cb9f66119f443599720db74f8ef34e11aa29deba4",
+    "mediaUrl": "/media/58ffe9f73ea3c31e3940f1039f4f707d2f98c0d13859a9f2.png"
+  },
+  {
+    "index": 5,
+    "original": "/var/folders/t3/wh0_r9jx0jz4kqxrwpsvv5rh0000gn/T/codex-clipboard-683f6325-f31a-4d5e-8c9b-cf1d74bda12f.png",
+    "generated": "/Users/mychkvad/.codex/generated_images/01a1a8ff-d244-7ee2-9a61-bb8ef9eacf43/exec-ed83ef36-44b4-41b7-9b0c-45c4f12f1c0d.png",
+    "file": "research/live-food/doctor-sausage.png",
+    "prompt": "Use case: precise-object-edit. Asset type: quiz image restored from a video screenshot. Image 1 is the edit target. Remove the thin blue screenshot border completely and restore compression-blurred detail. Preserve the same composition, subjects, clothing, expressions, props, background, lighting, visual joke and recognizable design. Do not redesign, add text, answer labels, frames or new objects. Do not remove any clue or crop existing subject matter. Keep the original aspect ratio and framing. Output at approximately 720p to 1080p resolution; maximum long edge 1080 pixels, never 4K. Restore only this image: the friendly sausage doctor in a white coat holding a clipboard in a hospital.",
+    "value": 1500,
+    "answer": "Докторская колбаса",
+    "sha256": "1eecd50ba24deeb35b9f8a2a507b811adaed1895c2cddec4dd96f2c7b679c7d9",
+    "mediaUrl": "/media/119acac5f35f6fada71eee79ea3d515dfb7e8b8897fe123d.png"
+  },
+  {
+    "index": 6,
+    "original": "/var/folders/t3/wh0_r9jx0jz4kqxrwpsvv5rh0000gn/T/codex-clipboard-86abeb0f-b59e-41fe-b390-61940ba13941.png",
+    "generated": "/Users/mychkvad/.codex/generated_images/01a1a8ff-d244-7ee2-9a61-bb8ef9eacf43/exec-4b5ec18e-550e-4a12-b874-ad49ed5abaaa.png",
+    "file": "research/live-food/caesar-chicken.png",
+    "prompt": "Use case: precise-object-edit. Asset type: quiz image restored from a video screenshot. Image 1 is the edit target. Remove the thin blue screenshot border completely and restore compression-blurred detail. Preserve the same composition, subjects, clothing, expressions, props, background, lighting, visual joke and recognizable design. Do not redesign, add text, answer labels, frames or new objects. Do not remove any clue or crop existing subject matter. Keep the original aspect ratio and framing. Output at approximately 720p to 1080p resolution; maximum long edge 1080 pixels, never 4K. Restore only this image: the Roman Caesar wearing a laurel wreath, red cloak and gold armor, holding a live chicken.",
+    "value": 1800,
+    "answer": "Цезарь с курицей",
+    "sha256": "f07bf0d5ece78bd5efd1970cf0d49f9c411ef914f142d372d0a8295e4ce581f1",
+    "mediaUrl": "/media/acbfcaa7cffdceb890401f7e9f1df505dd87a98c42356510.png"
+  },
+  {
+    "index": 7,
+    "original": "/var/folders/t3/wh0_r9jx0jz4kqxrwpsvv5rh0000gn/T/codex-clipboard-281e511a-4d64-4582-87b1-dda98b8865a3.png",
+    "generated": "/Users/mychkvad/.codex/generated_images/01a1a8ff-d244-7ee2-9a61-bb8ef9eacf43/exec-4da3e613-b86c-4aa1-a4a2-9b34021397ef.png",
+    "file": "research/live-food/merchant-buckwheat.png",
+    "prompt": "Use case: precise-object-edit. Asset type: quiz image restored from a video screenshot. Image 1 is the edit target. Remove the thin blue screenshot border completely and restore compression-blurred detail. Preserve the same composition, subjects, clothing, expressions, props, background, lighting, visual joke and recognizable design. Do not redesign, add text, answer labels, frames or new objects. Do not remove any clue or crop existing subject matter. Keep the original aspect ratio and framing. Output at approximately 720p to 1080p resolution; maximum long edge 1080 pixels, never 4K. Restore only this image: the buckwheat-headed bearded merchant in a fur hat counting coins at a wooden table.",
+    "value": 2100,
+    "answer": "Гречка по-купечески",
+    "sha256": "119dc008b6caee24e05fb194b2c5a233fb4da91770c27726202c082863eadc58",
+    "mediaUrl": "/media/52522d4d8a16be63ea18526255df97cfb2e28015d9de4182.png"
+  }
+]
