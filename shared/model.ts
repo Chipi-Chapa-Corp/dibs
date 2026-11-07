@@ -6,6 +6,8 @@ export interface Round { id: string; name: string; type: 'board'|'final'; catego
 export const orderRounds=(rounds:Round[]):Round[]=>[...rounds.filter(r=>r.type!=='final'),...rounds.filter(r=>r.type==='final')];
 export interface Theme { preset: 'paper'|'ink'|'clay'|'forest'; accent: string; paper: string; ink: string; surface: string; muted: string; line: string; displayFont: 'serif'|'sans'; background: string; motion: boolean; sound: boolean; title: string }
 export interface Settings { buzzMode: 'first'|'queue'; autoOpenBuzzers: boolean; earlyPenaltyMs: number; deductWrong: boolean; wrongMultiplier: number; correctMultiplier: number; allowNegative: boolean; reopenWrong: boolean; lockWrong: boolean; revealDelayMs: number; showLeaderboardOnStage: boolean; startingScore: number; finalMaxWager: 'score'|'unlimited'; }
+export const FINAL_WAGER_ALLOWANCE=1500;
+export const finalWagerLimit=(score:number,mode:Settings['finalMaxWager'])=>mode==='unlimited'?1e7:Math.max(FINAL_WAGER_ALLOWANCE,score);
 // Saved `players` records are teams; members have independent reconnect credentials.
 export interface TeamMember { id:string; teamId:string; name:string; token:string; connected:boolean; joinedAt:number }
 export type PublicMember = Omit<TeamMember,'token'>;

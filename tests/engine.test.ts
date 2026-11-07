@@ -116,7 +116,7 @@ test('questions remain open without time limits and game pause still blocks play
 });
 test('private final wagers, private submissions, scoring exactly once and final results',()=>{
  const{g,a,b,c}=fixture();a.score=500;b.score=-100;act(g,'round',{index:2});const questionId=g.current!.questionId;
- assert.throws(()=>act(g,'wager',{wager:800,version:0,questionId},'player',a.id),/whole wager/);
+ assert.throws(()=>act(g,'wager',{wager:1501,version:0,questionId},'player',a.id),/whole wager/);
  act(g,'wager',{wager:500,version:0,questionId},'player',a.id);act(g,'wager',{wager:0,version:0,questionId},'player',b.id);act(g,'hostWager',{playerId:c.id,wager:0});
  assert.equal(view(g,'stage').current?.wagers[a.id].wager,0);act(g,'finalBegin');act(g,'finalAnswer',{answer:'A light-year',version:0,questionId},'player',a.id);
  assert.equal(view(g,'stage').current?.wagers[a.id].answer,'');assert.equal(view(g,'host').current?.wagers[a.id].answer,'A light-year');

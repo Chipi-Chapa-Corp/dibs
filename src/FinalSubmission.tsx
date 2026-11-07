@@ -1,5 +1,6 @@
 import {useEffect,useRef,useState} from 'react';
 import type {FinalEntry,GameView} from '../shared/model';
+import {finalWagerLimit} from '../shared/model';
 import {Button} from './components';
 import {number} from './lib';
 
@@ -37,7 +38,7 @@ function useSharedField(value:string,version:number,enabled:boolean,valid:(value
 export function FinalSubmission({g,connected,command}:{g:GameView;connected:boolean;command:Command}){
   const c=g.current!,entry=g.yourFinal,wager=c.phase==='wager',locked=!wager&&!!c.answersLocked;
   const self=g.players.find(t=>t.id===g.selfId)!;
-  const max=g.settings.finalMaxWager==='unlimited'?1e7:Math.max(0,self.score);
+  const max=finalWagerLimit(self.score,g.settings.finalMaxWager);
   const enabled=connected&&!g.paused&&!locked;
   const field=useSharedField(wager?(entry?String(entry.wager):''):(entry?.answer??''),wager?entry?.wagerVersion||0:entry?.answerVersion||0,enabled,
     value=>wager?!!value.trim()&&Number.isInteger(Number(value))&&Number(value)>=0&&Number(value)<=max:value.length<=5000,
@@ -62,7 +63,7 @@ export function FinalOverride({g,teamId,command}:{g:GameView;teamId:string;comma
 }
 function FinalOverrideForm({g,teamId,entry,command}:{g:GameView;teamId:string;entry?:FinalEntry;command:Command}){
   const[draft,setDraft]=useState<{wager:string;answer:string;wagerVersion:number;answerVersion:number}|null>(null),[busy,setBusy]=useState(false);
-  const c=g.current!,team=g.players.find(t=>t.id===teamId)!,max=g.settings.finalMaxWager==='unlimited'?1e7:Math.max(0,g.finalPresentation?.scores[teamId]??team.score);
+  const c=g.current!,team=g.players.find(t=>t.id===teamId)!,max=finalWagerLimit(g.finalPresentation?.scores[teamId]??team.score,g.settings.finalMaxWager);
   const saved={wager:entry?String(entry.wager):'',answer:entry?.answer??'',wagerVersion:entry?.wagerVersion||0,answerVersion:entry?.answerVersion||0};
   const form=draft??saved,conflict=!!draft&&(draft.wagerVersion!==saved.wagerVersion||draft.answerVersion!==saved.answerVersion);
   const change=(key:'wager'|'answer',value:string)=>setDraft(old=>({...old??saved,[key]:value}));

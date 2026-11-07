@@ -1,5 +1,5 @@
 import {randomBytes} from 'node:crypto';
-import {defaultSettings,defaultTheme,emptyRound,uid,themes,isQuestionFilled,QUESTION_SELECTION_MS,orderRounds,numberRounds,hasCorrectResult} from '../shared/model.ts';
+import {defaultSettings,defaultTheme,emptyRound,uid,themes,isQuestionFilled,QUESTION_SELECTION_MS,orderRounds,numberRounds,hasCorrectResult,finalWagerLimit} from '../shared/model.ts';
 import type {Game,GameView,Player,Question,Settings,Theme,Round,TeamMember} from '../shared/model.ts';
 
 type Input=Record<string,any>;
@@ -255,7 +255,7 @@ export function act(g:Game,action:string,data:Input={},role:'host'|'player'='hos
     if(action==='wager'){
       assert(c!.phase==='wager'&&!c!.closed,'Wagers are closed');
       assert(data.version===(entry?.wagerVersion||0),'Your teammate updated the wager. Review the saved wager and try again.');
-      const max=g.settings.finalMaxWager==='unlimited'?1e7:Math.max(0,g.finalPresentation?.scores[playerId!]??self!.score);
+      const max=finalWagerLimit(g.finalPresentation?.scores[playerId!]??self!.score,g.settings.finalMaxWager);
       assert(Number.isInteger(data.wager)&&data.wager>=0&&data.wager<=max,`Enter a whole wager between 0 and ${max}`);
       c!.wagers[playerId!]={wager:data.wager,answer:'',submitted:true,judged:false,wagerVersion:(entry?.wagerVersion||0)+1,answerVersion:entry?.answerVersion||0,answerSubmitted:false};
       syncFinalPresentation(g);
@@ -477,7 +477,7 @@ export function act(g:Game,action:string,data:Input={},role:'host'|'player'='hos
         const team=g.players.find(t=>t.id===data.playerId);assert(team,'Team not found');
         const entry=c!.wagers[team!.id];
         assert(data.wagerVersion===(entry?.wagerVersion||0)&&data.answerVersion===(entry?.answerVersion||0),'This submission changed. Review the saved submission and try again.');
-        const max=g.settings.finalMaxWager==='unlimited'?1e7:Math.max(0,g.finalPresentation?.scores[team!.id]??team!.score);
+        const max=finalWagerLimit(g.finalPresentation?.scores[team!.id]??team!.score,g.settings.finalMaxWager);
         assert(Number.isInteger(data.wager)&&data.wager>=0&&data.wager<=max,`Enter a whole wager between 0 and ${max}`);
         assert(typeof data.answer==='string'&&data.answer.length<=5000,'Use up to 5000 characters');
         assert(c!.phase!=='wager'||!data.answer,'Lock wagers before recording an answer');
@@ -495,7 +495,7 @@ export function act(g:Game,action:string,data:Input={},role:'host'|'player'='hos
         assert(g.status==='playing'&&!g.paused&&c?.phase==='wager','Wagers are closed');
         const p=g.players.find(p=>p.id===data.playerId);assert(p,'Choose a team');
         if(q?.dailyDouble)assert(c!.dailyDoubleFromId&&c!.answeringId===p!.id,'Record the wager for the assigned team');
-        const max=q?.dailyDouble||g.settings.finalMaxWager==='unlimited'?1e7:Math.max(0,p!.score);
+        const max=q?.dailyDouble?1e7:finalWagerLimit(g.finalPresentation?.scores[p!.id]??p!.score,g.settings.finalMaxWager);
         assert(Number.isInteger(data.wager)&&data.wager>=0&&data.wager<=max,`Enter a whole wager between 0 and ${max}`);
         const old=c!.wagers[p!.id];
         c!.wagers[p!.id]={wager:data.wager,answer:'',submitted:true,judged:false,answerSubmitted:false,wagerVersion:(old?.wagerVersion||0)+1,answerVersion:old?.answerVersion||0};label='Wager set';break;

@@ -22,7 +22,7 @@ function fixture(){
 test('phone wagers are shared, editable, validated and versioned until every wager is locked',()=>{
   const{g,a,b,questionId,wager}=fixture();
   assert.throws(()=>act(g,'finalBegin'),/every team/);
-  for(const amount of [-1,1201,1.5,Infinity,NaN,'100',null])assert.throws(()=>act(g,'wager',{questionId,wager:amount,version:0},'player',a.id),/whole wager/);
+  for(const amount of [-1,1501,1.5,Infinity,NaN,'100',null])assert.throws(()=>act(g,'wager',{questionId,wager:amount,version:0},'player',a.id),/whole wager/);
   wager(a.id,731);assert.equal(view(g,'player',a.id).yourFinal?.wager,731);
   assert.throws(()=>wager(a.id,500),/teammate updated/);wager(a.id,600,1);
   assert.throws(()=>act(g,'finalBegin'),/every team/);wager(b.id,0);act(g,'finalBegin');
@@ -77,10 +77,46 @@ test('host overrides support paper or disconnected phones, including correcting 
   assert.equal(entry.wager,300);assert.throws(()=>act(g,'hostFinalEntry',{questionId,playerId:a.id,wager:0,answer:'bad'},'player',a.id),/Host access/);
 });
 
-test('zero and negative scores allow a zero wager, unlimited wagers still require whole valid amounts',()=>{
+test('zero and negative scores can wager up to 1500; unlimited still requires whole valid amounts',()=>{
   const{g,a,b,wager}=fixture();a.score=-500;b.score=0;g.finalPresentation!.scores={[a.id]:-500,[b.id]:0};
-  assert.throws(()=>wager(a.id,1),/between 0 and 0/);wager(a.id,0);wager(b.id,0);act(g,'finalBegin');
+  assert.throws(()=>wager(a.id,1501),/between 0 and 1500/);wager(a.id,1500);wager(b.id,0);act(g,'finalBegin');
   const other=fixture();other.g.settings.finalMaxWager='unlimited';other.wager(other.a.id,1e7);assert.throws(()=>other.wager(other.b.id,1e7+1),/whole wager/);
+});
+
+test('phone wagers and both host entry paths share the 1500 allowance and larger score limits',()=>{
+  for(const score of [-600,0,800,1500,4000])for(const path of ['phone','hostWager','hostFinalEntry']){
+    const{g,a,questionId}=fixture();a.score=score;g.finalPresentation!.scores[a.id]=score;
+    const limit=Math.max(1500,score);
+    const submit=(amount:number,version:number)=>{
+      if(path==='phone')act(g,'wager',{questionId,wager:amount,version},'player',a.id);
+      else if(path==='hostWager')act(g,'hostWager',{playerId:a.id,wager:amount});
+      else act(g,'hostFinalEntry',{questionId,playerId:a.id,wager:amount,answer:'',wagerVersion:version,answerVersion:version});
+    };
+    submit(0,0);assert.equal(g.current!.wagers[a.id].wager,0);
+    submit(limit,1);assert.equal(g.current!.wagers[a.id].wager,limit);
+    assert.equal(a.score,score,'Entering a wager must not reset or alter the score');
+    assert.throws(()=>submit(limit+1,2),/whole wager/);
+    assert.equal(g.current!.wagers[a.id].wager,limit,'Rejected wagers must preserve the saved entry');
+  }
+});
+
+test('a negative-score team gains or loses its wager from its existing score and may choose zero',()=>{
+  const{g,a,b,wager,lock,grade}=fixture();a.score=-600;b.score=-300;
+  g.finalPresentation!.scores={[a.id]:-600,[b.id]:-300};
+  wager(a.id,1500);wager(b.id,0);act(g,'finalBegin');lock();
+  grade(a.id,'correct');assert.equal(a.score,900);
+  grade(a.id,'incorrect');assert.equal(a.score,-2100);
+  grade(b.id,'incorrect');assert.equal(b.score,-300);
+  grade(b.id,'correct');assert.equal(b.score,-300);
+  assert.deepEqual(view(g,'stage').players.map(p=>p.score),[-600,-300]);
+});
+
+test('post-judgment host corrections use the opening score rather than winnings to raise the wager limit',()=>{
+  const{g,a,b,questionId,wager,lock,grade}=fixture();a.score=4000;g.finalPresentation!.scores[a.id]=4000;
+  wager(a.id,4000);wager(b.id,0);act(g,'finalBegin');lock();grade(a.id,'correct');assert.equal(a.score,8000);
+  const entry=g.current!.wagers[a.id];
+  assert.throws(()=>act(g,'hostFinalEntry',{questionId,playerId:a.id,wager:4001,answer:'',wagerVersion:entry.wagerVersion,answerVersion:entry.answerVersion}),/between 0 and 4000/);
+  assert.equal(a.score,8000);
 });
 
 test('lock missing answers for a paper game, reject paused or stale edits, and preserve submissions through restart/rejoin',()=>{
