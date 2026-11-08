@@ -8,6 +8,7 @@ import {api,download,go,number,playerKey,sortedPlayers,themeStyle,useGame,useGam
 import {flushAutosaves} from './autosave';
 import {useSoundCues} from './useSoundCues';
 import {createBuzzerInput,sendBuzz} from './buzzer';
+import {HostImageControl} from './HostImageControl';
 import {HostDailyDouble} from './DailyDouble';
 import {FinalWagers} from './FinalWagers';
 import {FinalResults} from './FinalResults';
@@ -162,7 +163,7 @@ function ResetGameDialog({name,command,onClose,onReset}:{name:string;command:Com
   </Modal>;
 }
 
-function HostQuestion({g,command}:{g:GameView;command:Command}){const c=g.current!,q=g.currentQuestion!;const final=g.rounds[g.roundIndex].type==='final';if(q.dailyDouble&&!final)return <HostDailyDouble g={g} command={command}/>;if(c.phase==='modifier')return <HostModifier g={g} command={command}/>;return <div className="host-question"><div className="question-meta"><span>{c.category}</span><span>{q.dailyDouble?'Daily double':number(q.value)}</span></div>{c.phase==='wager'?<><FinalWagers g={g} command={command}/><div className="host-answer"><span className="eyebrow">Host preview</span><RichText text={q.prompt}/><hr/><RichText text={q.answer}/></div></>:<><div className="host-clue"><RichText text={q.prompt}/><AnswerChoices question={q}/></div><div className="host-answer"><div className="answer-heading"><span className="eyebrow">Answer · host only</span></div><RichText text={q.answer}/>{q.notes&&<div className="host-notes"><RichText text={q.notes}/></div>}</div>{final?<FinalAnswers g={g} command={command}/>:<AnswerDecision key={`${c.questionId}:${c.answerToken||'waiting'}`} g={g} command={command}/>}</>}</div>}
+function HostQuestion({g,command}:{g:GameView;command:Command}){const c=g.current!,q=g.currentQuestion!;const final=g.rounds[g.roundIndex].type==='final';if(q.dailyDouble&&!final)return <HostDailyDouble g={g} command={command}/>;if(c.phase==='modifier')return <HostModifier g={g} command={command}/>;return <div className="host-question"><div className="question-meta"><span>{c.category}</span><span>{q.dailyDouble?'Daily double':number(q.value)}</span></div>{c.phase==='wager'?<><FinalWagers g={g} command={command}/><div className="host-answer"><span className="eyebrow">Host preview</span><RichText text={q.prompt}/><hr/><RichText text={q.answer}/></div></>:<><div className="host-clue"><HostImageControl g={g}/><RichText text={q.prompt}/><AnswerChoices question={q}/></div><div className="host-answer"><div className="answer-heading"><span className="eyebrow">Answer · host only</span></div><RichText text={q.answer}/>{q.notes&&<div className="host-notes"><RichText text={q.notes}/></div>}</div>{final?<FinalAnswers g={g} command={command}/>:<AnswerDecision key={`${c.questionId}:${c.answerToken||'waiting'}`} g={g} command={command}/>}</>}</div>}
 function PlayerList({g,command,onAdjust}:{g:GameView;command:Command;onAdjust:(id:string)=>void}){
   const[adding,setAdding]=useState(false),[name,setName]=useState('');
   const addTeamButton=useRef<HTMLButtonElement>(null);

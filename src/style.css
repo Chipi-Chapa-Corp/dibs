@@ -189,3 +189,48 @@
 .player-main .final-category-selection{padding:1rem 0;text-align:left}
 @media(max-width:600px){.final-category-editor{padding:1rem}.final-category-list .button{padding:.65rem}.final-category-list .button span{display:none}.stage-surface>.final-category-selection{padding:1.5rem}}
 @media(prefers-reduced-motion:reduce){.final-category-list li{transition:none}}
+
+/* Presenter: reserve the screen for the clue, media and team scores. */
+.stage-surface{height:100svh;min-height:0}
+.stage-header{flex:0 0 auto;min-height:64px;padding:1rem 2rem;gap:1.5rem}
+.stage-header .stage-brand{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:1.25rem}
+.stage-header-clue{display:flex;align-items:center;justify-content:center;gap:1rem;min-width:0;font-size:1.125rem;font-weight:550;color:var(--ink)!important}
+.stage-header-clue>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stage-header-clue>span:last-child{color:var(--muted);font-variant-numeric:tabular-nums}
+.stage-header-round{flex:1;text-align:right;white-space:nowrap;color:var(--muted);font-size:1rem}
+.stage-question{flex:1 1 0;min-height:0;padding:1.5rem 3vw;animation:none}
+.stage-question-body{flex:1 1 0;min-height:0;padding:0;align-items:stretch;justify-content:flex-start;gap:1rem;font-size:clamp(1.125rem,2vw,2rem);line-height:1.4}
+.screen-fit{position:relative;flex:1;min-width:0;min-height:0;overflow:hidden}
+.screen-fit-content{display:flex;flex-direction:column;gap:1rem;width:100%;height:100%;transform-origin:top left}
+.presentation-clue{display:flex;flex-direction:column;flex:1;min-height:0;gap:1rem;line-height:1.4}
+.presenter-clue-text{flex:0 0 auto;text-align:center}
+.presenter-clue-text:empty,.presenter-clue-media:empty{display:none}
+.presenter-clue-text p{margin:.4em 0;line-height:1.4}
+.presenter-clue-text>*:first-child{margin-top:0}
+.presenter-clue-text>*:last-child{margin-bottom:0}
+.presenter-clue-media{display:flex;flex:1 1 0;gap:1rem;min-height:80px;min-width:0}
+.presenter-media-item{display:flex;align-items:center;justify-content:center;flex:1 1 0;min-width:0;min-height:0}
+.stage-question .rich-text .presenter-media-item img,.stage-question .rich-text .presenter-media-item video,.stage-question .rich-text .presenter-media-item iframe{display:block;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;aspect-ratio:auto;margin:0}
+.screen-fit-content>.answer-choices{flex:0 0 auto;align-self:center;width:min(900px,100%);font-size:clamp(1rem,1.5vw,1.5rem);margin:0}
+.stage-score-strip{flex:0 0 auto;margin-top:0}
+.stage-score-strip>div{padding:1rem 1.5rem}
+.stage-score-strip>div>span{font-size:1.125rem}
+.stage-score-strip strong{font-size:clamp(1.75rem,2.5vw,2.75rem);margin-top:.3rem}
+.stage-answer{inset:0;padding:1.5rem 3vw;gap:1rem}
+.stage-answer>.screen-fit{width:100%;font:400 clamp(1.5rem,3vw,3rem)/1.3 var(--display)}
+.host-image-overlay{position:fixed;inset:0;z-index:100;width:100vw;height:100svh;max-width:none;max-height:none;margin:0;border:0;background:var(--paper);color:var(--ink);padding:3.5rem 1.5rem 1.5rem}
+.host-image-overlay[open]{display:flex}
+.host-image-close{position:absolute;top:.75rem;right:1rem;z-index:1;background:var(--paper)}
+.host-image-overlay>.rich-text{display:flex;gap:1rem;flex:1;min-width:0;min-height:0}
+.host-image-overlay>.rich-text img{flex:1 1 0;min-width:0;min-height:0;width:100%;height:100%;max-width:100%;max-height:100%;margin:0;object-fit:contain}
+.host-image-controls{display:flex;justify-content:flex-end;margin-bottom:1rem}
+.host-image-controls .button{font-size:1rem;min-height:40px;padding:.5rem .8rem}
+.stage-preview{height:530px;min-height:0}
+.stage-preview .stage-header{padding:1rem;gap:1rem}
+@media(max-width:760px){.stage-header{flex-wrap:nowrap;padding:.8rem 1rem;gap:.75rem;min-height:56px}.stage-header .stage-brand{font-size:1rem}.stage-header>.stage-header-clue{order:0;flex-basis:auto;font-size:1rem;gap:.5rem}.stage-header-round{font-size:.85rem}.stage-question{padding:1rem}.stage-score-strip{overflow:hidden}.stage-score-strip>div{min-width:0;padding:.75rem .5rem}.stage-score-strip>div>span{font-size:1rem}.host-image-overlay{padding:.75rem}}
+.stage-main{display:flex;flex:1 1 0;min-width:0;min-height:0}
+.stage-main>.screen-fit>.screen-fit-content{gap:0}
+.stage-main .stage-board{min-height:0;width:100%}
+.stage-main .stage-board .board-scroll{overflow:visible;min-width:0;width:100%}
+.stage-main .stage-lobby,.stage-main .finale{min-height:0}
+.stage-main .final-category-selection{padding:1.5rem 3vw}

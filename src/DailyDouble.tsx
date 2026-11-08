@@ -1,6 +1,7 @@
 import {useEffect,useState} from 'react';
 import {ArrowRight,Check,ChevronDown,X} from 'lucide-react';
 import type {GameView} from '../shared/model';
+import {HostImageControl} from './HostImageControl';
 import {ContinueQuestion} from './ContinueQuestion';
 import {dailyDoubleStep} from '../shared/daily-double';
 import {AnswerChoices,Button,HostDailyDoubleStatus,Field,RichText} from './components';
@@ -28,7 +29,7 @@ export function HostDailyDouble({g,command}:{g:GameView;command:Command}){
     {step==='wager'&&team&&<><p className="dd-notice">Offer the amounts aloud, then record {team.name}’s choice.</p><form className="dd-wager-form" onSubmit={async e=>{e.preventDefault();if(validWager(wager))await run('hostWager',{playerId:team.id,wager:Number(wager)});}}><Field label="Wager"><input autoFocus type="number" min={0} max={1e7} step={1} value={wager} onChange={e=>setWager(e.target.value)} disabled={disabled}/></Field><Button type="submit" variant="primary" disabled={disabled||!validWager(wager)}>Confirm wager<ArrowRight size={22}/></Button></form></>}
     {step==='open'&&<Button className="dd-primary-action" variant="primary" disabled={disabled} onClick={()=>void run('finalBegin')}>Open question<ArrowRight size={22}/></Button>}
     {(step==='answer'||step==='result')&&<>
-      <div className="host-clue"><RichText text={q.prompt}/><AnswerChoices question={q}/></div>
+      <div className="host-clue"><HostImageControl g={g}/><RichText text={q.prompt}/><AnswerChoices question={q}/></div>
       <div className="dd-answer"><h3>Answer</h3><RichText text={q.answer}/></div>
       <div className="team-result-buttons dd-judging" role="group" aria-label={`Result for ${team?.name}`}><Button className="result-correct" aria-pressed={entry?.judged&&entry.correct===true} disabled={disabled} onClick={()=>void run('gradeTeam',{questionId:c.questionId,playerId:team!.id,result:'correct'})}><Check size={20}/>Correct</Button><Button className="result-incorrect" aria-pressed={entry?.judged&&entry.correct===false} disabled={disabled} onClick={()=>void run('gradeTeam',{questionId:c.questionId,playerId:team!.id,result:'incorrect'})}><X size={20}/>Incorrect</Button></div>{step==='result'&&<ContinueQuestion g={g} command={run}/>}
     </>}
