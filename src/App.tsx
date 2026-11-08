@@ -1,14 +1,16 @@
 import {FinalCategories} from './FinalCategories';
 import {useEffect,useRef,useState} from 'react';
 import {AppLink,usePathname} from './navigation';
-import {ArrowUpRight,ArrowRight,Plus,Users,Monitor,Settings2,Palette,Grid2X2,Layers,CircleHelp,Play,Pause,Flag,Hand,Check,X,Lock,Unlock,Copy,Download,Upload,ChevronDown,ArrowLeft,MoreHorizontal,Zap,QrCode,Pencil,RotateCcw,Trash2,LogOut,Volume2,VolumeX} from 'lucide-react';
+import {ArrowUpRight,ArrowRight,Plus,Users,Monitor,Settings2,Palette,Grid2X2,Layers,CircleHelp,Play,Pause,Flag,Hand,Check,X,Lock,Unlock,Copy,Download,Upload,ChevronDown,ArrowLeft,MoreHorizontal,Zap,QrCode,Pencil,RotateCcw,Trash2,LogOut} from 'lucide-react';
 import type {GameSummary,GameView,Theme} from '../shared/model';
 import {themes,defaultTheme,defaultSettings,emptyRound,roundName} from '../shared/model';
 import {api,download,go,number,playerKey,sortedPlayers,themeStyle,useGame,useGames,useNow,useToast} from './lib';
 import {flushAutosaves} from './autosave';
-import {useSoundCues} from './useSoundCues';
+import {PresenterControls} from './PresenterControls';
+import {usePresenterDisplay} from './usePresenterDisplay';
 import {createBuzzerInput,sendBuzz} from './buzzer';
-import {HostImageControl} from './HostImageControl';
+import {HostClue} from './HostClue';
+import {PresenterFeedback} from './media-context';
 import {HostDailyDouble} from './DailyDouble';
 import {FinalWagers} from './FinalWagers';
 import {FinalResults} from './FinalResults';
@@ -113,29 +115,30 @@ function GameEditor({id}:{id:string}){
 }
 
 function Host({id}:{id:string}){
-  const{g,connected,error,command}=useGame(id,'host');
+  const{g,connected,error,command,presenters}=useGame(id,'host');
   const[invite,setInvite]=useState(false),[adjust,setAdjust]=useState<string|null>(null),[confirm,setConfirm]=useState<'finish'|'round'|null>(null),[reset,setReset]=useState(false),[more,setMore]=useState(false);
-  const{muted,toggleSound}=useSoundCues(g,'host');
+  const[presenterControls,setPresenterControls]=useState(false);
   const toast=useToast();
   if(!g&&error==='Someone is already hosting this game.')return <main className="loading-page"><Logo/><h2>{error}</h2><AppLink className="button primary" href={`/play/${id}`}>Join<ArrowRight size={20}/></AppLink><AppLink className="button" href="/">Back to games<ArrowLeft size={20}/></AppLink></main>;
   if(!g)return <LoadError error={error} connected={connected}/>;
   const questionTotal=g.filledQuestionIds.length;
   const waitingForReady=g.players.some(p=>!p.ready);
-  return <div className="host-app hosting-app" style={themeStyle(g.theme)}>
-    <header className="host-header"><div className="host-header-identity"><AppLink className="icon-button host-header-button library-link" href="/" title="Library" aria-label="Library"><ArrowLeft size={22}/></AppLink><span className="host-game-name">{g.name}</span></div><div className="header-actions"><Connection connected={connected}/><IconButton className="icon-button host-header-button" title="Game controls" onClick={()=>setMore(true)}><Settings2 size={22}/></IconButton><IconButton className="icon-button host-header-button" title="Invite" onClick={()=>setInvite(true)}><Users size={22}/></IconButton><AppLink className="icon-button host-header-button" href={`/stage/${id}`} target="_blank" rel="noreferrer" title="Presenter" aria-label="Presenter"><Monitor size={22}/></AppLink></div></header>
+  return <PresenterFeedback.Provider value={{connected,presenters}}><div className="host-app hosting-app" style={themeStyle(g.theme)}>
+    <header className="host-header"><div className="host-header-identity"><AppLink className="icon-button host-header-button library-link" href="/" title="Library" aria-label="Library"><ArrowLeft size={22}/></AppLink><span className="host-game-name">{g.name}</span></div><div className="header-actions"><Connection connected={connected}/><IconButton className="icon-button host-header-button" title="Game controls" onClick={()=>setMore(true)}><Settings2 size={22}/></IconButton><IconButton className="icon-button host-header-button" title="Invite" onClick={()=>setInvite(true)}><Users size={22}/></IconButton><IconButton className="icon-button host-header-button" title="Presenter controls" onClick={()=>setPresenterControls(true)}><Monitor size={22}/></IconButton></div></header>
     <main className="host-main hosting-main">
       {g.status!=='lobby'&&<div className="live-toolbar"><div className="round-select"><span className="eyebrow">Round</span><select aria-label="Current round" disabled={g.status==='finished'} value={g.roundIndex} onChange={e=>void command('round',{index:Number(e.target.value)})}>{g.rounds.map((r,i)=><option key={r.id} value={i}>{roundName(i)}{r.type==='final'?' · Final':''}</option>)}</select>{g.paused&&<span className="tag">Paused</span>}</div></div>}
       <div className="live-layout"><section className="live-table">
         {g.status==='lobby'?<div className="host-waiting"><span className="eyebrow">Ready to host</span><h1>Gather your teams.</h1><p>{g.rounds.length} {g.rounds.length===1?'round':'rounds'} · {questionTotal} {questionTotal===1?'question':'questions'}</p><Button variant="primary" disabled={!connected||!questionTotal||!g.players.length||waitingForReady||!!g.editLock} onClick={()=>void command('start')}><Play size={20}/>Start game</Button>{!g.players.length&&<p className="field-hint">Create your teams using the + button before starting.</p>}{g.editLock&&<p className="field-hint">Someone is editing this game. You can start when they’re done.</p>}{waitingForReady&&<p className="field-hint">Waiting for all teams to mark themselves ready.</p>}{!questionTotal&&<p className="field-hint">This game needs questions first. Prepare it from the <AppLink href="/">game library</AppLink>.</p>}</div>
-        :g.status==='finished'?<div className="host-results"><span className="eyebrow">Final standings</span><h1>{sortedPlayers(g.players).filter(p=>p.score===Math.max(...g.players.map(x=>x.score))).map(p=>p.name).join(' & ')||'Good game.'}</h1><Scores g={g}/><div className="results-actions"><Button variant="primary" disabled={!connected} onClick={()=>setReset(true)}><RotateCcw size={20}/>Play again</Button><AppLink className="button" href="/">Choose another game<ArrowRight size={20}/></AppLink></div></div>
+        :g.status==='finished'?<div className="host-results"><span className="eyebrow">Final standings</span><h1>{sortedPlayers(g.players).filter(p=>p.score===Math.max(...g.players.map(x=>x.score))).map(p=>p.name).join(' & ')||'Good game.'}</h1><Scores g={g}/><div className="results-actions">{g.theme.motion&&!g.resultsSkipped&&<Button disabled={!connected} onClick={()=>void command('skipResults')}>Skip results reveal</Button>}<Button variant="primary" disabled={!connected} onClick={()=>setReset(true)}><RotateCcw size={20}/>Play again</Button><AppLink className="button" href="/">Choose another game<ArrowRight size={20}/></AppLink></div></div>
         :g.rounds[g.roundIndex].type==='final'&&!g.current?<FinalCategories g={g} command={command}/>:g.current?<HostQuestion key={g.current.questionId} g={g} command={command}/>
         :<><Board g={g} onSelect={!g.paused&&!g.selection?q=>void command('selectQuestion',{questionId:q.id}):undefined}/><div className="board-bottom">{g.roundIndex<g.rounds.length-1?<Button onClick={()=>setConfirm('round')}>Next round<ArrowRight size={20}/></Button>:<Button onClick={()=>setConfirm('finish')}>Finish game<Flag size={20}/></Button>}</div></>}
       </section><aside className="live-side"><PlayerList g={g} command={command} onAdjust={setAdjust}/><ModifierReminders g={g} command={command}/></aside></div>
     </main>
+    {presenterControls&&<Modal title="Presenter controls" onClose={()=>setPresenterControls(false)}><PresenterControls g={g} presenters={presenters} connected={connected} command={command}/></Modal>}
     {invite&&<Invite onClose={()=>setInvite(false)}/>}
     {adjust&&<TeamsPanel g={g} command={command} onClose={()=>setAdjust(null)}/>}
     {more&&<Modal title="Game controls" onClose={()=>setMore(false)}><div className="host-more-actions">
-      <Button aria-pressed={!muted} onClick={toggleSound}>{muted?<VolumeX size={20}/>:<Volume2 size={20}/>} {muted?'Enable selection sound':'Mute selection sound'}</Button>
+      <Button onClick={()=>{setMore(false);setPresenterControls(true);}}><Monitor size={20}/>Presenter controls</Button>
       {g.status==='playing'&&<Button disabled={!connected} onClick={async()=>{if(await command('pause'))setMore(false);}}>{g.paused?<Play size={20}/>:<Pause size={20}/>} {g.paused?'Resume game':'Pause game'}</Button>}
       {g.status==='finished'&&<Button disabled={!connected} onClick={async()=>{if(await command('resume'))setMore(false);}}><Play size={20}/>Resume game</Button>}
       {g.status==='playing'&&<Button onClick={()=>{setMore(false);setConfirm('finish');}}><Flag size={20}/>Finish game</Button>}
@@ -143,7 +146,7 @@ function Host({id}:{id:string}){
     </div></Modal>}
     {reset&&<ResetGameDialog name={g.name} command={command} onClose={()=>setReset(false)} onReset={()=>{setReset(false);setAdjust(null);setConfirm(null);toast('Game reset · teams can join again');}}/>}
     {confirm&&<Modal title={confirm==='finish'?'Finish this game?':'Move to the next round?'} onClose={()=>setConfirm(null)}><div className="modal-actions"><Button onClick={()=>setConfirm(null)}>Cancel</Button><Button variant="primary" disabled={!connected} onClick={async()=>{if(await command(confirm==='finish'?'finish':'round',{index:g.roundIndex+1}))setConfirm(null);}}>{confirm==='finish'?'Show results':'Next round'}<ArrowRight size={20}/></Button></div></Modal>}
-  </div>;
+  </div></PresenterFeedback.Provider>;
 }
 function ResetGameDialog({name,command,onClose,onReset}:{name:string;command:Command;onClose:()=>void;onReset:()=>void}){
   const[busy,setBusy]=useState(false),[error,setError]=useState('');
@@ -163,7 +166,7 @@ function ResetGameDialog({name,command,onClose,onReset}:{name:string;command:Com
   </Modal>;
 }
 
-function HostQuestion({g,command}:{g:GameView;command:Command}){const c=g.current!,q=g.currentQuestion!;const final=g.rounds[g.roundIndex].type==='final';if(q.dailyDouble&&!final)return <HostDailyDouble g={g} command={command}/>;if(c.phase==='modifier')return <HostModifier g={g} command={command}/>;return <div className="host-question"><div className="question-meta"><span>{c.category}</span><span>{q.dailyDouble?'Daily double':number(q.value)}</span></div>{c.phase==='wager'?<><FinalWagers g={g} command={command}/><div className="host-answer"><span className="eyebrow">Host preview</span><RichText text={q.prompt}/><hr/><RichText text={q.answer}/></div></>:<><div className="host-clue"><HostImageControl g={g}/><RichText text={q.prompt}/><AnswerChoices question={q}/></div><div className="host-answer"><div className="answer-heading"><span className="eyebrow">Answer · host only</span></div><RichText text={q.answer}/>{q.notes&&<div className="host-notes"><RichText text={q.notes}/></div>}</div>{final?<FinalAnswers g={g} command={command}/>:<AnswerDecision key={`${c.questionId}:${c.answerToken||'waiting'}`} g={g} command={command}/>}</>}</div>}
+function HostQuestion({g,command}:{g:GameView;command:Command}){const c=g.current!,q=g.currentQuestion!;const final=g.rounds[g.roundIndex].type==='final';if(q.dailyDouble&&!final)return <HostDailyDouble g={g} command={command}/>;if(c.phase==='modifier')return <HostModifier g={g} command={command}/>;return <div className="host-question"><div className="question-meta"><span>{c.category}</span><span>{q.dailyDouble?'Daily double':number(q.value)}</span></div>{c.phase==='wager'?<><FinalWagers g={g} command={command}/><div className="host-answer"><span className="eyebrow">Host preview</span><RichText text={q.prompt}/><hr/><RichText text={q.answer}/></div></>:<><HostClue g={g} command={command}/><div className="host-answer"><div className="answer-heading"><span className="eyebrow">Answer · host only</span></div><RichText text={q.answer}/>{q.notes&&<div className="host-notes"><RichText text={q.notes}/></div>}</div>{final?<FinalAnswers g={g} command={command}/>:<AnswerDecision key={`${c.questionId}:${c.answerToken||'waiting'}`} g={g} command={command}/>}</>}</div>}
 function PlayerList({g,command,onAdjust}:{g:GameView;command:Command;onAdjust:(id:string)=>void}){
   const[adding,setAdding]=useState(false),[name,setName]=useState('');
   const addTeamButton=useRef<HTMLButtonElement>(null);
@@ -214,7 +217,8 @@ function ModifierReminders({g,command}:{g:GameView;command:Command}){
   return <section className="modifier-reminders"><div className="side-heading"><h2>Claimed modifiers</h2><Zap size={20}/></div>{g.modifierClaims.map(m=><div className="modifier-reminder" key={m.id}><div><strong>{m.title}</strong><IconButton title={`Dismiss ${m.title} reminder`} onClick={()=>void command('dismissModifier',{id:m.id})}><X size={18}/></IconButton></div><span className="field-hint">{g.players.find(p=>p.id===m.playerId)?.name||'Removed team'} · round {m.roundIndex+1}</span><RichText text={m.instructions}/></div>)}</section>;
 }
 
-function Stage({id}:{id:string}){const{g,error}=useGame(id,'stage');useEffect(()=>{document.title=g?`${g.name} · Presenter`:'Presenter';},[g?.name]);return g?<StageContent g={g}/>:<LoadError error={error}/>;}
+function Stage({id}:{id:string}){const{g,error,reportPresenter}=useGame(id,'stage');useEffect(()=>{document.title=g?`${g.name} · Presenter`:'Presenter';},[g?.name]);return g?<PresenterDisplay g={g} report={reportPresenter}/>:<div className="stage-connection" role="status">{error||'Connecting…'}</div>;}
+function PresenterDisplay({g,report}:{g:GameView;report:Parameters<typeof usePresenterDisplay>[1]}){const root=usePresenterDisplay(g,report);return <div ref={root} className="presenter-display"><StageContent g={g}/></div>;}
 function PlayerEntry({id}:{id:string}){const[hasToken,setHasToken]=useState(!!playerKey(id));return hasToken?<PlayerGame id={id} rejoin={()=>{localStorage.removeItem(`jeopardy:player:${id}`);setHasToken(false);}}/>:<JoinGame id={id} joined={()=>setHasToken(true)}/>;}
 function JoinGame({id,joined}:{id:string;joined:()=>void}){
   const{g,error}=useGame(id,'stage');

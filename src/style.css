@@ -234,3 +234,22 @@
 .stage-main .stage-board .board-scroll{overflow:visible;min-width:0;width:100%}
 .stage-main .stage-lobby,.stage-main .finale{min-height:0}
 .stage-main .final-category-selection{padding:1.5rem 3vw}
+.presenter-display{height:100svh;overflow:hidden}
+.presenter-controls>p{margin:0 0 1.25rem}
+.presenter-controls .presenter-control-error{margin:1rem 0 0;padding:.85rem 1rem;border:1px solid var(--line);font-size:1rem;color:var(--ink)}
+.stage-connection{height:100svh;display:grid;place-items:center;padding:2rem;text-align:center;background:var(--paper);color:var(--muted);font-size:1.25rem}
+/* Audio clues: host transport controls and a live, read-only signal on the display. */
+.host-audio-controls{border:1px solid var(--line);background:var(--surface);padding:1.25rem;margin:1.25rem 0 0;border-radius:4px;font-size:1rem;line-height:1.4}
+.host-audio-heading{display:flex;align-items:center;gap:.85rem;margin-bottom:1.25rem}
+.host-audio-heading>svg{color:var(--accent)}
+.host-audio-heading>div{display:flex;flex:1;flex-direction:column;gap:.25rem}
+.host-audio-heading strong{font-size:1.125rem}
+.host-audio-heading span{color:var(--muted)}
+.host-audio-time{font-size:.95rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+.host-audio-actions{display:flex;gap:.75rem;flex-wrap:wrap}
+.host-audio-actions>.button{flex:1;min-height:44px;justify-content:center;font-size:1rem}
+.presenter-audio{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.75rem;width:100%;height:100%;max-width:960px;min-width:0;min-height:0;margin:auto}
+.presenter-audio>audio{display:none!important}
+.audio-wave-shell{width:100%;height:clamp(72px,18svh,180px);min-height:32px;flex-shrink:1}
+.audio-waveform{display:block;width:100%;height:100%;color:var(--accent)}
+.rich-text .media-paragraph{margin:.8em 0}

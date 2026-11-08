@@ -1,6 +1,6 @@
 import {useEffect,useState} from 'react';
 import type {CSSProperties} from 'react';
-import {ArrowRight,Trophy} from 'lucide-react';
+import {Trophy} from 'lucide-react';
 import type {GameView} from '../shared/model';
 import {number,useNow} from './lib';
 import {RichText} from './components';
@@ -8,14 +8,14 @@ import {FINAL_ANSWER_MS,RESULTS_COUNTDOWN_MS,resultGroups,resultRevealAt,resultS
 
 export function FinalResults({g,preview=false}:{g:GameView;preview?:boolean}){
   const now=useNow(),[clockOffset]=useState(()=>g.serverTime-Date.now());
-  const[skip,setSkip]=useState(false),[reduced,setReduced]=useState(()=>matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const[reduced,setReduced]=useState(()=>matchMedia('(prefers-reduced-motion: reduce)').matches);
   useEffect(()=>{
     const media=matchMedia('(prefers-reduced-motion: reduce)'),change=()=>setReduced(media.matches);
     media.addEventListener('change',change);return()=>media.removeEventListener('change',change);
   },[]);
   const groups=resultGroups(g.players),finishedAt=g.history.find(entry=>entry.label==='Game finished')?.at;
   // Use the server's finish time so every display stays in sync, including after a refresh.
-  const elapsed=skip||reduced||!g.theme.motion||preview||!finishedAt?Infinity:Math.max(0,now+clockOffset-finishedAt);
+  const elapsed=g.resultsSkipped||reduced||!g.theme.motion||preview||!finishedAt?Infinity:Math.max(0,now+clockOffset-finishedAt);
   const finalAnswer=g.rounds[g.roundIndex].type==='final'?g.currentQuestion?.answer:undefined;
   const resultsElapsed=elapsed-(finalAnswer?FINAL_ANSWER_MS:0),showAnswer=resultsElapsed<0;
   const step=resultStep(resultsElapsed,groups.length),active=groups[step],winner=!!active&&step===groups.length-1;
@@ -48,6 +48,5 @@ export function FinalResults({g,preview=false}:{g:GameView;preview?:boolean}){
         </div>;
       })}
     </div>
-    {!winner&&g.role!=='player'&&<button className="finale-skip" onClick={()=>setSkip(true)}>Skip reveal<ArrowRight size={16}/></button>}
   </section>;
 }

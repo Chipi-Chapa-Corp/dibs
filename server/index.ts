@@ -10,7 +10,7 @@ import multer from 'multer';
 import {fileURLToPath} from 'node:url';
 import {act,joinMember,removeMember,createGame,view,tick,token} from './engine.ts';
 import {openGameStore} from './storage.ts';
-import type {Game,GameSummary} from '../shared/model.ts';
+import type {Game,GameSummary,PresenterStatus} from '../shared/model.ts';
 import {isQuestionFilled} from '../shared/model.ts';
 
 export async function startServer(options:{port?:number;dataDir?:string;dev?:boolean;quiet?:boolean;mediaDir?:string;limits?:{maxGames?:number;mediaBytes?:number;fileBytes?:number}}={}){
@@ -42,7 +42,11 @@ export async function startServer(options:{port?:number;dataDir?:string;dev?:boo
     for(const member of g.members)member.connected=[...io.sockets.sockets.values()].some(s=>s.connected&&s.data.gameId===g.id&&s.data.memberId===member.id);
     for(const team of g.players)team.connected=g.members.some(m=>m.teamId===team.id&&m.connected);
   };
-  const publish=(g:Game,removedMessage='You were removed from this game')=>{presence(g);grantWaitingEditor(g);for(const s of io.sockets.sockets.values())if(s.data.gameId===g.id){if(s.data.role==='player'&&!g.members.some(m=>m.id===s.data.memberId)){s.emit('revoked',removedMessage);s.data={};continue;}s.emit('state',{...view(g,s.data.role,s.data.playerId,Date.now(),s.data.memberId),editLock:editLocks.has(g.id)?editLocks.get(g.id)===s.id?'mine':'other':null});}io.emit('games',summaries());save(g);};
+  const notifyPresenters=(gameId:string)=>{
+    const statuses:PresenterStatus[]=[...io.sockets.sockets.values()].filter(s=>s.connected&&s.data.gameId===gameId&&s.data.role==='stage').map(s=>({id:s.id,fullscreen:false,sound:false,...s.data.presenterStatus}));
+    for(const s of io.sockets.sockets.values())if(s.data.gameId===gameId&&s.data.role==='host')s.emit('presenterStatus',statuses);
+  };
+  const publish=(g:Game,removedMessage='You were removed from this game')=>{presence(g);grantWaitingEditor(g);for(const s of io.sockets.sockets.values())if(s.data.gameId===g.id){if(s.data.role==='player'&&!g.members.some(m=>m.id===s.data.memberId)){s.emit('revoked',removedMessage);s.data={};continue;}s.emit('state',{...view(g,s.data.role,s.data.playerId,Date.now(),s.data.memberId),editLock:editLocks.has(g.id)?editLocks.get(g.id)===s.id?'mine':'other':null});}notifyPresenters(g.id);io.emit('games',summaries());save(g);};
   const game=(id:string)=>{const g=games.get(id.toUpperCase());if(!g)throw new Error('Game not found');return g;};
   app.disable('x-powered-by');
   app.use((req,res,next)=>{
@@ -128,6 +132,18 @@ export async function startServer(options:{port?:number;dataDir?:string;dev?:boo
         if(p)p.connected=true;
         publish(g);ack?.({ok:true});
       }catch(e){ack?.({ok:false,error:(e as Error).message});}
+    });
+    s.on('presenterStatus',(input:Omit<PresenterStatus,'id'>,ack?:(value:unknown)=>void)=>{
+      try{
+        if(s.data.role!=='stage'||!games.has(s.data.gameId))throw new Error('Only a subscribed presenter can report display status');
+        if(!input||typeof input.fullscreen!=='boolean'||typeof input.sound!=='boolean')throw new Error('Invalid display status');
+        const status:Omit<PresenterStatus,'id'>={fullscreen:input.fullscreen,sound:input.sound};
+        for(const key of ['fullscreenError','soundError','mediaError'] as const)if(typeof input[key]==='string')status[key]=input[key]!.slice(0,240);
+        if(['idle','playing','paused','ended','blocked'].includes(input.mediaState||''))status.mediaState=input.mediaState;
+        for(const key of ['mediaTime','mediaDuration'] as const)if(typeof input[key]==='number'&&Number.isFinite(input[key])&&input[key]!>=0&&input[key]!<=86400)status[key]=input[key];
+        if(typeof input.mediaSource==='string')status.mediaSource=input.mediaSource.slice(0,4096);
+        s.data.presenterStatus=status;notifyPresenters(s.data.gameId);ack?.({ok:true});
+      }catch(error){ack?.({ok:false,error:(error as Error).message});}
     });
     s.on('command',(input:{action:string;data?:Record<string,unknown>},ack:(v:unknown)=>void)=>{
       let revision:number|undefined;

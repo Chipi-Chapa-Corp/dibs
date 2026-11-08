@@ -10,6 +10,7 @@ export class GameSounds {
   private announcementKey:string|undefined;
   private enabled=false;
   constructor(private createContext=()=>new AudioContext()){}
+  get state(){return this.context?.state||'unavailable';}
 
   unlock(){
     try{

@@ -184,6 +184,7 @@ function selectableQuestion(g:Game,qid:string){
 }
 function open(g:Game,qid:string,now:number){
   const {r,c,q}=selectableQuestion(g,qid);
+  if(g.presenter){g.presenter.mediaPlaying=false;g.presenter.version++;}
   g.questionCount++;g.current={openedAt:now,answerToken:null,dailyDoubleFromId:null,questionId:qid,category:c!.name,buzzOpen:!!q!.modifier||r.type==='board'&&!q!.dailyDouble,buzzes:[],answeringId:null,attempted:[],revealAt:null,revealed:false,phase:q!.modifier?'modifier':r.type==='final'||q!.dailyDouble?'wager':'question',wagers:{},closed:false};
   if(!q.modifier&&q.responseType!=='free'&&q.shuffleAnswers!==false&&q.answerOptions&&q.answerOptions.length>1){
     const order=q.answerOptions.map((_,i)=>i);
@@ -202,11 +203,12 @@ function syncImageReveal(g:Game,now:number){
     delete c.imageRevealPausedAt;
   }
 }
-function reveal(g:Game,now:number){assert(g.current,'Open a question first');g.current!.buzzOpen=false;g.current!.revealAt=now+g.settings.revealDelayMs;g.current!.revealed=g.settings.revealDelayMs===0;}
+function reveal(g:Game,now:number){assert(g.current,'Open a question first');if(g.presenter){g.presenter.mediaPlaying=false;g.presenter.version++;}g.current!.buzzOpen=false;g.current!.revealAt=now+g.settings.revealDelayMs;g.current!.revealed=g.settings.revealDelayMs===0;}
 function finish(g:Game,now:number){
   assert(g.status!=='finished','This game has already ended');
   if(g.rounds[g.roundIndex].type==='final')assert(g.current?.phase==='final'&&g.current.answersLocked&&g.players.length&&g.players.every(t=>g.current!.wagers[t.id]?.judged),'Lock answers and mark every team Correct or Incorrect before finishing');
-  g.undo=[];g.status='finished';g.paused=false;g.selection=null;
+  if(g.presenter){g.presenter.mediaPlaying=false;g.presenter.version++;}
+  delete g.resultsSkipped;g.undo=[];g.status='finished';g.paused=false;g.selection=null;
   if(g.current){
     g.current.buzzOpen=false;
     if(g.rounds[g.roundIndex].type==='final'&&g.current.phase==='final'){
@@ -222,9 +224,36 @@ export function act(g:Game,action:string,data:Input={},role:'host'|'player'='hos
   assert(role==='host'||['buzz','ready','wager','finalAnswer'].includes(action),'Host access required');
   const self=g.players.find(p=>p.id===playerId);if(role==='player')assert(self,'Join the game first');
   if(action==='reset'){
-    delete g.finalPresentation;delete g.finalCategorySelection;
+    delete g.finalPresentation;delete g.finalCategorySelection;delete g.resultsSkipped;
     Object.assign(g,{status:'lobby',paused:false,roundIndex:0,teamsLocked:false,members:[],players:[],played:[],current:null,modifierClaims:[],history:[],undo:[],questionCount:0,selection:null,announcement:null,revision:g.revision+1});
     return;
+  }
+  if(action==='controlPresenterMedia'){
+    const c=g.current;
+    assert(c&&c.questionId===data.questionId&&['question','final'].includes(c.phase),'This audio clue is no longer active');
+    assert(['start','stop','restart'].includes(data.operation),'Choose Start, Stop or Restart');
+    assert(typeof data.source==='string'&&data.source.length>0&&data.source.length<=4096,'Choose an audio source');
+    assert(data.operation==='stop'||!g.paused,'Resume the game before playing audio');
+    g.presenter??={fullscreen:false,sound:false,mediaPlaying:false,version:0};
+    const p=g.presenter;
+    p.mediaSource=data.source;p.mediaPlaying=data.operation!=='stop';
+    if(p.mediaPlaying)p.sound=true;
+    p.mediaCommandVersion=(p.mediaCommandVersion||0)+1;
+    if(data.operation!=='start')p.mediaResetVersion=(p.mediaResetVersion||0)+1;
+    p.version++;g.revision++;return;
+  }
+  if(action==='setPresenter'){
+    const keys=['fullscreen','sound','mediaPlaying'] as const;
+    assert(keys.some(key=>key in data),'Choose a presenter control');
+    for(const key of keys)if(key in data)assert(typeof data[key]==='boolean','Presenter controls must be on or off');
+    g.presenter??={fullscreen:false,sound:false,mediaPlaying:false,version:0};
+    for(const key of keys)if(key in data)g.presenter[key]=data[key];
+    if('mediaPlaying' in data){g.presenter.mediaCommandVersion=(g.presenter.mediaCommandVersion||0)+1;delete g.presenter.mediaSource;}
+    g.presenter.version++;g.revision++;return;
+  }
+  if(action==='skipResults'){
+    assert(g.status==='finished','Finish the game before skipping its results');
+    g.resultsSkipped=true;g.revision++;return;
   }
   if(action==='ready'){assert(g.status==='lobby','The game has already started');assert(self,'Team not found');self!.ready=!!data.ready;g.revision++;return;}
   if(action==='buzz'&&g.current?.phase==='modifier'){
@@ -273,8 +302,9 @@ export function act(g:Game,action:string,data:Input={},role:'host'|'player'='hos
     assert(g.undo.length,'Nothing to undo');
     const{undoKind:_kind,...state}=g.undo.pop()as Omit<Game,'undo'|'members'>&{undoKind:string};
     // Undo gameplay without restoring departed players or changing a locked roster.
-    const undo=g.undo,members=g.members,teamsLocked=g.teamsLocked,teams=g.players,paused=g.paused;
+    const undo=g.undo,members=g.members,teamsLocked=g.teamsLocked,teams=g.players,paused=g.paused,presenter=g.presenter;
     Object.assign(g,state,{undo,revision:g.revision+1,members,teamsLocked,paused});
+    if(presenter)g.presenter=presenter;else delete g.presenter;
     if(teamsLocked)g.players=teams.map(team=>({...team,...g.players.find(saved=>saved.id===team.id),name:team.name,color:team.color,token:team.token}));
     for(const team of g.players)team.connected=members.some(m=>m.teamId===team.id&&m.connected);
     normalizeStoredGameplay(g);delete(g as Input).chooserId;if(g.current)delete(g.current as Input).selectionPlayerId;
