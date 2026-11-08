@@ -63,6 +63,44 @@ async function waitState(client:{s:Socket;state:()=>GameView},predicate:(v:GameV
   client.s.on('state',changed);
  });
 }
+test('a buzzer race broadcasts the winner once; rejected early-buzz penalties still synchronize',async()=>{
+ const dir=mkdtempSync(join(tmpdir(),'dibs-buzz-traffic-'));
+ const server=await startServer({port:0,dataDir:dir,dev:false,quiet:true}),sockets:Socket[]=[];
+ try{
+  const base=`http://127.0.0.1:${(server.server.address()as{port:number}).port}`;
+  const post=async(path:string,data:unknown)=>(await fixtureRequest(server,base,path,data)).json();
+  const created=await post('/api/games',{definition:{rounds:demoRounds()}});
+  const members:{token:string;playerId:string}[]=[];
+  for(let i=0;i<6;i++)members.push(await post(`/api/games/${created.id}/join`,{name:`Team ${i}`}));
+  const connect=async(role:string,token?:string)=>{
+   const s=io(base,{autoConnect:false,transports:['websocket']});sockets.push(s);
+   let latest:GameView;s.on('state',state=>latest=state);s.connect();await once(s,'connect');
+   assert((await emit(s,'subscribe',{gameId:created.id,role,token})).ok);
+   return{s,state:()=>latest!};
+  };
+  const host=await connect('host'),phones=[];
+  for(const member of members)phones.push(await connect('player',member.token));
+  const command=(s:Socket,action:string,data?:unknown)=>emit(s,'command',{action,data});
+  markTeamsReady(server.games.get(created.id)!);await command(host.s,'start');
+  assert((await command(host.s,'openQuestion',{questionId:server.games.get(created.id)!.rounds[0].categories[0].questions[0].id})).ok);
+  await Promise.all(phones.map(phone=>waitState(phone,state=>!!state.current?.buzzOpen)));
+  const updates=new Map(sockets.map(s=>[s.id!,0]));
+  for(const s of sockets)s.on('state',()=>updates.set(s.id!,updates.get(s.id!)!+1));
+  const results=await Promise.all(phones.map(phone=>command(phone.s,'buzz')));
+  assert.equal(results.filter(result=>result.ok).length,1);
+  await Promise.all([host,...phones].map(phone=>waitState(phone,state=>!!state.current?.answeringId)));
+  for(const count of updates.values())assert.equal(count,1,'losing buzzes must not rebroadcast unchanged state');
+  const winner=host.state().current?.answeringId;
+  assert(phones.every(phone=>phone.state().current?.answeringId===winner));
+
+  await command(host.s,'resetBuzzers');await command(host.s,'closeBuzzers');
+  await Promise.all(phones.map(phone=>waitState(phone,state=>state.current?.buzzOpen===false&&!state.current.answeringId)));
+  const early=phones[0];
+  assert.equal((await command(early.s,'buzz')).ok,false);
+  await waitState(host,state=>state.players.find(p=>p.id===members[0].playerId)!.blockedUntil>0);
+  await waitState(early,state=>state.players.find(p=>p.id===members[0].playerId)!.blockedUntil>0);
+ }finally{sockets.forEach(s=>s.disconnect());await server.close();rmSync(dir,{recursive:true,force:true});}
+});
 for(const buzzMode of ['queue','first']as const)test(`group phones share one score and wrong-answer lockout in ${buzzMode} mode, including after restart`,async()=>{
  const dir=mkdtempSync(join(tmpdir(),'dibs-groups-'));let server=await startServer({port:0,dataDir:dir,dev:false,quiet:true});const sockets:Socket[]=[];
  try{

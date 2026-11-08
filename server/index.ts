@@ -129,8 +129,10 @@ export async function startServer(options:{port?:number;dataDir?:string;dev?:boo
       }catch(e){ack?.({ok:false,error:(e as Error).message});}
     });
     s.on('command',(input:{action:string;data?:Record<string,unknown>},ack:(v:unknown)=>void)=>{
+      let revision:number|undefined;
       try{
         const g=game(s.data.gameId||'');
+        revision=g.revision;
         if(!['host','player'].includes(s.data.role))throw new Error('Join as a host or player');
         if(input.action==='save')requireEditor(g,s.id);
         else if(s.data.role==='host'&&hostLocks.get(g.id)!==s.id)throw new Error('Open the host screen to control this game.');
@@ -141,7 +143,13 @@ export async function startServer(options:{port?:number;dataDir?:string;dev?:boo
           removeMember(g,s.data.memberId);
         }else act(g,input.action,input.data||{},s.data.role,s.data.playerId||null);
         publish(g,input.action==='reset'?'The host reset this game. Join again to play.':input.action==='leaveGame'?'You left the game. Join a team to play again.':undefined);ack?.({ok:true});
-      }catch(e){const g=games.get(s.data.gameId);if(g)publish(g);ack?.({ok:false,error:(e as Error).message});}
+      }catch(e){
+        const g=games.get(s.data.gameId);
+        // Losing buzzes do not change state. Rebroadcasting for every loser
+        // floods phones during a race; early-buzz penalties still need publishing.
+        if(g&&(input.action!=='buzz'||g.revision!==revision))publish(g);
+        ack?.({ok:false,error:(e as Error).message});
+      }
     });
     s.on('disconnect',()=>{
       const g=games.get(s.data.gameId);if(!g)return;

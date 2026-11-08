@@ -7,6 +7,7 @@ import {themes,defaultTheme,defaultSettings,emptyRound,roundName} from '../share
 import {api,download,go,number,playerKey,sortedPlayers,themeStyle,useGame,useGames,useNow,useToast} from './lib';
 import {flushAutosaves} from './autosave';
 import {useSoundCues} from './useSoundCues';
+import {createBuzzerInput,sendBuzz} from './buzzer';
 import {HostDailyDouble} from './DailyDouble';
 import {FinalWagers} from './FinalWagers';
 import {FinalResults} from './FinalResults';
@@ -236,6 +237,7 @@ function JoinGame({id,joined}:{id:string;joined:()=>void}){
 }
 function PlayerGame({id,rejoin}:{id:string;rejoin:()=>void}){
   const{g,connected,error,deleted,command}=useGame(id,'player');
+  const buzzerInput=useRef(createBuzzerInput()).current;
   const[leaving,setLeaving]=useState(false);
   const now=useNow(),self=g?.players.find(p=>p.id===g.selfId),c=g?.current;
   const lobby=g?.status==='lobby',selected=!!self&&c?.phase==='question'&&!g?.currentQuestion?.dailyDouble&&!c.closed&&!c.revealAt&&c.answeringId===self.id;
@@ -244,7 +246,7 @@ function PlayerGame({id,rejoin}:{id:string;rejoin:()=>void}){
   const press=()=>{
     if(!g||!self||!connected)return;
     if(lobby){void command('ready',{ready:!self.ready});return;}
-    if(canBuzz){navigator.vibrate?.(25);void command('buzz');}
+    if(canBuzz)sendBuzz(command);
   };
   useEffect(()=>{
     const key=(e:KeyboardEvent)=>{if(e.code==='Space'&&!e.repeat&&!(e.target as HTMLElement).closest('input,textarea,select,button,a,summary,[contenteditable="true"]')){e.preventDefault();press();}};
@@ -261,7 +263,7 @@ function PlayerGame({id,rejoin}:{id:string;rejoin:()=>void}){
     <main className="player-main">
       <p className="player-team-identity">{member?.name} · <strong>{self.name}</strong></p>
       {g.status==='finished'?(g.rounds[g.roundIndex].type==='final'?<FinalResults g={g}/>:<Scores g={g}/>):<div className="my-score"><strong>{number(self.score)}</strong><span>points</span></div>}
-      {g.status==='finished'?null:g.status==='playing'&&g.rounds[g.roundIndex].type==='final'&&!c?<FinalCategories g={g}/>:g.status==='playing'&&g.rounds[g.roundIndex].type==='final'&&c?<FinalSubmission key={`${c.questionId}:${c.phase}`} g={g} connected={connected} command={command}/>:<div className="buzz-area"><button aria-label={lobby?(self.ready?'Mark team not ready':'Mark team ready'):'Buzz in'} aria-pressed={lobby?self.ready:undefined} className={`buzz-button ${selected||lobby&&self.ready?'has-floor':''}`} disabled={!connected||!lobby&&!canBuzz} onPointerDown={e=>{if(connected&&(lobby||canBuzz)){e.preventDefault();press();}}} onClick={e=>{if(e.detail===0)press();}}><Hand strokeWidth={1.2}/><span>{label}</span></button></div>}
+      {g.status==='finished'?null:g.status==='playing'&&g.rounds[g.roundIndex].type==='final'&&!c?<FinalCategories g={g}/>:g.status==='playing'&&g.rounds[g.roundIndex].type==='final'&&c?<FinalSubmission key={`${c.questionId}:${c.phase}`} g={g} connected={connected} command={command}/>:<div className="buzz-area"><button aria-label={lobby?(self.ready?'Mark team not ready':'Mark team ready'):'Buzz in'} aria-pressed={lobby?self.ready:undefined} className={`buzz-button ${selected||lobby&&self.ready?'has-floor':''}`} disabled={!connected||!lobby&&!canBuzz} onPointerDown={e=>{buzzerInput.cancel();if(e.button===0&&connected&&(lobby||canBuzz)){e.preventDefault();buzzerInput.pointerDown(press);}}} onPointerCancel={()=>buzzerInput.cancel()} onClick={e=>buzzerInput.click(e.detail,press)}><Hand strokeWidth={1.2}/><span>{label}</span></button></div>}
     </main>
   </div>;
 }
