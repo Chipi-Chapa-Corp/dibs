@@ -17,7 +17,8 @@ export async function startServer(options:{port?:number;dataDir?:string;dev?:boo
   const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
   const dataDir=options.dataDir||process.env.DATA_DIR||path.join(root,'data');fs.mkdirSync(dataDir,{recursive:true});
   const mediaDir=options.mediaDir||path.join(root,'public/media');fs.mkdirSync(mediaDir,{recursive:true});
-  const storage=openGameStore(dataDir,undefined,path.resolve(dataDir)===path.join(root,'data')?path.join(root,'examples/test-game.json'):undefined),games=storage.games;
+  const seedFiles=path.resolve(dataDir)===path.join(root,'data')?['test-game.json','eto-moya-igra.json'].map(file=>path.join(root,'examples',file)):[];
+  const storage=openGameStore(dataDir,undefined,seedFiles),games=storage.games;
   const dirty=new Set<string>();
   const network=localNetwork(),rates=new RateLimits();
   const caps={maxGames:100,mediaBytes:1024**3,fileBytes:100*1024**2,...options.limits};

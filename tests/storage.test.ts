@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import {mkdtempSync,mkdirSync,readFileSync,readdirSync,writeFileSync,rmSync,existsSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
+import {fileURLToPath} from 'node:url';
 import {openGameStore} from '../server/storage.ts';
 import {createGame,addPlayer,act,tick,view} from '../server/engine.ts';
 import {demoRounds} from '../shared/model.ts';
@@ -112,10 +113,31 @@ test('the bundled sample is seeded only when the game directory is first created
  const f=fixture();
  try{
   rmSync(f.directory,{recursive:true});
-  const seed=join(f.dir,'sample-source.json');write(seed,{format:'jeopardy/1',name:'Bundled sample',rounds:demoRounds()});
-  const store=openGameStore(f.dir,undefined,seed);assert.equal(store.games.size,1);assert.equal(read(join(f.directory,'test-game.json')).name,'Bundled sample');
+  const seed=join(f.dir,'test-game.json');write(seed,{format:'jeopardy/1',name:'Bundled sample',rounds:demoRounds()});
+  const store=openGameStore(f.dir,undefined,[seed]);assert.equal(store.games.size,1);assert.equal(read(join(f.directory,'test-game.json')).name,'Bundled sample');
   rmSync(join(f.directory,'test-game.json'));
-  assert.equal(openGameStore(f.dir,undefined,seed).games.size,0);assert(!existsSync(join(f.directory,'test-game.json')));
+  assert.equal(openGameStore(f.dir,undefined,[seed]).games.size,0);assert(!existsSync(join(f.directory,'test-game.json')));
+ }finally{f.remove();}
+});
+
+test('both bundled games load on first run and later starts preserve edits and deletions',()=>{
+ const f=fixture();
+ try{
+  rmSync(f.directory,{recursive:true});
+  const seeds=['test-game.json','eto-moya-igra.json'].map(file=>fileURLToPath(new URL(`../examples/${file}`,import.meta.url)));
+  const store=openGameStore(f.dir,undefined,seeds);
+  assert.equal(store.games.size,2);
+  const game=[...store.games.values()].find(g=>g.name==='Это моя игра')!;
+  assert(game);assert.equal(game.status,'lobby');assert.equal(game.rounds.length,4);assert.equal(game.players.length,0);
+  const mediaPaths=[...new Set(JSON.stringify(game).match(/\/played-games\/eto-moya-igra\/[a-zA-Z0-9._-]+/g)||[])];
+  assert.equal(mediaPaths.length,75);
+  for(const path of mediaPaths)assert(existsSync(new URL(`../public${path}`,import.meta.url)),`Missing bundled media: ${path}`);
+  game.name='Edited bundled game';store.save(game);
+  const sample=[...store.games.values()].find(g=>g.id!==game.id)!;store.remove(sample.id);
+  const restored=openGameStore(f.dir,undefined,seeds);
+  assert.equal(restored.games.size,1);assert.equal(restored.games.get(game.id)?.name,'Edited bundled game');
+  assert(!existsSync(join(f.directory,'test-game.json')));
+  assert(existsSync(join(f.directory,'eto-moya-igra.json')));
  }finally{f.remove();}
 });
 
@@ -148,10 +170,10 @@ test('deleting a game removes only its JSON file and it stays gone after reopeni
 test('deleting a named, directory-loaded sample removes the original file and does not seed it again',()=>{
  const f=fixture();
  try{
-  rmSync(f.directory,{recursive:true});const seed=join(f.dir,'seed.json');write(seed,{format:'jeopardy/1',name:'Sample',rounds:demoRounds()});
-  const store=openGameStore(f.dir,undefined,seed),game=[...store.games.values()][0];
+  rmSync(f.directory,{recursive:true});const seed=join(f.dir,'test-game.json');write(seed,{format:'jeopardy/1',name:'Sample',rounds:demoRounds()});
+  const store=openGameStore(f.dir,undefined,[seed]),game=[...store.games.values()][0];
   assert(existsSync(join(f.directory,'test-game.json')));store.remove(game.id);
-  assert(!existsSync(join(f.directory,'test-game.json')));assert.equal(store.games.size,0);assert.equal(openGameStore(f.dir,undefined,seed).games.size,0);
+  assert(!existsSync(join(f.directory,'test-game.json')));assert.equal(store.games.size,0);assert.equal(openGameStore(f.dir,undefined,[seed]).games.size,0);
  }finally{f.remove();}
 });
 test('deleting a migrated game prevents an unfinished legacy migration from restoring it',()=>{

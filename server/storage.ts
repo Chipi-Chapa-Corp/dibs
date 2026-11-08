@@ -41,11 +41,11 @@ function restore(value:unknown):Game{
 }
 
 /** A file contains either an importable definition or a complete, private saved game. */
-export function openGameStore(dataDir:string,warn:(message:string)=>void=console.warn,seedFile?:string){
+export function openGameStore(dataDir:string,warn:(message:string)=>void=console.warn,seedFiles:string[]=[]){
   const directory=path.join(dataDir,'games');
   const firstRun=!fs.existsSync(directory);
   fs.mkdirSync(directory,{recursive:true});
-  if(firstRun&&seedFile&&fs.existsSync(seedFile))fs.copyFileSync(seedFile,path.join(directory,'test-game.json'));
+  if(firstRun)for(const seedFile of seedFiles)if(fs.existsSync(seedFile))fs.copyFileSync(seedFile,path.join(directory,path.basename(seedFile)));
   const games=new Map<string,Game>(),files=new Map<string,string>();
   const save=(game:Game)=>{
     if(!validId(game.id))throw new Error('Invalid game ID');

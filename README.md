@@ -20,6 +20,8 @@ Use `npm run play` for game nights. Use `npm run dev` during development for hot
 
 Open [localhost:43187](http://localhost:43187). Players open the LAN address printed in the terminal on the same Wi-Fi, choose their game from the list and tap **Join**. The host creates teams before starting. Players enter their own name and select one of these teams; they cannot create teams. Each player can use their own phone as a buzzer; teammates share their score, readiness, wagers and buzz lockouts. Invite links and QR codes open this game list; room codes are never shown. Open **Presenter** on your second screen. During play, phones show only scores and the circular buzzer. Teams speak their choices and answers to the presenter, who records them on the host screen.
 
+On the first startup, the library includes the small test game and **Это моя игра**, with their media bundled in Git. See [Bundled games](#bundled-games) if you already have local game data or use a custom `DATA_DIR`.
+
 ## Local network security
 
 The server accepts HTTP and Socket.IO connections from loopback and the subnet of one selected private IPv4 LAN interface. It prefers `en0`, otherwise the first physical private IPv4 interface, excluding common VPN/container interfaces. Set `LAN_INTERFACE=en0` (or your interface name) to select one explicitly. Without a private LAN interface, only loopback is allowed. Restart after switching networks. IPv6 connections are disabled. Forwarded-IP headers are ignored; this configuration is intended for direct LAN access, not a reverse proxy or public tunnel.
@@ -120,13 +122,19 @@ Saved game files contain individual player tokens, team scores and current progr
 
 The old combined `data/games.json` is migrated automatically. Existing per-game files take precedence, and the original combined file is kept as `data/games.json.migrated` after a successful migration. Invalid game files are reported and skipped so other games can still load.
 
-## Sample test game
+## Bundled games
+
+On the first startup with the default data directory, both `examples/test-game.json` and `examples/eto-moya-igra.json` are copied into `data/games/` and appear in the library as fresh, unplayed games. This happens only when the game directory is first created; later starts preserve edits and deletions. Custom `DATA_DIR` directories are not seeded.
+
+If your game directory already exists, import [Это моя игра](examples/eto-moya-igra.json) through **Create game → Import JSON**. You can also stop the server, copy the definition into `data/games/` under an unused filename, and restart it. Local sessions in `data/` stay excluded from Git; the reusable definitions and bundled media are tracked.
+
+### Sample test game
 
 On the first startup with the default data directory, the bundled sample is copied to `data/games/test-game.json` and loads with the other games. Removing that file later does not recreate it. It has two small boards and a final, with pictures, hidden modifiers and Daily Doubles. A portable definition remains in [examples/test-game.json](examples/test-game.json) for creating another copy through **Create game → Import JSON**. The photos are bundled in `public/test-board/`, so the sample works offline. See the [host guide](examples/test-game.md) for the answer map and a suggested playthrough.
 
-## Played game: Это моя игра
+### Played game: Это моя игра
 
-The completed Russian-language game is available as [examples/eto-moya-igra.json](examples/eto-moya-igra.json), with its images and audio bundled in `public/played-games/eto-moya-igra/`. Import it through **Create game → Import JSON** to play a fresh copy. See the [game guide](examples/eto-moya-igra.md) for details. Reports, sources and preparation assets are published in [research/](research/README.md). Local saved sessions remain excluded from Git.
+The Russian-language game is available as [examples/eto-moya-igra.json](examples/eto-moya-igra.json), with its images and audio bundled in `public/played-games/eto-moya-igra/`. It appears automatically on first startup, or you can import it through **Create game → Import JSON** to play another fresh copy. See the [game guide](examples/eto-moya-igra.md) for details. Reports, sources and preparation assets are published in [research/](research/README.md).
 
 ## Commands
 
