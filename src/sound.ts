@@ -44,7 +44,7 @@ export class GameSounds {
       // Wait only for that gesture's resume; cancelled or expired selections stay silent.
       if(this.context?.state!=='running'&&this.resuming)void this.resuming.then(play);
       else play();
-    }else if(announcementChanged&&g.theme.sound&&g.announcement&&now-g.announcement.at<3500){
+    }else if(announcementChanged&&g.announcement&&now-g.announcement.at<3500){
       this.tone(520,0,.35,.06);
     }
   }

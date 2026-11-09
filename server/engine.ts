@@ -1,4 +1,5 @@
 import {randomBytes} from 'node:crypto';
+import {pruneThemeOverrides} from '../shared/appearance';
 import {defaultSettings,defaultTheme,emptyRound,uid,themes,isQuestionFilled,QUESTION_SELECTION_MS,orderRounds,numberRounds,hasCorrectResult,finalWagerLimit} from '../shared/model.ts';
 import type {Game,GameView,Player,Question,Settings,Theme,Round,TeamMember} from '../shared/model.ts';
 
@@ -95,7 +96,7 @@ function normalizeTheme(data:Input,old=defaultTheme):Theme {
 function normalizeRounds(data:unknown):Round[]{
   assert(Array.isArray(data)&&data.length>0&&data.length<=20,'Use 1–20 rounds');const ids=new Set<string>();
   const id=(s:unknown)=>{let n=text(s,60)||uid();if(ids.has(n))n=uid();ids.add(n);return n;};
-  const rounds:Round[]=(data as Input[]).map((r,i)=>{assert(Array.isArray(r.categories)&&r.categories.length<=(r.type==='final'?20:10),r.type==='final'?'Use up to 20 final categories':'Use up to 10 categories');return{id:id(r.id),name:text(r.name,60)||`Round ${i+1}`,type:r.type==='final'?'final':'board',categories:r.categories.map((c:Input)=>{assert(Array.isArray(c.questions)&&c.questions.length<=(r.type==='final'?1:12),r.type==='final'?'Each final category must contain one question':'Use up to 12 questions per category');return{id:id(c.id),name:text(c.name,60)||'Category',questions:c.questions.map((q:Input)=>{
+  const rounds:Round[]=(data as Input[]).map((r,i)=>{assert(Array.isArray(r.categories)&&r.categories.length<=(r.type==='final'?20:10),r.type==='final'?'Use up to 20 final categories':'Use up to 10 categories');return{id:id(r.id),name:text(r.name,60)||`Round ${i+1}`,type:r.type==='final'?'final':'board',...(r.theme?{theme:r.theme}:{}),categories:r.categories.map((c:Input)=>{assert(Array.isArray(c.questions)&&c.questions.length<=(r.type==='final'?1:12),r.type==='final'?'Each final category must contain one question':'Use up to 12 questions per category');return{id:id(c.id),name:text(c.name,60)||'Category',questions:c.questions.map((q:Input)=>{
     const question:Question={id:id(q.id),value:Math.round(finite(q.value,100,0,1e7)),prompt:text(q.prompt,100000),answer:text(q.answer,100000),notes:text(q.notes,20000),dailyDouble:!!q.dailyDouble&&!q.modifier&&r.type!=='final',modifier:r.type==='final'||!q.modifier?null:{title:text(q.modifier.title,80)||'Mystery modifier',instructions:text(q.modifier.instructions,20000)}};
     if(r.type==='final')question.responseType='free';
     else if(q.responseType!==undefined)question.responseType=q.responseType==='free'?'free':'answer';
@@ -114,8 +115,12 @@ function normalizeRounds(data:unknown):Round[]{
 }
 export function updateDefinition(g:Game,data:Input){
   // Normalize everything first: malformed imports must not partially mutate a game.
-  const rounds=data.rounds?normalizeRounds(data.rounds):g.rounds;
+  const incomingRounds=data.rounds?normalizeRounds(data.rounds):g.rounds;
   const settings=data.settings?normalizeSettings(data.settings,g.settings):g.settings,theme=data.theme?normalizeTheme(data.theme,g.theme):g.theme;
+  const rounds=incomingRounds.map(({theme:overrides,...round})=>{
+    const own=pruneThemeOverrides(theme,overrides);
+    return Object.keys(own).length?{...round,theme:own}:round;
+  });
   if(g.current)assert(rounds.some(r=>r.categories.some(c=>c.questions.some(q=>q.id===g.current?.questionId))),'Close the current question before deleting it');
   if(g.current){
     const nextQuestion=rounds.flatMap(r=>r.categories.flatMap(c=>c.questions)).find(q=>q.id===g.current!.questionId)!;

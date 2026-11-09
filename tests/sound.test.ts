@@ -47,15 +47,15 @@ test('muted, paused, expired and initial snapshots do not replay selections',()=
   assert.equal(notes.length,0);
 });
 
-test('selection chimes work independently of announcement preferences; announcements retain their toggle',()=>{
+test('selection and announcement cues both follow the host mute, including legacy appearance flags',()=>{
   const{sound,g,notes}=fixture();sound.unlock();sound.update(g,true,1000);
+  g.theme.sound=false;
   g.selection={questionId:'daily-double',opensAt:1800};sound.update(g,true,1000);
   assert.equal(notes.length,2);
-  g.selection=null;g.announcement={id:'quiet',at:1800,title:'Claimed',detail:''};sound.update(g,true,1800);
-  assert.equal(notes.length,2);
-  g.theme.sound=true;sound.update(g,true,1800);assert.equal(notes.length,2);
-  g.announcement={...g.announcement,id:'new',at:2000};sound.update(g,true,2000);
+  g.selection=null;g.announcement={id:'new',at:1800,title:'Claimed',detail:''};sound.update(g,true,1800);
   assert.equal(notes.length,3);assert.equal(notes[2].frequency,520);
+  g.announcement={...g.announcement,id:'muted',at:2000};sound.update(g,false,2000);
+  sound.update(g,true,2100);assert.equal(notes.length,3);
 });
 
 test('blocked or unavailable audio never queues a late cue or breaks play',()=>{

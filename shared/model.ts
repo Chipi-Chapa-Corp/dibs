@@ -2,9 +2,11 @@ export interface HiddenModifier { title: string; instructions: string }
 export interface ModifierClaim extends HiddenModifier { id: string; questionId: string; playerId: string; roundIndex: number }
 export interface Question { modifier?: HiddenModifier|null; id: string; value: number; prompt: string; answer: string; responseType?: 'answer'|'free'; answerOptions?: string[]; correctAnswerIndex?: number; shuffleAnswers?: boolean; slowReveal?: boolean; notes: string; dailyDouble: boolean }
 export interface Category { id: string; name: string; questions: Question[] }
-export interface Round { id: string; name: string; type: 'board'|'final'; categories: Category[] }
+export interface Round { id: string; name: string; type: 'board'|'final'; categories: Category[]; theme?:ThemeOverrides }
 export const orderRounds=(rounds:Round[]):Round[]=>[...rounds.filter(r=>r.type!=='final'),...rounds.filter(r=>r.type==='final')];
 export interface Theme { preset: 'paper'|'ink'|'clay'|'forest'; accent: string; paper: string; ink: string; surface: string; muted: string; line: string; displayFont: 'serif'|'sans'; background: string; motion: boolean; sound: boolean; title: string }
+export type AppearanceKey=Exclude<keyof Theme,'motion'|'sound'|'title'>;
+export type ThemeOverrides=Partial<Pick<Theme,AppearanceKey>>;
 export interface Settings { buzzMode: 'first'|'queue'; autoOpenBuzzers: boolean; earlyPenaltyMs: number; deductWrong: boolean; wrongMultiplier: number; correctMultiplier: number; allowNegative: boolean; reopenWrong: boolean; lockWrong: boolean; revealDelayMs: number; showLeaderboardOnStage: boolean; startingScore: number; finalMaxWager: 'score'|'unlimited'; }
 export const FINAL_WAGER_ALLOWANCE=1500;
 export const finalWagerLimit=(score:number,mode:Settings['finalMaxWager'])=>mode==='unlimited'?1e7:Math.max(FINAL_WAGER_ALLOWANCE,score);

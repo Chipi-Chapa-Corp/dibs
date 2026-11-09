@@ -56,6 +56,10 @@ When your board is ready, choose **Host**, use **Add team** to create the teams,
 
 After a game starts, its definition is locked, including in editor tabs left open elsewhere. Choose **Copy & edit** in the library to prepare a fresh version while keeping the current game's teams, scores and results. A reset returns the original to the lobby and allows preparation again.
 
+In **Edit → Appearance**, **Shared** sets the base palette, display type and background. Each round has its own tab and inherits Shared until a value is changed. The revert icon beside a changed setting restores inheritance; a dot marks round tabs with overrides. Overrides stay attached to their rounds when reordered and survive export/import. The presenter uses the game name; animations run automatically, while the host controls sound.
+
+Appearance shows a gallery of the real presenter states for the selected scope, including clues, answers, special questions, pause, final and results. Each preview renders the production presenter at 1280 × 720 with the game's content; example teams are marked when teams have not been created. Use the expand icon to inspect a view at a larger size.
+
 Round names are automatic: **Round 1**, **Round 2**, **Round 3**, and so on. Moving, duplicating or removing rounds updates their numbers. Imported and saved games use the same numbering.
 
 Each category has its own **+ Question** button and can contain a different number of questions. New categories start empty. Default values increase by 100 in round one, 200 in round two, 300 in round three, and so on, continuing after the highest value in that category. Existing values remain editable. **Delete question** in the question popup removes only that question.
@@ -74,7 +78,7 @@ In the question popup, **Daily double** uses the same checkbox control as **Show
 
 Question prompts, answers and notes store media as Markdown/HTML URLs, for example `![Photo](/media/example.jpg)` and `[Audio](/media/example.mp3)`. Uploaded files live under `public/media/`; bundled sample pictures use `/test-board/...` and live under `public/test-board/`. External HTTP(S) URLs remain external. A background image URL is stored separately as `theme.background`.
 
-Game JSON contains these references, not the media bytes. Moving a game to another server requires copying uploaded files while preserving their paths. Built-in selection and announcement sounds are synthesized with Web Audio; they have no media-file reference. `theme.sound` controls announcement sounds. The host’s presenter sound setting controls display audio and is saved with the game.
+Game JSON contains these references, not the media bytes. Moving a game to another server requires copying uploaded files while preserving their paths. Built-in selection and announcement sounds are synthesized with Web Audio; they have no media-file reference. The host’s presenter sound setting controls selection, announcement and media audio and is saved with the game. Legacy appearance sound and animation switches no longer control playback or motion.
 
 ## Daily Double: give it to another team
 

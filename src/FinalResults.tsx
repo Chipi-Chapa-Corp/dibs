@@ -6,7 +6,7 @@ import {number,useNow} from './lib';
 import {RichText} from './components';
 import {FINAL_ANSWER_MS,RESULTS_COUNTDOWN_MS,resultGroups,resultRevealAt,resultStep} from './final-results';
 
-export function FinalResults({g,preview=false}:{g:GameView;preview?:boolean}){
+export function FinalResults({g,previewTime}:{g:GameView;previewTime?:number}){
   const now=useNow(),[clockOffset]=useState(()=>g.serverTime-Date.now());
   const[reduced,setReduced]=useState(()=>matchMedia('(prefers-reduced-motion: reduce)').matches);
   useEffect(()=>{
@@ -15,7 +15,7 @@ export function FinalResults({g,preview=false}:{g:GameView;preview?:boolean}){
   },[]);
   const groups=resultGroups(g.players),finishedAt=g.history.find(entry=>entry.label==='Game finished')?.at;
   // Use the server's finish time so every display stays in sync, including after a refresh.
-  const elapsed=g.resultsSkipped||reduced||!g.theme.motion||preview||!finishedAt?Infinity:Math.max(0,now+clockOffset-finishedAt);
+  const elapsed=g.resultsSkipped||reduced||!finishedAt?Infinity:Math.max(0,(previewTime??now+clockOffset)-finishedAt);
   const finalAnswer=g.rounds[g.roundIndex].type==='final'?g.currentQuestion?.answer:undefined;
   const resultsElapsed=elapsed-(finalAnswer?FINAL_ANSWER_MS:0),showAnswer=resultsElapsed<0;
   const step=resultStep(resultsElapsed,groups.length),active=groups[step],winner=!!active&&step===groups.length-1;
